@@ -1,0 +1,20 @@
+---
+title: Bashkit
+author: Erik Adelbert ea@wuage.org
+rights:  Creative Commons Attribution 4.0 International
+language: en-US
+tags: [bashkit]
+abstract: |
+  Wuage bashkit is a bash script programming model along with
+  a development library for bash 5.x.
+  Bashkit scripts are robusts - thanks to an advanced yet easy
+  to use error handling framework. They look a lot like regular
+  bash scripts with some error handling idioms added her and
+  there.
+  Many of the various modules are crafted with state-of-the-art
+  techniques.
+# mainfont: DejaVu Sans
+# Filter preferences:
+# - pandoc-crossref
+linkReferences: true
+---

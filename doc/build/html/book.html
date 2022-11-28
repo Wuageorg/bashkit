@@ -1,0 +1,4073 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Erik Adelbert ea@wuage.org" />
+  <title>Bashkit</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    div.abstract {
+      margin: 2em 2em 2em 2em;
+      text-align: left;
+      font-size: 85%;
+    }
+    div.abstract-title {
+      font-weight: bold;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.5em;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /*
+     * Custom CSS file. Override it as you like.
+     *
+     * Credits to @killercup (https://gist.github.com/killercup); Extracted from this Gist:
+     *   https://gist.github.com/killercup/5917178
+     */
+
+    html {
+        font-size: 100%;
+        overflow-y: scroll;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+    }
+
+    body {
+        color: #444;
+        font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
+        font-size: 12px;
+        line-height: 1.7;
+        padding: 1em;
+        margin: auto;
+        max-width: 42em;
+        background: #fefefe;
+    }
+
+    a {
+        color: #0645ad;
+        text-decoration: none;
+    }
+
+    a:visited {
+        color: #0b0080;
+    }
+
+    a:hover {
+        color: #06e;
+    }
+
+    a:active {
+        color: #faa700;
+    }
+
+    a:focus {
+        outline: thin dotted;
+    }
+
+    *::-moz-selection {
+        background: rgba(255, 255, 0, 0.3);
+        color: #000;
+    }
+
+    *::selection {
+        background: rgba(255, 255, 0, 0.3);
+        color: #000;
+    }
+
+    a::-moz-selection {
+        background: rgba(255, 255, 0, 0.3);
+        color: #0645ad;
+    }
+
+    a::selection {
+        background: rgba(255, 255, 0, 0.3);
+        color: #0645ad;
+    }
+
+    p {
+        margin: 1em 0;
+    }
+
+    img {
+        max-width: 100%;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: #111;
+        line-height: 125%;
+        margin-top: 2em;
+        font-weight: normal;
+    }
+
+    h4,
+    h5,
+    h6 {
+        font-weight: bold;
+    }
+
+    h1 {
+        font-size: 2.5em;
+    }
+
+    h2 {
+        font-size: 2em;
+    }
+
+    h3 {
+        font-size: 1.5em;
+    }
+
+    h4 {
+        font-size: 1.2em;
+    }
+
+    h5 {
+        font-size: 1em;
+    }
+
+    h6 {
+        font-size: 0.9em;
+    }
+
+    blockquote {
+        color: #666666;
+        margin: 0;
+        padding-left: 3em;
+        border-left: 0.5em #EEE solid;
+    }
+
+    hr {
+        display: block;
+        height: 2px;
+        border: 0;
+        border-top: 1px solid #aaa;
+        border-bottom: 1px solid #eee;
+        margin: 1em 0;
+        padding: 0;
+    }
+
+    pre,
+    code,
+    kbd,
+    samp {
+        color: #000;
+        font-family: monospace, monospace;
+        _font-family: 'courier new', monospace;
+        font-size: 0.98em;
+    }
+
+    pre {
+        white-space: pre;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    b,
+    strong {
+        font-weight: bold;
+    }
+
+    dfn {
+        font-style: italic;
+    }
+
+    ins {
+        background: #ff9;
+        color: #000;
+        text-decoration: none;
+    }
+
+    mark {
+        background: #ff0;
+        color: #000;
+        font-style: italic;
+        font-weight: bold;
+    }
+
+    sub,
+    sup {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
+    }
+
+    sup {
+        top: -0.5em;
+    }
+
+    sub {
+        bottom: -0.25em;
+    }
+
+    ul,
+    ol {
+        margin: 1em 0;
+        padding: 0 0 0 2em;
+    }
+
+    li p:last-child {
+        margin-bottom: 0;
+    }
+
+    ul ul,
+    ol ol {
+        margin: .3em 0;
+    }
+
+    dl {
+        margin-bottom: 1em;
+    }
+
+    dt {
+        font-weight: bold;
+        margin-bottom: .8em;
+    }
+
+    dd {
+        margin: 0 0 .8em 2em;
+    }
+
+    dd:last-child {
+        margin-bottom: 0;
+    }
+
+    img {
+        border: 0;
+        -ms-interpolation-mode: bicubic;
+        vertical-align: middle;
+    }
+
+    figure {
+        display: block;
+        text-align: center;
+        margin: 1em 0;
+    }
+
+    figure img {
+        border: none;
+        margin: 0 auto;
+    }
+
+    figcaption {
+        font-size: 0.8em;
+        font-style: italic;
+        margin: 0 0 .8em;
+    }
+
+    table {
+        margin-bottom: 2em;
+        border-bottom: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-spacing: 0;
+        border-collapse: collapse;
+    }
+
+    table th {
+        padding: .2em 1em;
+        background-color: #eee;
+        border-top: 1px solid #ddd;
+        border-left: 1px solid #ddd;
+    }
+
+    table td {
+        padding: .2em 1em;
+        border-top: 1px solid #ddd;
+        border-left: 1px solid #ddd;
+        vertical-align: top;
+    }
+
+    .author {
+        font-size: 1.2em;
+        text-align: center;
+    }
+
+    @media only screen and (min-width: 480px) {
+        body {
+            font-size: 14px;
+        }
+    }
+
+    @media only screen and (min-width: 768px) {
+        body {
+            font-size: 16px;
+        }
+    }
+
+    @media print {
+        * {
+            background: transparent !important;
+            color: black !important;
+            filter: none !important;
+            -ms-filter: none !important;
+        }
+        body {
+            font-size: 12pt;
+            max-width: 100%;
+        }
+        a,
+        a:visited {
+            text-decoration: underline;
+        }
+        hr {
+            height: 1px;
+            border: 0;
+            border-bottom: 1px solid black;
+        }
+        a[href]:after {
+            content: " (" attr(href) ")";
+        }
+        abbr[title]:after {
+            content: " (" attr(title) ")";
+        }
+        .ir a:after,
+        a[href^="javascript:"]:after,
+        a[href^="#"]:after {
+            content: "";
+        }
+        pre,
+        blockquote {
+            border: 1px solid #999;
+            padding-right: 1em;
+            page-break-inside: avoid;
+        }
+        tr,
+        img {
+            page-break-inside: avoid;
+        }
+        img {
+            max-width: 100% !important;
+        }
+        @page :left {
+            margin: 15mm 20mm 15mm 10mm;
+        }
+        @page :right {
+            margin: 15mm 10mm 15mm 20mm;
+        }
+        p,
+        h2,
+        h3 {
+            orphans: 3;
+            widows: 3;
+        }
+        h2,
+        h3 {
+            page-break-after: avoid;
+        }
+    }  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Bashkit</h1>
+<p class="author">Erik Adelbert ea@wuage.org</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#what-is-bashkit" id="toc-what-is-bashkit">What is
+bashkit</a></li>
+<li><a href="#download" id="toc-download">Download</a></li>
+<li><a href="#documentation"
+id="toc-documentation">Documentation</a></li>
+<li><a href="#mailing-lists" id="toc-mailing-lists">Mailing
+Lists</a></li>
+<li><a href="#getting-involved" id="toc-getting-involved">Getting
+involved</a></li>
+<li><a href="#definitions" id="toc-definitions">Definitions</a></li>
+<li><a href="#table-of-contents" id="toc-table-of-contents">Table of
+Contents</a></li>
+<li><a href="#basic-bashkit-features"
+id="toc-basic-bashkit-features">Basic Bashkit features</a>
+<ul>
+<li><a href="#logging" id="toc-logging">Logging</a></li>
+<li><a href="#error-handling" id="toc-error-handling">Error
+handling</a></li>
+<li><a href="#bashkit-scripting" id="toc-bashkit-scripting">Bashkit
+scripting</a></li>
+</ul></li>
+<li><a href="#name" id="toc-name">NAME</a></li>
+<li><a href="#synopsis" id="toc-synopsis">SYNOPSIS</a></li>
+<li><a href="#description" id="toc-description">DESCRIPTION</a></li>
+<li><a href="#examples" id="toc-examples">EXAMPLES</a></li>
+<li><a href="#see-also" id="toc-see-also">SEE ALSO</a></li>
+<li><a href="#colophon" id="toc-colophon">COLOPHON</a></li>
+<li><a href="#name-1" id="toc-name-1">NAME</a></li>
+<li><a href="#synopsis-1" id="toc-synopsis-1">SYNOPSIS</a></li>
+<li><a href="#description-1" id="toc-description-1">DESCRIPTION</a></li>
+<li><a href="#examples-1" id="toc-examples-1">EXAMPLES</a></li>
+<li><a href="#see-also-1" id="toc-see-also-1">SEE ALSO</a></li>
+<li><a href="#colophon-1" id="toc-colophon-1">COLOPHON</a></li>
+<li><a href="#name-2" id="toc-name-2">NAME</a></li>
+<li><a href="#synopsis-2" id="toc-synopsis-2">SYNOPSIS</a></li>
+<li><a href="#description-2" id="toc-description-2">DESCRIPTION</a></li>
+<li><a href="#examples-2" id="toc-examples-2">EXAMPLES</a></li>
+<li><a href="#see-also-2" id="toc-see-also-2">SEE ALSO</a></li>
+<li><a href="#colophon-2" id="toc-colophon-2">COLOPHON</a></li>
+<li><a href="#name-3" id="toc-name-3">NAME</a></li>
+<li><a href="#synopsis-3" id="toc-synopsis-3">SYNOPSIS</a></li>
+<li><a href="#description-3" id="toc-description-3">DESCRIPTION</a></li>
+<li><a href="#examples-3" id="toc-examples-3">EXAMPLES</a></li>
+<li><a href="#see-also-3" id="toc-see-also-3">SEE ALSO</a></li>
+<li><a href="#colophon-3" id="toc-colophon-3">COLOPHON</a></li>
+<li><a href="#name-4" id="toc-name-4">NAME</a></li>
+<li><a href="#synopsis-4" id="toc-synopsis-4">SYNOPSIS</a></li>
+<li><a href="#description-4" id="toc-description-4">DESCRIPTION</a></li>
+<li><a href="#examples-4" id="toc-examples-4">EXAMPLES</a></li>
+<li><a href="#see-also-4" id="toc-see-also-4">SEE ALSO</a></li>
+<li><a href="#colophon-4" id="toc-colophon-4">COLOPHON</a></li>
+<li><a href="#name-5" id="toc-name-5">NAME</a></li>
+<li><a href="#synopsis-5" id="toc-synopsis-5">SYNOPSIS</a></li>
+<li><a href="#description-5" id="toc-description-5">DESCRIPTION</a></li>
+<li><a href="#example-5" id="toc-example-5">EXAMPLE</a></li>
+<li><a href="#see-also-5" id="toc-see-also-5">SEE ALSO</a></li>
+<li><a href="#colophon-5" id="toc-colophon-5">COLOPHON</a></li>
+<li><a href="#name-6" id="toc-name-6">NAME</a></li>
+<li><a href="#synopsis-6" id="toc-synopsis-6">SYNOPSIS</a></li>
+<li><a href="#description-6" id="toc-description-6">DESCRIPTION</a></li>
+<li><a href="#example-6" id="toc-example-6">EXAMPLE</a></li>
+<li><a href="#see-also-6" id="toc-see-also-6">SEE ALSO</a></li>
+<li><a href="#colophon-6" id="toc-colophon-6">COLOPHON</a></li>
+<li><a href="#name-7" id="toc-name-7">NAME</a></li>
+<li><a href="#synopsis-7" id="toc-synopsis-7">SYNOPSIS</a></li>
+<li><a href="#description-7" id="toc-description-7">DESCRIPTION</a></li>
+<li><a href="#example-7" id="toc-example-7">EXAMPLE</a></li>
+<li><a href="#see-also-7" id="toc-see-also-7">SEE ALSO</a></li>
+<li><a href="#colophon-7" id="toc-colophon-7">COLOPHON</a></li>
+<li><a href="#name-8" id="toc-name-8">NAME</a></li>
+<li><a href="#synopsis-8" id="toc-synopsis-8">SYNOPSIS</a></li>
+<li><a href="#description-8" id="toc-description-8">DESCRIPTION</a></li>
+<li><a href="#example-8" id="toc-example-8">EXAMPLE</a></li>
+<li><a href="#see-also-8" id="toc-see-also-8">SEE ALSO</a></li>
+<li><a href="#colophon-8" id="toc-colophon-8">COLOPHON</a></li>
+<li><a href="#name-9" id="toc-name-9">NAME</a></li>
+<li><a href="#synopsis-9" id="toc-synopsis-9">SYNOPSIS</a></li>
+<li><a href="#description-9" id="toc-description-9">DESCRIPTION</a></li>
+<li><a href="#examples-5" id="toc-examples-5">EXAMPLES</a></li>
+<li><a href="#see-also-9" id="toc-see-also-9">SEE ALSO</a></li>
+<li><a href="#colophon-9" id="toc-colophon-9">COLOPHON</a></li>
+<li><a href="#name-10" id="toc-name-10">NAME</a></li>
+<li><a href="#synopsis-10" id="toc-synopsis-10">SYNOPSIS</a></li>
+<li><a href="#description-10"
+id="toc-description-10">DESCRIPTION</a></li>
+<li><a href="#example-9" id="toc-example-9">EXAMPLE</a></li>
+<li><a href="#see-also-10" id="toc-see-also-10">SEE ALSO</a></li>
+<li><a href="#colophon-10" id="toc-colophon-10">COLOPHON</a></li>
+<li><a href="#name-11" id="toc-name-11">NAME</a></li>
+<li><a href="#synopsis-11" id="toc-synopsis-11">SYNOPSIS</a></li>
+<li><a href="#description-11"
+id="toc-description-11">DESCRIPTION</a></li>
+<li><a href="#example-10" id="toc-example-10">EXAMPLE</a></li>
+<li><a href="#see-also-11" id="toc-see-also-11">SEE ALSO</a></li>
+<li><a href="#colophon-11" id="toc-colophon-11">COLOPHON</a></li>
+<li><a href="#name-12" id="toc-name-12">NAME</a></li>
+<li><a href="#synopsis-12" id="toc-synopsis-12">SYNOPSIS</a></li>
+<li><a href="#description-12"
+id="toc-description-12">DESCRIPTION</a></li>
+<li><a href="#examples-6" id="toc-examples-6">EXAMPLES</a></li>
+<li><a href="#see-also-12" id="toc-see-also-12">SEE ALSO</a></li>
+<li><a href="#colophon-12" id="toc-colophon-12">COLOPHON</a></li>
+<li><a href="#name-13" id="toc-name-13">NAME</a></li>
+<li><a href="#synopsis-13" id="toc-synopsis-13">SYNOPSIS</a></li>
+<li><a href="#description-13"
+id="toc-description-13">DESCRIPTION</a></li>
+<li><a href="#examples-7" id="toc-examples-7">EXAMPLES</a></li>
+<li><a href="#see-also-13" id="toc-see-also-13">SEE ALSO</a></li>
+<li><a href="#colophon-13" id="toc-colophon-13">COLOPHON</a></li>
+<li><a href="#name-14" id="toc-name-14">NAME</a></li>
+<li><a href="#synopsis-14" id="toc-synopsis-14">SYNOPSIS</a></li>
+<li><a href="#description-14"
+id="toc-description-14">DESCRIPTION</a></li>
+<li><a href="#examples-8" id="toc-examples-8">EXAMPLES</a></li>
+<li><a href="#see-also-14" id="toc-see-also-14">SEE ALSO</a></li>
+<li><a href="#colophon-14" id="toc-colophon-14">COLOPHON</a></li>
+<li><a href="#name-15" id="toc-name-15">NAME</a></li>
+<li><a href="#synopsis-15" id="toc-synopsis-15">SYNOPSIS</a></li>
+<li><a href="#description-15"
+id="toc-description-15">DESCRIPTION</a></li>
+<li><a href="#examples-9" id="toc-examples-9">EXAMPLES</a></li>
+<li><a href="#see-also-15" id="toc-see-also-15">SEE ALSO</a></li>
+<li><a href="#colophon-15" id="toc-colophon-15">COLOPHON</a></li>
+<li><a href="#name-16" id="toc-name-16">NAME</a></li>
+<li><a href="#synopsis-16" id="toc-synopsis-16">SYNOPSIS</a></li>
+<li><a href="#description-16"
+id="toc-description-16">DESCRIPTION</a></li>
+<li><a href="#examples-10" id="toc-examples-10">EXAMPLES</a></li>
+<li><a href="#see-also-16" id="toc-see-also-16">SEE ALSO</a></li>
+<li><a href="#colophon-16" id="toc-colophon-16">COLOPHON</a></li>
+<li><a href="#name-17" id="toc-name-17">NAME</a></li>
+<li><a href="#synopsis-17" id="toc-synopsis-17">SYNOPSIS</a></li>
+<li><a href="#description-17"
+id="toc-description-17">DESCRIPTION</a></li>
+<li><a href="#examples-11" id="toc-examples-11">EXAMPLES</a></li>
+<li><a href="#see-also-17" id="toc-see-also-17">SEE ALSO</a></li>
+<li><a href="#colophon-17" id="toc-colophon-17">COLOPHON</a></li>
+<li><a href="#name-18" id="toc-name-18">NAME</a></li>
+<li><a href="#synopsis-18" id="toc-synopsis-18">SYNOPSIS</a></li>
+<li><a href="#description-18"
+id="toc-description-18">DESCRIPTION</a></li>
+<li><a href="#examples-12" id="toc-examples-12">EXAMPLES</a></li>
+<li><a href="#see-also-18" id="toc-see-also-18">SEE ALSO</a></li>
+<li><a href="#colophon-18" id="toc-colophon-18">COLOPHON</a></li>
+<li><a href="#name-19" id="toc-name-19">NAME</a></li>
+<li><a href="#synopsis-19" id="toc-synopsis-19">SYNOPSIS</a></li>
+<li><a href="#description-19"
+id="toc-description-19">DESCRIPTION</a></li>
+<li><a href="#examples-13" id="toc-examples-13">EXAMPLES</a></li>
+<li><a href="#see-also-19" id="toc-see-also-19">SEE ALSO</a></li>
+<li><a href="#colophon-19" id="toc-colophon-19">COLOPHON</a></li>
+<li><a href="#name-20" id="toc-name-20">NAME</a></li>
+<li><a href="#synopsis-20" id="toc-synopsis-20">SYNOPSIS</a></li>
+<li><a href="#description-20"
+id="toc-description-20">DESCRIPTION</a></li>
+<li><a href="#examples-14" id="toc-examples-14">EXAMPLES</a></li>
+<li><a href="#see-also-20" id="toc-see-also-20">SEE ALSO</a></li>
+<li><a href="#colophon-20" id="toc-colophon-20">COLOPHON</a></li>
+<li><a href="#name-21" id="toc-name-21">NAME</a></li>
+<li><a href="#synopsis-21" id="toc-synopsis-21">SYNOPSIS</a></li>
+<li><a href="#description-21"
+id="toc-description-21">DESCRIPTION</a></li>
+<li><a href="#examples-15" id="toc-examples-15">EXAMPLES</a></li>
+<li><a href="#see-also-21" id="toc-see-also-21">SEE ALSO</a></li>
+<li><a href="#colophon-21" id="toc-colophon-21">COLOPHON</a></li>
+<li><a href="#name-22" id="toc-name-22">NAME</a></li>
+<li><a href="#synopsis-22" id="toc-synopsis-22">SYNOPSIS</a></li>
+<li><a href="#description-22"
+id="toc-description-22">DESCRIPTION</a></li>
+<li><a href="#examples-16" id="toc-examples-16">EXAMPLES</a></li>
+<li><a href="#see-also-22" id="toc-see-also-22">SEE ALSO</a></li>
+<li><a href="#colophon-22" id="toc-colophon-22">COLOPHON</a></li>
+<li><a href="#name-23" id="toc-name-23">NAME</a></li>
+<li><a href="#synopsis-23" id="toc-synopsis-23">SYNOPSIS</a></li>
+<li><a href="#description-23"
+id="toc-description-23">DESCRIPTION</a></li>
+<li><a href="#examples-17" id="toc-examples-17">EXAMPLES</a></li>
+<li><a href="#see-also-23" id="toc-see-also-23">SEE ALSO</a></li>
+<li><a href="#colophon-23" id="toc-colophon-23">COLOPHON</a></li>
+<li><a href="#name-24" id="toc-name-24">NAME</a></li>
+<li><a href="#synopsis-24" id="toc-synopsis-24">SYNOPSIS</a></li>
+<li><a href="#description-24"
+id="toc-description-24">DESCRIPTION</a></li>
+<li><a href="#example-11" id="toc-example-11">EXAMPLE</a></li>
+<li><a href="#see-also-24" id="toc-see-also-24">SEE ALSO</a></li>
+<li><a href="#colophon-24" id="toc-colophon-24">COLOPHON</a></li>
+<li><a href="#name-25" id="toc-name-25">NAME</a></li>
+<li><a href="#synopsis-25" id="toc-synopsis-25">SYNOPSIS</a></li>
+<li><a href="#description-25"
+id="toc-description-25">DESCRIPTION</a></li>
+<li><a href="#examples-18" id="toc-examples-18">EXAMPLES</a></li>
+<li><a href="#see-also-25" id="toc-see-also-25">SEE ALSO</a></li>
+<li><a href="#colophon-25" id="toc-colophon-25">COLOPHON</a></li>
+<li><a href="#name-26" id="toc-name-26">NAME</a></li>
+<li><a href="#synopsis-26" id="toc-synopsis-26">SYNOPSIS</a></li>
+<li><a href="#description-26"
+id="toc-description-26">DESCRIPTION</a></li>
+<li><a href="#example-12" id="toc-example-12">EXAMPLE</a></li>
+<li><a href="#colophon-26" id="toc-colophon-26">COLOPHON</a></li>
+<li><a href="#name-27" id="toc-name-27">NAME</a></li>
+<li><a href="#synopsis-27" id="toc-synopsis-27">SYNOPSIS</a></li>
+<li><a href="#description-27"
+id="toc-description-27">DESCRIPTION</a></li>
+<li><a href="#example-13" id="toc-example-13">EXAMPLE</a></li>
+<li><a href="#colophon-27" id="toc-colophon-27">COLOPHON</a></li>
+<li><a href="#name-28" id="toc-name-28">NAME</a></li>
+<li><a href="#synopsis-28" id="toc-synopsis-28">SYNOPSIS</a></li>
+<li><a href="#description-28"
+id="toc-description-28">DESCRIPTION</a></li>
+<li><a href="#examples-19" id="toc-examples-19">EXAMPLES</a></li>
+<li><a href="#see-also-26" id="toc-see-also-26">SEE ALSO</a></li>
+<li><a href="#colophon-28" id="toc-colophon-28">COLOPHON</a></li>
+<li><a href="#name-29" id="toc-name-29">NAME</a></li>
+<li><a href="#synopsis-29" id="toc-synopsis-29">SYNOPSIS</a></li>
+<li><a href="#description-29"
+id="toc-description-29">DESCRIPTION</a></li>
+<li><a href="#example-14" id="toc-example-14">EXAMPLE</a></li>
+<li><a href="#colophon-29" id="toc-colophon-29">COLOPHON</a></li>
+<li><a href="#name-30" id="toc-name-30">NAME</a></li>
+<li><a href="#synopsis-30" id="toc-synopsis-30">SYNOPSIS</a></li>
+<li><a href="#description-30"
+id="toc-description-30">DESCRIPTION</a></li>
+<li><a href="#example-15" id="toc-example-15">EXAMPLE</a></li>
+<li><a href="#see-also-27" id="toc-see-also-27">SEE ALSO</a></li>
+<li><a href="#colophon-30" id="toc-colophon-30">COLOPHON</a></li>
+<li><a href="#name-31" id="toc-name-31">NAME</a></li>
+<li><a href="#synopsis-31" id="toc-synopsis-31">SYNOPSIS</a></li>
+<li><a href="#description-31"
+id="toc-description-31">DESCRIPTION</a></li>
+<li><a href="#example-16" id="toc-example-16">EXAMPLE</a></li>
+<li><a href="#see-also-28" id="toc-see-also-28">SEE ALSO</a></li>
+<li><a href="#colophon-31" id="toc-colophon-31">COLOPHON</a></li>
+<li><a href="#name-32" id="toc-name-32">NAME</a></li>
+<li><a href="#synopsis-32" id="toc-synopsis-32">SYNOPSIS</a></li>
+<li><a href="#description-32"
+id="toc-description-32">DESCRIPTION</a></li>
+<li><a href="#example-17" id="toc-example-17">EXAMPLE</a></li>
+<li><a href="#colophon-32" id="toc-colophon-32">COLOPHON</a></li>
+<li><a href="#name-33" id="toc-name-33">NAME</a></li>
+<li><a href="#synopsis-33" id="toc-synopsis-33">SYNOPSIS</a></li>
+<li><a href="#description-33"
+id="toc-description-33">DESCRIPTION</a></li>
+<li><a href="#example-18" id="toc-example-18">EXAMPLE</a></li>
+<li><a href="#see-also-29" id="toc-see-also-29">SEE ALSO</a></li>
+<li><a href="#colophon-33" id="toc-colophon-33">COLOPHON</a></li>
+<li><a href="#name-34" id="toc-name-34">NAME</a></li>
+<li><a href="#synopsis-34" id="toc-synopsis-34">SYNOPSIS</a></li>
+<li><a href="#description-34"
+id="toc-description-34">DESCRIPTION</a></li>
+<li><a href="#example-19" id="toc-example-19">EXAMPLE</a></li>
+<li><a href="#colophon-34" id="toc-colophon-34">COLOPHON</a></li>
+<li><a href="#name-35" id="toc-name-35">NAME</a></li>
+<li><a href="#synopsis-35" id="toc-synopsis-35">SYNOPSIS</a></li>
+<li><a href="#description-35"
+id="toc-description-35">DESCRIPTION</a></li>
+<li><a href="#examples-20" id="toc-examples-20">EXAMPLES</a></li>
+<li><a href="#colophon-35" id="toc-colophon-35">COLOPHON</a></li>
+<li><a href="#name-36" id="toc-name-36">NAME</a></li>
+<li><a href="#synopsis-36" id="toc-synopsis-36">SYNOPSIS</a></li>
+<li><a href="#description-36"
+id="toc-description-36">DESCRIPTION</a></li>
+<li><a href="#example-20" id="toc-example-20">EXAMPLE</a></li>
+<li><a href="#see-also-30" id="toc-see-also-30">SEE ALSO</a></li>
+<li><a href="#colophon-36" id="toc-colophon-36">COLOPHON</a></li>
+<li><a href="#name-37" id="toc-name-37">NAME</a></li>
+<li><a href="#synopsis-37" id="toc-synopsis-37">SYNOPSIS</a></li>
+<li><a href="#description-37"
+id="toc-description-37">DESCRIPTION</a></li>
+<li><a href="#example-21" id="toc-example-21">EXAMPLE</a></li>
+<li><a href="#see-also-31" id="toc-see-also-31">SEE ALSO</a></li>
+<li><a href="#colophon-37" id="toc-colophon-37">COLOPHON</a></li>
+<li><a href="#name-38" id="toc-name-38">NAME</a></li>
+<li><a href="#synopsis-38" id="toc-synopsis-38">SYNOPSIS</a></li>
+<li><a href="#description-38"
+id="toc-description-38">DESCRIPTION</a></li>
+<li><a href="#examples-21" id="toc-examples-21">EXAMPLES</a></li>
+<li><a href="#colophon-38" id="toc-colophon-38">COLOPHON</a></li>
+<li><a href="#name-39" id="toc-name-39">NAME</a></li>
+<li><a href="#synopsis-39" id="toc-synopsis-39">SYNOPSIS</a></li>
+<li><a href="#description-39"
+id="toc-description-39">DESCRIPTION</a></li>
+<li><a href="#example-22" id="toc-example-22">EXAMPLE</a></li>
+<li><a href="#colophon-39" id="toc-colophon-39">COLOPHON</a></li>
+<li><a href="#name-40" id="toc-name-40">NAME</a></li>
+<li><a href="#synopsis-40" id="toc-synopsis-40">SYNOPSIS</a></li>
+<li><a href="#description-40"
+id="toc-description-40">DESCRIPTION</a></li>
+<li><a href="#examples-22" id="toc-examples-22">EXAMPLES</a></li>
+<li><a href="#colophon-40" id="toc-colophon-40">COLOPHON</a></li>
+<li><a href="#name-41" id="toc-name-41">NAME</a></li>
+<li><a href="#synopsis-41" id="toc-synopsis-41">SYNOPSIS</a></li>
+<li><a href="#description-41"
+id="toc-description-41">DESCRIPTION</a></li>
+<li><a href="#example-23" id="toc-example-23">EXAMPLE</a></li>
+<li><a href="#colophon-41" id="toc-colophon-41">COLOPHON</a></li>
+<li><a href="#name-42" id="toc-name-42">NAME</a></li>
+<li><a href="#synopsis-42" id="toc-synopsis-42">SYNOPSIS</a></li>
+<li><a href="#description-42"
+id="toc-description-42">DESCRIPTION</a></li>
+<li><a href="#example-24" id="toc-example-24">EXAMPLE</a></li>
+<li><a href="#see-also-32" id="toc-see-also-32">SEE ALSO</a></li>
+<li><a href="#colophon-42" id="toc-colophon-42">COLOPHON</a></li>
+<li><a href="#name-43" id="toc-name-43">NAME</a></li>
+<li><a href="#synopsis-43" id="toc-synopsis-43">SYNOPSIS</a></li>
+<li><a href="#description-43"
+id="toc-description-43">DESCRIPTION</a></li>
+<li><a href="#example-25" id="toc-example-25">EXAMPLE</a></li>
+<li><a href="#colophon-43" id="toc-colophon-43">COLOPHON</a></li>
+<li><a href="#name-44" id="toc-name-44">NAME</a></li>
+<li><a href="#synopsis-44" id="toc-synopsis-44">SYNOPSIS</a></li>
+<li><a href="#description-44"
+id="toc-description-44">DESCRIPTION</a></li>
+<li><a href="#example-26" id="toc-example-26">EXAMPLE</a></li>
+<li><a href="#colophon-44" id="toc-colophon-44">COLOPHON</a></li>
+<li><a href="#name-45" id="toc-name-45">NAME</a></li>
+<li><a href="#synopsis-45" id="toc-synopsis-45">SYNOPSIS</a></li>
+<li><a href="#description-45"
+id="toc-description-45">DESCRIPTION</a></li>
+<li><a href="#examples-23" id="toc-examples-23">EXAMPLES</a></li>
+<li><a href="#see-also-33" id="toc-see-also-33">SEE ALSO</a></li>
+<li><a href="#colophon-45" id="toc-colophon-45">COLOPHON</a></li>
+<li><a href="#name-46" id="toc-name-46">NAME</a></li>
+<li><a href="#synopsis-46" id="toc-synopsis-46">SYNOPSIS</a></li>
+<li><a href="#description-46"
+id="toc-description-46">DESCRIPTION</a></li>
+<li><a href="#example-27" id="toc-example-27">EXAMPLE</a></li>
+<li><a href="#see-also-34" id="toc-see-also-34">SEE ALSO</a></li>
+<li><a href="#colophon-46" id="toc-colophon-46">COLOPHON</a></li>
+<li><a href="#name-47" id="toc-name-47">NAME</a></li>
+<li><a href="#synopsis-47" id="toc-synopsis-47">SYNOPSIS</a></li>
+<li><a href="#description-47"
+id="toc-description-47">DESCRIPTION</a></li>
+<li><a href="#example-28" id="toc-example-28">EXAMPLE</a></li>
+<li><a href="#colophon-47" id="toc-colophon-47">COLOPHON</a></li>
+<li><a href="#name-48" id="toc-name-48">NAME</a></li>
+<li><a href="#synopsis-48" id="toc-synopsis-48">SYNOPSIS</a></li>
+<li><a href="#description-48"
+id="toc-description-48">DESCRIPTION</a></li>
+<li><a href="#example-29" id="toc-example-29">EXAMPLE</a></li>
+<li><a href="#colophon-48" id="toc-colophon-48">COLOPHON</a></li>
+<li><a href="#name-49" id="toc-name-49">NAME</a></li>
+<li><a href="#synopsis-49" id="toc-synopsis-49">SYNOPSIS</a></li>
+<li><a href="#description-49"
+id="toc-description-49">DESCRIPTION</a></li>
+<li><a href="#examples-24" id="toc-examples-24">EXAMPLES</a></li>
+<li><a href="#colophon-49" id="toc-colophon-49">COLOPHON</a></li>
+<li><a href="#name-50" id="toc-name-50">NAME</a></li>
+<li><a href="#synopsis-50" id="toc-synopsis-50">SYNOPSIS</a></li>
+<li><a href="#description-50"
+id="toc-description-50">DESCRIPTION</a></li>
+<li><a href="#example-30" id="toc-example-30">EXAMPLE</a></li>
+<li><a href="#colophon-50" id="toc-colophon-50">COLOPHON</a></li>
+<li><a href="#name-51" id="toc-name-51">NAME</a></li>
+<li><a href="#synopsis-51" id="toc-synopsis-51">SYNOPSIS</a></li>
+<li><a href="#description-51"
+id="toc-description-51">DESCRIPTION</a></li>
+<li><a href="#example-31" id="toc-example-31">EXAMPLE</a></li>
+<li><a href="#colophon-51" id="toc-colophon-51">COLOPHON</a></li>
+<li><a href="#name-52" id="toc-name-52">NAME</a></li>
+<li><a href="#synopsis-52" id="toc-synopsis-52">SYNOPSIS</a></li>
+<li><a href="#description-52"
+id="toc-description-52">DESCRIPTION</a></li>
+<li><a href="#example-32" id="toc-example-32">EXAMPLE</a></li>
+<li><a href="#see-also-35" id="toc-see-also-35">SEE ALSO</a></li>
+<li><a href="#colophon-52" id="toc-colophon-52">COLOPHON</a></li>
+<li><a href="#name-53" id="toc-name-53">NAME</a></li>
+<li><a href="#synopsis-53" id="toc-synopsis-53">SYNOPSIS</a></li>
+<li><a href="#description-53"
+id="toc-description-53">DESCRIPTION</a></li>
+<li><a href="#example-33" id="toc-example-33">EXAMPLE</a></li>
+<li><a href="#see-also-36" id="toc-see-also-36">SEE ALSO</a></li>
+<li><a href="#colophon-53" id="toc-colophon-53">COLOPHON</a></li>
+<li><a href="#name-54" id="toc-name-54">NAME</a></li>
+<li><a href="#synopsis-54" id="toc-synopsis-54">SYNOPSIS</a></li>
+<li><a href="#description-54"
+id="toc-description-54">DESCRIPTION</a></li>
+<li><a href="#example-34" id="toc-example-34">EXAMPLE</a></li>
+<li><a href="#colophon-54" id="toc-colophon-54">COLOPHON</a></li>
+<li><a href="#name-55" id="toc-name-55">NAME</a></li>
+<li><a href="#synopsis-55" id="toc-synopsis-55">SYNOPSIS</a></li>
+<li><a href="#description-55"
+id="toc-description-55">DESCRIPTION</a></li>
+<li><a href="#example-35" id="toc-example-35">EXAMPLE</a></li>
+<li><a href="#colophon-55" id="toc-colophon-55">COLOPHON</a></li>
+<li><a href="#name-56" id="toc-name-56">NAME</a></li>
+<li><a href="#synopsis-56" id="toc-synopsis-56">SYNOPSIS</a></li>
+<li><a href="#description-56"
+id="toc-description-56">DESCRIPTION</a></li>
+<li><a href="#see-also-37" id="toc-see-also-37">SEE ALSO</a></li>
+<li><a href="#colophon-56" id="toc-colophon-56">COLOPHON</a></li>
+<li><a href="#name-57" id="toc-name-57">NAME</a></li>
+<li><a href="#synopsis-57" id="toc-synopsis-57">SYNOPSIS</a></li>
+<li><a href="#description-57"
+id="toc-description-57">DESCRIPTION</a></li>
+<li><a href="#see-also-38" id="toc-see-also-38">SEE ALSO</a></li>
+<li><a href="#colophon-57" id="toc-colophon-57">COLOPHON</a></li>
+<li><a href="#name-58" id="toc-name-58">NAME</a></li>
+<li><a href="#synopsis-58" id="toc-synopsis-58">SYNOPSIS</a></li>
+<li><a href="#description-58"
+id="toc-description-58">DESCRIPTION</a></li>
+<li><a href="#example-36" id="toc-example-36">EXAMPLE</a></li>
+<li><a href="#see-also-39" id="toc-see-also-39">SEE ALSO</a></li>
+<li><a href="#colophon-58" id="toc-colophon-58">COLOPHON</a></li>
+<li><a href="#name-59" id="toc-name-59">NAME</a></li>
+<li><a href="#synopsis-59" id="toc-synopsis-59">SYNOPSIS</a></li>
+<li><a href="#description-59"
+id="toc-description-59">DESCRIPTION</a></li>
+<li><a href="#example-37" id="toc-example-37">EXAMPLE</a></li>
+<li><a href="#see-also-40" id="toc-see-also-40">SEE ALSO</a></li>
+<li><a href="#colophon-59" id="toc-colophon-59">COLOPHON</a></li>
+<li><a href="#name-60" id="toc-name-60">NAME</a></li>
+<li><a href="#synopsis-60" id="toc-synopsis-60">SYNOPSIS</a></li>
+<li><a href="#description-60"
+id="toc-description-60">DESCRIPTION</a></li>
+<li><a href="#example-38" id="toc-example-38">EXAMPLE</a></li>
+<li><a href="#see-also-41" id="toc-see-also-41">SEE ALSO</a></li>
+<li><a href="#colophon-60" id="toc-colophon-60">COLOPHON</a></li>
+<li><a href="#name-61" id="toc-name-61">NAME</a></li>
+<li><a href="#synopsis-61" id="toc-synopsis-61">SYNOPSIS</a></li>
+<li><a href="#description-61"
+id="toc-description-61">DESCRIPTION</a></li>
+<li><a href="#example-39" id="toc-example-39">EXAMPLE</a></li>
+<li><a href="#see-also-42" id="toc-see-also-42">SEE ALSO</a></li>
+<li><a href="#colophon-61" id="toc-colophon-61">COLOPHON</a></li>
+<li><a href="#name-62" id="toc-name-62">NAME</a></li>
+<li><a href="#synopsis-62" id="toc-synopsis-62">SYNOPSIS</a></li>
+<li><a href="#description-62"
+id="toc-description-62">DESCRIPTION</a></li>
+<li><a href="#example-40" id="toc-example-40">EXAMPLE</a></li>
+<li><a href="#see-also-43" id="toc-see-also-43">SEE ALSO</a></li>
+<li><a href="#colophon-62" id="toc-colophon-62">COLOPHON</a></li>
+<li><a href="#name-63" id="toc-name-63">NAME</a></li>
+<li><a href="#synopsis-63" id="toc-synopsis-63">SYNOPSIS</a></li>
+<li><a href="#description-63"
+id="toc-description-63">DESCRIPTION</a></li>
+<li><a href="#example-41" id="toc-example-41">EXAMPLE</a></li>
+<li><a href="#see-also-44" id="toc-see-also-44">SEE ALSO</a></li>
+<li><a href="#colophon-63" id="toc-colophon-63">COLOPHON</a></li>
+<li><a href="#name-64" id="toc-name-64">NAME</a></li>
+<li><a href="#synopsis-64" id="toc-synopsis-64">SYNOPSIS</a></li>
+<li><a href="#description-64"
+id="toc-description-64">DESCRIPTION</a></li>
+<li><a href="#example-42" id="toc-example-42">EXAMPLE</a></li>
+<li><a href="#see-also-45" id="toc-see-also-45">SEE ALSO</a></li>
+<li><a href="#colophon-64" id="toc-colophon-64">COLOPHON</a></li>
+<li><a href="#name-65" id="toc-name-65">NAME</a></li>
+<li><a href="#synopsis-65" id="toc-synopsis-65">SYNOPSIS</a></li>
+<li><a href="#description-65"
+id="toc-description-65">DESCRIPTION</a></li>
+<li><a href="#example-43" id="toc-example-43">EXAMPLE</a></li>
+<li><a href="#see-also-46" id="toc-see-also-46">SEE ALSO</a></li>
+<li><a href="#colophon-65" id="toc-colophon-65">COLOPHON</a></li>
+<li><a href="#name-66" id="toc-name-66">NAME</a></li>
+<li><a href="#synopsis-66" id="toc-synopsis-66">SYNOPSIS</a></li>
+<li><a href="#description-66"
+id="toc-description-66">DESCRIPTION</a></li>
+<li><a href="#example-44" id="toc-example-44">EXAMPLE</a></li>
+<li><a href="#see-also-47" id="toc-see-also-47">SEE ALSO</a></li>
+<li><a href="#colophon-66" id="toc-colophon-66">COLOPHON</a></li>
+<li><a href="#name-67" id="toc-name-67">NAME</a></li>
+<li><a href="#synopsis-67" id="toc-synopsis-67">SYNOPSIS</a></li>
+<li><a href="#description-67"
+id="toc-description-67">DESCRIPTION</a></li>
+<li><a href="#see-also-48" id="toc-see-also-48">SEE ALSO</a></li>
+<li><a href="#colophon-67" id="toc-colophon-67">COLOPHON</a></li>
+<li><a href="#name-68" id="toc-name-68">NAME</a></li>
+<li><a href="#synopsis-68" id="toc-synopsis-68">SYNOPSIS</a></li>
+<li><a href="#description-68"
+id="toc-description-68">DESCRIPTION</a></li>
+<li><a href="#example-45" id="toc-example-45">EXAMPLE</a></li>
+<li><a href="#see-also-49" id="toc-see-also-49">SEE ALSO</a></li>
+<li><a href="#colophon-68" id="toc-colophon-68">COLOPHON</a></li>
+<li><a href="#name-69" id="toc-name-69">NAME</a></li>
+<li><a href="#synopsis-69" id="toc-synopsis-69">SYNOPSIS</a></li>
+<li><a href="#description-69"
+id="toc-description-69">DESCRIPTION</a></li>
+<li><a href="#example-46" id="toc-example-46">EXAMPLE</a></li>
+<li><a href="#see-also-50" id="toc-see-also-50">SEE ALSO</a></li>
+<li><a href="#colophon-69" id="toc-colophon-69">COLOPHON</a></li>
+<li><a href="#name-70" id="toc-name-70">NAME</a></li>
+<li><a href="#synopsis-70" id="toc-synopsis-70">SYNOPSIS</a></li>
+<li><a href="#description-70"
+id="toc-description-70">DESCRIPTION</a></li>
+<li><a href="#examples-25" id="toc-examples-25">EXAMPLES</a></li>
+<li><a href="#see-also-51" id="toc-see-also-51">SEE ALSO</a></li>
+<li><a href="#colophon-70" id="toc-colophon-70">COLOPHON</a></li>
+<li><a href="#name-71" id="toc-name-71">NAME</a></li>
+<li><a href="#synopsis-71" id="toc-synopsis-71">SYNOPSIS</a></li>
+<li><a href="#description-71"
+id="toc-description-71">DESCRIPTION</a></li>
+<li><a href="#example-47" id="toc-example-47">EXAMPLE</a></li>
+<li><a href="#colophon-71" id="toc-colophon-71">COLOPHON</a></li>
+<li><a href="#name-72" id="toc-name-72">NAME</a></li>
+<li><a href="#synopsis-72" id="toc-synopsis-72">SYNOPSIS</a></li>
+<li><a href="#description-72"
+id="toc-description-72">DESCRIPTION</a></li>
+<li><a href="#example-48" id="toc-example-48">EXAMPLE</a></li>
+<li><a href="#see-also-52" id="toc-see-also-52">SEE ALSO</a></li>
+<li><a href="#colophon-72" id="toc-colophon-72">COLOPHON</a></li>
+<li><a href="#name-73" id="toc-name-73">NAME</a></li>
+<li><a href="#synopsis-73" id="toc-synopsis-73">SYNOPSIS</a></li>
+<li><a href="#description-73"
+id="toc-description-73">DESCRIPTION</a></li>
+<li><a href="#example-49" id="toc-example-49">EXAMPLE</a></li>
+<li><a href="#colophon-73" id="toc-colophon-73">COLOPHON</a></li>
+<li><a href="#name-74" id="toc-name-74">NAME</a></li>
+<li><a href="#synopsis-74" id="toc-synopsis-74">SYNOPSIS</a></li>
+<li><a href="#description-74"
+id="toc-description-74">DESCRIPTION</a></li>
+<li><a href="#example-50" id="toc-example-50">EXAMPLE</a></li>
+<li><a href="#see-also-53" id="toc-see-also-53">SEE ALSO</a></li>
+<li><a href="#colophon-74" id="toc-colophon-74">COLOPHON</a></li>
+<li><a href="#name-75" id="toc-name-75">NAME</a></li>
+<li><a href="#synopsis-75" id="toc-synopsis-75">SYNOPSIS</a></li>
+<li><a href="#description-75"
+id="toc-description-75">DESCRIPTION</a></li>
+<li><a href="#example-51" id="toc-example-51">EXAMPLE</a></li>
+<li><a href="#see-also-54" id="toc-see-also-54">SEE ALSO</a></li>
+<li><a href="#colophon-75" id="toc-colophon-75">COLOPHON</a></li>
+<li><a href="#name-76" id="toc-name-76">NAME</a></li>
+<li><a href="#synopsis-76" id="toc-synopsis-76">SYNOPSIS</a></li>
+<li><a href="#description-76"
+id="toc-description-76">DESCRIPTION</a></li>
+<li><a href="#example-52" id="toc-example-52">EXAMPLE</a></li>
+<li><a href="#colophon-76" id="toc-colophon-76">COLOPHON</a></li>
+</ul>
+</nav>
+<h1 id="what-is-bashkit">What is bashkit</h1>
+<p>Bashkit is an opiniated scripting model and framework for <a
+href="https://www.gnu.org/software/bash/">Bash 5.x</a>. It is intended
+to help writing more robust scripts in which unhandled errors are
+preferably fatal. It does so by enforcing and exploiting selected
+<em>bashisms</em> and sometimes moving away from IEEE POSIX P1003.2/ISO
+9945.2. It supplements bash as a collection of modules akin to a
+<em>script development library</em>. It consists mostly in pure bash
+functions with very few dependencies.</p>
+<p>Bashkit is a scripting model that proposes idioms and tools for: *
+fail fast scripting * avoiding some bash scripting pitfalls * runtime
+error handling and event logging</p>
+<p>Bashkit comes with 8 <em>core</em> and 11 <em>standard</em> function
+modules. A bashkit script is a bash script that, at some point
+<em>sources</em> bashkit and modules and starts calling their functions.
+<em>Custom modules</em> are easy to write and module boilerplates are
+kept small. Nonetheless, a proper error handling surely requires
+editing.</p>
+<p>Core modules implement: * <em>revised control flows</em> * <em>ANSI
+color for the masses</em> * <em>error code handling</em> *
+<em>exhaustive error scheme</em> * <em>advanced logging routines</em> *
+<em>thorough signal trap handling</em> * <em>stateful bashkit
+versionning</em></p>
+<p>Standard modules bring: * <em>easy array manipulations</em> *
+<em>advanced checking, including variable type checking</em> * <em>curl
+download integration</em> * <em>yes/no interaction support</em> *
+<em>json conversions</em> * <em>patch integration</em> * <em>file
+permissions conversion</em> * <em>readlink as a function</em> *
+<em>shopt stacking</em> * <em>string manipulations</em></p>
+<h1 id="download">Download</h1>
+<p>Stable releases can be found at <a
+href="http://bashkit.wuage.org">wuage</a>.</p>
+<h1 id="documentation">Documentation</h1>
+<p>Documentation for Bashkit is available <a
+href="http://bashkit.wuage.org">online</a>. You may also find
+information on Bashkit by running TODO.</p>
+<h1 id="mailing-lists">Mailing Lists</h1>
+<p>TODO</p>
+<h1 id="getting-involved">Getting involved</h1>
+<p>TODO ## Development TODO ## Translating Bashkit TODO ## Maintainer
+TODO</p>
+<h1 id="definitions">Definitions</h1>
+<p>These definitions are used throughout the remainder of this
+manual.</p>
+<p><strong>POSIX</strong><br />
+A family of open system standards based on Unix. Bash and Bashkit are
+primarily concerned with the Shell<br />
+and Utilities portion of the POSIX 1003.1 standard.</p>
+<p><strong>blank</strong><br />
+A space or a tab character.</p>
+<p><strong>builtin</strong><br />
+A command that is implemented internally by the shell itself, rather
+than by an executable program<br />
+somewhere in the file system.</p>
+<p><strong>control operator</strong><br />
+A token that performs a control function. It is a newline or one of the
+following:<br />
+‘||’, ‘&amp;&amp;’, ‘&amp;’, ‘;’, ‘;;’, ‘;&amp;’, ‘;;&amp;’, ‘|’,
+‘|&amp;’, ‘(’, or ‘)’.</p>
+<p><strong>exit status or error code or errcode</strong><br />
+The value returned by a command to its caller. The value is restricted
+to eight bits,<br />
+so the maximum value is 255.</p>
+<p><strong>field</strong><br />
+A unit of text that is the result of one of the shell expansions. After
+expansion, when<br />
+executing a command, the resulting fields are used as the command name
+and arguments.</p>
+<p><strong>filename</strong><br />
+A string of characters used to identify a file.</p>
+<p><strong>job</strong><br />
+A set of processes comprising a pipeline, and any processes descended
+from it, that are<br />
+all in the same process group.</p>
+<p><strong>job control</strong><br />
+A mechanism by which users can selectively stop (suspend) and restart
+(resume) execution<br />
+of processes.</p>
+<p><strong>metacharacter</strong><br />
+A character that, when unquoted, separates words. A metacharacter is a
+space, tab, newline,<br />
+or one of the following characters: ‘|’, ‘&amp;’, ‘;’, ‘(’, ‘)’, ‘&lt;’,
+or ‘&gt;’.</p>
+<p><strong>name</strong><br />
+A word consisting solely of letters, numbers, and underscores, and
+beginning with a letter<br />
+or underscore. Names are used as shell variable and function names. Also
+referred to as an<br />
+identifier.</p>
+<p><strong>operator</strong><br />
+A control operator or a redirection operator. See Redirections, for a
+list of redirection<br />
+operators. Operators contain at least one unquoted metacharacter.</p>
+<p><strong>process group</strong><br />
+A collection of related processes each having the same process group
+ID.</p>
+<p><strong>process group ID</strong><br />
+A unique identifier that represents a process group during its
+lifetime.</p>
+<p><strong>reserved word</strong><br />
+A word that has a special meaning to the shell. Most reserved words
+introduce shell flow<br />
+control constructs, such as for and while.</p>
+<p><strong>return status</strong><br />
+A synonym for exit status.</p>
+<p><strong>signal</strong><br />
+A mechanism by which a process may be notified by the kernel of an event
+occurring in<br />
+the system.</p>
+<p><strong>special builtin</strong><br />
+A shell builtin command that has been classified as special by the POSIX
+standard.</p>
+<p><strong>token</strong><br />
+A sequence of characters considered a single unit by the shell. It is
+either a word or<br />
+an operator.</p>
+<p><strong>word</strong><br />
+A sequence of characters treated as a unit by the shell. Words may not
+include unquoted<br />
+metacharacters.</p>
+<h1 id="table-of-contents">Table of Contents</h1>
+<ol type="1">
+<li><a href="#logging">Logging</a>
+<ol type="1">
+<li><a href="#standard-logging">Standard logging</a></li>
+<li><a href="#json-logging">JSON logging</a></li>
+<li><a href="#panicking">Panicking</a></li>
+<li><a href="#report-and-trace">Report and Trace</a></li>
+</ol></li>
+<li><a href="#error-handling">Error Handling</a>
+<ol type="1">
+<li><a href="#discussion">Discussion</a></li>
+<li><a href="#error-code-mapping">Error code mapping</a></li>
+<li><a href="#flow-of-control-with-true">Flow of control with
+true</a></li>
+<li><a href="#raise-catch-and-resume">raise, catch and resume</a></li>
+</ol></li>
+<li><a href="#bashkit-scripting">Bashkit scripting</a>
+<ol type="1">
+<li><a href="#unhandled-errors">Unhandled errors</a></li>
+<li><a href="#fail-fast">Fail fast</a></li>
+<li><a href="#traps-and-cleanup">Traps and cleanup</a></li>
+<li><a href="#colors">Colors</a></li>
+</ol></li>
+</ol>
+<h1 id="basic-bashkit-features">Basic Bashkit features</h1>
+<p>Bashkit is an acronym for <code>Bourne-Again SHell KIT</code>. It
+supplements Bash and can not be used without. This chapter briefly
+summarizes the bashkit’s <em>building blocks</em>: logging, control
+structures, functions, and how the shell executes commands with active
+bashkit.</p>
+<h2 id="logging">Logging</h2>
+<p>Bashkit as a proper software framework offers a logging system. A
+bashkit script can and should record software events in a structured
+way. Bashkit follows <code>syslog(1)</code> levels to implement
+<em>logging routines</em>:</p>
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>routine</th>
+<th style="text-align: center;">panic</th>
+<th style="text-align: center;">alert</th>
+<th style="text-align: center;">crit</th>
+<th style="text-align: center;">error</th>
+<th style="text-align: center;">warn</th>
+<th style="text-align: center;">note</th>
+<th style="text-align: center;">info</th>
+<th style="text-align: center;">debug</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>level</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">7</td>
+</tr>
+</tbody>
+</table>
+<p>Logging level is controlled either by setting the global variable
+<code>$LOGLEVEL</code> beforehand or by calling
+<code>logging:setlevel</code> at runtime. Default logging level is
+<code>INFO/6</code>. As expected, a logging routine displays a message
+when the current logging level is <em>lower or equal</em> to its own,
+otherwise the message is silenced but planned side-effects occur (see
+<code>errcode</code>).</p>
+<h4 id="example">Example:</h4>
+<hr />
+<pre><code>bash-5.2$ cat hello.bash
+#!/usr/bin/env bash
+source ${SOME_PATH_TO_BASHKIT}/bashkit.bash
+info &#39;hello world!&#39;
+
+bash-5.2$ bash -c ./hello.bash
+2022-10-12 18:27:33+0200 [ info] ./hello.bash:3| hello world!</code></pre>
+<h3 id="standard-logging">Standard logging</h3>
+<p>Standard logging happens on <code>stderr</code>, when on a supported
+terminal it is colorized by default. Whenever color is unsuitable, it
+can be disabled by setting the global variable <code>$NO_COLOR</code>.
+As shown in <code>hello.bash</code> example, standard logging routines
+display a default format: ******</p>
+<pre><code>YYYY-MM-DD HH:MM:SS+hhmm [LEVEL] ORIGIN:LINENO| MSG`</code></pre>
+<table>
+<colgroup>
+<col style="width: 72%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>field</th>
+<th>format</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>STAMP</td>
+<td>ISO-8601 extended offset date-time format</td>
+</tr>
+<tr class="even">
+<td>LEVEL</td>
+<td>routine name in a padded string of length 5, enclosed in
+brackets</td>
+</tr>
+<tr class="odd">
+<td>ORIGIN</td>
+<td>$FUNCNAME or $FILENAME or main or bash</td>
+</tr>
+<tr class="even">
+<td>LINENO</td>
+<td>integer of calling time $LINENO value</td>
+</tr>
+<tr class="odd">
+<td>MSG</td>
+<td>arbitrary bash expandable string after “|”</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>there’s a bashkit routine named <code>info</code>. It shadows
+<code>info(1)</code> the bash info document reader. If you need to use
+<code>info(1)</code>, call it with <code>command</code>
+<code>info</code> <code>[args]</code>.</p>
+</blockquote>
+<h3 id="json-logging">JSON logging</h3>
+<p>JSON logging happens on <code>stderr</code>, it is enabled by setting
+the global variable <code>$JSON</code> beforehand. When activated, it
+replaces standard logging output. Messages are emitted in <a
+href="http://ndjson.org">NDJSON</a> format and consist in valid json
+values with no color and a fix layout:</p>
+<pre><code>&#39;{ &quot;date&quot;: &quot;STAMP&quot;, &quot;level&quot;: &quot;LEVEL&quot;, &quot;func&quot;: &quot;ORIGIN&quot;, &quot;lineno&quot;: &quot;LINENO&quot;, &quot;text&quot;: &quot;MSG&quot; }\n&#39;</code></pre>
+<p>Fields STAMP, LEVEL, …, MSG are similar to standard logging except
+for LEVEL that is not padded nor bracketed. They are all enclosed in
+double-quotes.</p>
+<h4 id="example-1">Example:</h4>
+<hr />
+<pre><code>bash-5.2$ bash -c &#39;JSON=1 ./hello.bash&#39;
+{ &quot;date&quot;: &quot;2022-10-13 17:35:04+0200&quot;, &quot;level&quot;: &quot;info&quot;, &quot;func&quot;: &quot;./hello.bash&quot;, &quot;lineno&quot;: &quot;3&quot;, &quot;text&quot;: &quot;hello world!&quot; }
+bash-5.2$</code></pre>
+<h3 id="panicking">Panicking</h3>
+<p><code>panic</code> and <code>fatal</code> are special logging
+routines that stop the ordinary flow of control and begin
+<em>panicking</em>: - <code>panic</code> calls bash <code>exit</code>
+with code 1 - <code>fatal</code> calls bash <code>exit</code> with a
+previously set value (see <code>errcode</code>) - registered
+<code>cleanup</code> functions (see <code>trap</code>) execute normally
+in LIFO order until the last one - at that point, the script crashes</p>
+<p>Panics can only be initiated by invoking <code>panic</code> or
+<code>fatal</code> directly.</p>
+<h3 id="report-and-trace">Report and Trace</h3>
+<p>Report mode is controlled by setting the global variable
+<code>$REPORT</code>. When activated, the script will dump a stack-trace
+and exit whenever an error is detected by bashkit.</p>
+<p>Trace mode is controlled by <code>$TRACE</code>. When activated: -
+bash is put in <code>xtrace</code> mode - additional program counter
+details are displayed by <code>$PS4</code> - <code>report</code> mode is
+activated - logging level is set to <code>DEBUG/7</code></p>
+<h2 id="error-handling">Error handling</h2>
+<p>Bashkit proposes unique yet classical error handling coding patterns.
+They extend bash error semantic by exploiting conditional statements.
+They assemble into error handling pipelines. Bashkit uses a trap to
+catch errors as they arise. If they are handled locally, the flow of
+control proceeds. Otherwise, the error is bubbled up the calling stack
+until handled. When an unhandled error reaches its calling-stack root,
+the calling script usually crashes. In Bashkit, almost <em>all errors
+are fatal</em>.</p>
+<h3 id="discussion">Discussion</h3>
+<p>Handling error in bash is difficult: The query “error handling in
+bash”, on the biggest search engine, returns +88M links as of October
+2022. On <a
+href="https://stackoverflow.com/questions/64786/error-handling-in-bash">SO</a>,
+a closely related question, asked in 2008, was viewed +410k times and
+received answers as late as early 2022. Eventually, it was deemed
+“opinion-based” by moderators and closed to more answers. Bash basic
+exit status handling is flawed by decisions made early during bash
+design along with heavy POSIX constraints on the subject. The resulting
+<code>set -e</code> mode is unsatisfactory and error-prone: whenever
+scripts are thought to fail fast, they could just behave in unintuitive
+ways, fallen into one of the many bash pitfalls.</p>
+<p>Bashkit helps scripts to efficiently handle errors or fail fast in
+most of the cases. One should be aware that some bash quirks are simply
+unreachable to address within bash itself. Don’t do this:</p>
+<pre><code>diff &lt;(sort A) &lt;(sort B)</code></pre>
+<h3 id="error-code-mapping">Error code mapping</h3>
+<p>Bashkit defines an error code mapping that closely follows <a
+href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">bash
+definition</a> and adds additional constraints to it: - an error is a
+global variable with a name prefixed by “E_” followed by words connected
+with “_” &gt; ex. <code>$E_FAILURE</code> but not <del>$E_FAILURE_</del>
+- such a variable contains a <em>uniquely</em> assigned integer, a
+preset &gt; ex. <code>E_FAILURE=1</code> - bashkit owns some of the
+preset errors - bash is said to owns some other preset errors - signal
+is a shorcut to bash/[129-192] - ownership is conventional and not
+enforced in any way - the proposed mapping is declared at runtime - some
+user <em>custom</em> errors can be registered at runtime</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>range</th>
+<th>names</th>
+<th>owner</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0-3</td>
+<td>E_SUCCESS - E_UNSUPPORTED</td>
+<td>bash</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4-7</td>
+<td>N/A</td>
+<td>unused</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>8-32</td>
+<td>E_BASHKIT - E_CUSTOM</td>
+<td>bashkit</td>
+<td>highest bit is 3 or 4</td>
+</tr>
+<tr class="even">
+<td>33-123</td>
+<td>custom names</td>
+<td>user</td>
+<td>highest bit is 5 or 6 but lesser than 124</td>
+</tr>
+<tr class="odd">
+<td>124-128</td>
+<td>E_TIMEOUT - E_INVALID_EXIT</td>
+<td>bash</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>129-192</td>
+<td>E_SIGHUP - E_SIGRTMAX</td>
+<td>signal</td>
+<td>highest bit is 7 low bits for signum</td>
+</tr>
+<tr class="odd">
+<td>193-254</td>
+<td>N/A</td>
+<td>unused</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>255</td>
+<td>E_OUT_OF_RANGE</td>
+<td>bash</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>bashkit offers tools to manipulate errors (see
+<code>error</code>)</p>
+</blockquote>
+<h3 id="flow-of-control-with-true">Flow of control with true</h3>
+<p>Using <code>true</code> as a control flow mechanism is already a bash
+idiom: ******</p>
+<pre><code>#!/usr/bin/env bash
+
+up_the_game
+rm some_random_file_that_could_not_exist || true
+echo &quot;all went well!&quot;</code></pre>
+<p>Under <code>errcode</code>, the bashkit error handling system, you
+can do the same: ******</p>
+<pre><code>source bashkit.bash
+
+up_the_game
+
+rm some_random_file_that_could_not_exist \
+|| true
+
+echo &quot;all went well!&quot;</code></pre>
+<p><code>true</code>, is the most basic <code>errcode handler</code> of
+all. Using <code>true</code> to handle an error means this error is
+irrelevant to the flow of control.</p>
+<blockquote>
+<p><code>return</code> and <code>exit</code> are also
+<code>errcode</code> compatible so existing constructs are
+preserved.</p>
+</blockquote>
+<h3 id="raise-catch-and-resume">raise, catch and resume</h3>
+<hr />
+<pre><code>check_cmd() {
+    command -v &quot;${cmd}&quot; &amp;&gt; /dev/null
+}</code></pre>
+<p><code>command</code> is a bash <code>builtin</code>. When used with
+<code>-v</code> option, it prints a description similar to the
+<code>type</code> builtin. It returns exit status <code>0</code> if
+<code>$cmd</code> is executable or fails with <code>1</code> if not. As
+stated before, under <code>errcode</code> (bashkit error handling
+support) when <code>$cmd</code> is not available, it is a fatal error.
+To be more on point, <code>check_cmd</code> should be more flexible than
+silently failing (thanks to redirecting to <code>/dev/null</code>), it
+could at least <code>log</code> an error. Consider the
+<code>bashkit idiom</code> to just do that: ******</p>
+<pre><code>check_cmd() {
+    local cmd=$1
+    command -v &quot;${cmd}&quot; &amp;&gt; /dev/null \
+    || error &quot;${cmd} not found&quot;
+}
+
+bash-5.2$ bash -c &#39;source bashkit.bash; check_cmd(){... ; check_cmd inexistent&#39;
+2022-10-17 16:18:02+0200 [error] bash:1| inexistent not found</code></pre>
+<p>It is slightly better but still lacks some genericity: what if we
+just want to know if a command exists and proceed with a workaround if
+not? Enter <code>raise</code> that ultimately enables more efficient
+error handling patterns: ******</p>
+<pre><code>source bashkit.bash
+
+check_cmd() {
+    local cmd=$1
+    command -v &quot;${cmd}&quot; &amp;&gt; /dev/null \
+    || raise &quot;${cmd} not found&quot;
+}
+
+check_cmd inexistent \
+|| error</code></pre>
+<p>Invoked like this, <code>raise</code> position a <code>message</code>
+along with the <code>exit status</code> <em>before</em> returning to the
+caller. It becomes the caller’s responsibility to chose what to do when
+<code>check_cmd</code> fails. For now, as previously, the script logs
+the error and then crashes. But a more convenient flow is within reach
+by using <code>catch</code>: ******</p>
+<pre><code>source bashkit.bash
+
+check_cmd isint \
+|| {
+  catch
+  isint() {
+     printf &#39;%d&#39; &quot;$1&quot; &gt; /dev/null 2&gt;&amp;1 \
+     || raise &quot;invalid number: $1&quot;
+  }
+}
+
+isint 1 \
+&amp;&amp; info integer \
+|| error</code></pre>
+<p>In this situation, when <code>check_cmd</code> raises a failure, the
+<code>catch</code> block is able to: 1) consume this failure 2) define a
+replacement function</p>
+<p><code>isint</code> also complies to <code>errcode</code>: the last
+invocation logs an informational “integer” (rather than error log
+“invalid number”).</p>
+<p>Now consider this example where <code>maybe</code> has 50% chances of
+failure: ******</p>
+<pre><code>source bashkit.bash
+
+maybe()(( $1 &lt; RANDOM%100 ))
+
+maybe 50 \
+&amp;&amp; echo yep \
+|| echo nope # not an errcode handler</code></pre>
+<p>Bashkit error handling trap will stop short right after the
+<code>maybe</code> call if it fails. In the long run, the script prints
+“yep” in one out of two runs but will never print “nope”. Under
+<code>errcode</code> it does not work because <code>echo</code> is not
+an <em>errcode compatible handler</em>. The idiomatic way here, is to
+use <code>resume</code>: ******</p>
+<pre><code>source bashkit.bash
+
+maybe()(( $1 &lt; RANDOM%100 ))
+
+maybe 50 \
+&amp;&amp; echo yep \
+|| resume echo nope</code></pre>
+<p>This time, the script will print either “yep” or “nope” with the same
+frequency. <code>resume</code> consumes the error and restores control
+to the command that immediately follows, in this case:
+<code>echo nope</code>.</p>
+<h4 id="not-as-a-function">not as a function</h4>
+<blockquote>
+<p>Because bash unary negation operator <code>!</code> is not a command,
+<code>resume</code> can not transfer control to it. It can be replaced
+by <code>not</code>. <code>not</code> is defined to return the logical
+negation of its argument. ******</p>
+</blockquote>
+<pre><code>source bashkit.bash
+
+maybe()(( $1 &lt; RANDOM%100 ))
+abort()(( RANDOM &amp; 0x1 ))
+
+maybe 50 \
+|| resume not abort \
+|| error &#39;can not proceed&#39;</code></pre>
+<p>In the long run, this script will rather succeed (75%) than log an
+error and fail (25%).</p>
+<h2 id="bashkit-scripting">Bashkit scripting</h2>
+<p>Bashkit favors <code>fail fast</code> like scripting patterns: by
+combining <a
+href="https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html"><code>Conditional Constructs</code></a>
+<code>[[...]]</code> and <code>((...))</code> with <code>errcode</code>
+and <code>handlers</code> scripts can achieve useful and robust
+behaviors. Bashkit scripts can setup LIFO <code>traps</code> on any
+signal and <code>cleanup</code> command easily enables deferred actions
+upon script exit. It is also very easy to add <code>text color</code> to
+outputs.</p>
+<h3 id="unhandled-errors">Unhandled errors</h3>
+<p>Bashkit can detect a set but unhandled error that otherwise would go
+silent. In this case, the script will <strong>crit</strong> log the
+error: ******</p>
+<pre><code>source bashkit.bash extras
+
+isint not_an_integer</code></pre>
+<p>When ran, the above script outputs: ******</p>
+<pre><code>bash-5.2$ ./noint.bash
+2022-10-24 15:14:52+0200 [ crit] isint:33| invalid number</code></pre>
+<h3 id="fail-fast">Fail fast</h3>
+<p><a
+href="https://www.martinfowler.com/ieeeSoftware/failFast.pdf"><code>Fail fast</code></a>
+is a simple technique that is known to ease finding most defects in a
+software. A software that fails fast, will stop visibly as soon as a
+problem occurs: bugs are easier to find and fix so, hopefully, fewer
+make it to production.</p>
+<h4 id="assertions">Assertions</h4>
+<p>Usually <code>assertions</code> are different from exceptions in the
+way that assertions can be turned off because they were believed useful
+during design and tuning development stages. Experience has proven them
+usefull even in production where <em>real</em> problems happen.</p>
+<p>Bash has no support built-in support for <em>assertions</em>. Bashkit
+which is mostly written in pure-bash does not either implement a
+<em>per-se</em> assertion system: instead it <em>emulates</em> them
+using <code>conditional construcs</code> and <code>errcode</code>:
+Namely a tests followed by a <code>|| raise</code> pattern that exploits
+<code>raise</code> polymorphism <em>is</em> an
+<code>assertion</code>.</p>
+<h4 id="example-2">Example:</h4>
+<hr />
+<pre><code>array::pick() {
+    local -n A=$1
+    local -n acc=${2:-__}
+
+    local i=$(( RANDOM % ${#A[@]} ))
+    printf -v acc &#39;%s\n&#39; &quot;${A[i]}&quot;
+}</code></pre>
+<p><code>array::pick</code> takes two bash <a
+href="https://www.gnu.org/software/bash/manual/html_node/Shell-Parameters.html">namerefs</a>.
+The first one points to an array <code>A</code> while the second,
+<code>acc</code>, is used to write out a random element of
+<code>A</code>. Here are the things that could go wrong within this
+function: 1) a wrong argument count (invocation mistake) 2)
+<code>A</code> not pointing to an array 3) <code>A</code> pointing to an
+empty array</p>
+<p>Being a publicly exposed function of bashkit module
+<code>array</code>, <code>array::pick</code> should remediate these
+situations. The proper way is to add a bunch of tests akin to
+<code>assertions</code> and combine <code>errcode handlers</code> to
+always achieve a useful behavior: ******</p>
+<pre><code>source bashkit.bash
+
+array::pick() {
+    (( $# == 1 || $# == 2 )) \
+    || raise &quot;${E_PARAM_ERR}&quot; &#39;incorrect invocation&#39; \
+    || fatal
+
+    local -n A=$1
+    local -n acc=${2:-__}
+
+    check::vartype as A \
+    || raise
+
+    (( ${#A[@]} != 0 )) \
+    || raise &quot;${E_PARAM_ERR}&quot; &#39;array is empty&#39;
+
+    local i=$(( RANDOM % ${#A[@]} ))
+    printf -v acc &#39;%s\n&#39; &quot;${A[i]}&quot;
+}</code></pre>
+<blockquote>
+<p>This example also shows that <code>raise</code> is polymorphic. - the
+first test <em>asserts</em> that there is either a single or 2
+arguments, if not the script <code>fatals</code> immediately with exit
+status <code>$E_PARAM_ERR</code> and a descriptive message -
+<code>local refnames</code> assignations can not fail by design:
+<code>$1</code> exists and <code>$2</code> has a default - bashkit
+<code>check::vartype</code> enables script to assert that
+<code>$A</code> refers to an <em>array that has been set</em>, if not
+the function (re)raises the <code>check::vartype</code> failure to
+<code>array::pick</code> caller - next test <em>asserts</em> a non-empty
+array and once again, raises any failure to <code>array::pick</code>
+caller - at this point, there is no way the function could fail anymore
+and it will eventually select and copy a random element from
+<code>$A[@]</code> to <code>$acc</code></p>
+</blockquote>
+<h3 id="traps-and-cleanup">Traps and cleanup</h3>
+<p>In Bash, a process may choose to perform a different action, rather
+than exiting, upon receiving a signal. This is done by setting up a
+signal handler (or trap). The trap must be set before the signal is
+received. A process that receives a signal for which it has set a trap
+is said to have caught the signal.</p>
+<p>The simplest signal handling a process can choose to perform is to
+ignore a signal. This is generally a <em>bad idea</em>, unless it is
+done for a very specific purpose. Ignoring signals often leads to
+runaway processes which consume all available CPU.</p>
+<p>Bashkit <code>trap</code> module utilities extend bash command
+behavior. Namely, <code>trap::callback</code> enables a script to
+register <em>multiple callback functions or plain sources</em> that are
+called in LIFO order upon receving selected signals.</p>
+<p>More commonly, traps can be set up to intercept a fatal signal,
+perform cleanup, and then exit gracefully. For example, a program that
+creates temporary files might wish to remove them before exiting. If the
+program is forced to exit by a signal, it won’t be able to remove the
+files unless it catches the signal.</p>
+<p>Bashkit <code>cleanup</code> utility is a <code>trap::callback</code>
+wrapper dedicated to hook instructions to signal <code>EXIT/0</code>. It
+can be called anytime from anywhere in the script, registered functions
+will run in LIFO order at the script top level. As in bash, a mistake in
+a callback could abort the entire cleanup process but won’t prevent the
+script from exiting.</p>
+<h4 id="example-3">Example:</h4>
+<hr />
+<pre><code>source bashkit.bash
+
+scratch=$(mktemp) \
+|| exit
+
+cleanup &#39;rm -f &quot;${scratch}&quot;&#39;</code></pre>
+<blockquote>
+<p>When <code>panicking</code>, a bashkit script will
+<code>cleanup</code> before exiting. But there are situations beyond
+reach, like arithmetic exceptions or uncatchable signals that can
+prevent <code>cleanup</code> to take place.</p>
+</blockquote>
+<h3 id="colors">Colors</h3>
+<p>Bashkit provides a <code>color</code> module. For now, this module
+only supports the <a
+href="https://en.wikipedia.org/wiki/ANSI_escape_code">ANSI 8 colors
+model</a>.</p>
+<p><code>color::encode</code> supports a tiny english color description
+language: ******</p>
+<pre><code>description = color &quot;text&quot; [ color &quot;background&quot; ]
+            | &quot;reset&quot;
+color = &quot;&quot;
+      | attributes brightness base
+attributes=? a list of unique modifiers ?
+modifiers = &quot;&quot;
+          | &quot;regular&quot; | &quot;bold&quot; | &quot;dim&quot; | &quot;italic&quot; | &quot;underlined&quot; | &quot;blinking&quot;
+          | modifiers, { modifiers }
+brightness = &quot;&quot;
+           | &quot;bright&quot;
+base = &quot;black&quot; | &quot;red&quot; | &quot;green&quot; | &quot;yellow&quot; | &quot;blue&quot; | &quot;magenta&quot; | &quot;cyan&quot;
+     | &quot;white&quot; | &quot;default&quot;</code></pre>
+<p>The smallest descriptions of all are <code>"text"</code> and
+<code>"reset"</code>. The later is always the ANSI <code>ESC[m</code>
+reset code while the former is the current system-defined default.</p>
+<h4 id="example-4">Example:</h4>
+<hr />
+<pre><code>source bashkit.bash
+
+color::encode bold green text; bold_green=${__}
+color::encode reset; reset=${__}
+
+printf &quot;%b%s%b&quot; &quot;${bold_green}&quot; NATURE &quot;${reset} does not hurry, yet everything is accomplished\n&quot;</code></pre>
+<blockquote>
+<ul>
+<li>descriptions are literals, they have no quote</li>
+<li>after a successful encoding, ANSI code in store is
+<code>${__}</code></li>
+<li><code>%b</code> is the required verb for an escape code when
+colorizing with <code>printf</code></li>
+<li>any compatible terminal that receives such codes will interpret them
+as color commands</li>
+</ul>
+</blockquote>
+<p>Declaring colors can be a tidy task, the following example shows how
+to build a <em>color palette</em>: ******</p>
+<pre><code>source bashkit.bash
+
+declare -A COLPAL=(  # color palette
+  [panic]=&#39;underlined blinking bold white text red background&#39;
+  [alert]=&#39;bold white text red background&#39;
+  [crit]=&#39;underlined bold red text&#39;
+  [fatal]=&#39;bold red text&#39;
+  [error]=&#39;red text&#39;
+  [warn]=&#39;yellow text&#39;
+  [note]=&#39;blue text&#39;
+  [info]=&#39;green text&#39;
+  [debug]=&#39;magenta text&#39;
+  [reset]=&#39;reset&#39;
+)
+
+color::table COLPAL</code></pre>
+<blockquote>
+<p>The demonstrated palette is actually used by bashkit
+<code>logging</code> routines.</p>
+</blockquote>
+<p>When called on a bash <em>dictionary</em> (ie. associate array),
+<code>color::table</code> will substitute, in place, each description by
+a computed ANSI <em>escape sequence</em>. The resulting dictionary is to
+be used later as a <code>lookup table</code>.</p>
+<p>% CATCH(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name">NAME</h1>
+<p>catch - store a raising <code>errcode</code> and resume execution</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<p>catch [<em>refname</em>]</p>
+<h1 id="description">DESCRIPTION</h1>
+<p>Catch captures and stores a raising <code>errcode</code> and then
+resume execution at the first following command.</p>
+<p>If no <em>refname</em> is specified, <code>errcode</code> is stored
+in special bashkit variable <code>$____</code>.</p>
+<p>When <code>catch</code> returns, the error context is modified:
+<code>$?</code> is equal to 0.</p>
+<p>Catch always returns with an exit code of zero.</p>
+<h1 id="examples">EXAMPLES</h1>
+<p>Example 1 <code>true(1)</code> equivalence</p>
+<p>The following command will never fail, it is equivalent to using
+<code>true(1)</code>.</p>
+<pre><code>$ rm &quot;${TMPFILE}&quot; || catch</code></pre>
+<p>Example 2 Error handling</p>
+<p>The following command, in case of failure, will print an explanation
+for <code>curl(1)</code> exit statuses [1-3] or display the exit status
+otherwise.</p>
+<pre><code>$ curl &quot;${URL}&quot; &gt; /dev/null 2&gt;&amp;1 || {
+    catch rc;
+    case ${rc} in
+      1) echo &quot;unsupported Protocol&quot;;;
+      2) echo &quot;failed to initialize&quot;;;
+      3) echo &quot;malformed URL&quot;;;
+      *) echo &quot;curl exited with status ${rc}&quot;;;
+    esac
+  }</code></pre>
+<h1 id="see-also">SEE ALSO</h1>
+<p><code>raise(1)</code>, <code>resume(1)</code></p>
+<h1 id="colophon">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% NOT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-1">NAME</h1>
+<p>not - unary logical not as a function</p>
+<h1 id="synopsis-1">SYNOPSIS</h1>
+<p>not [<em>command</em>]</p>
+<h1 id="description-1">DESCRIPTION</h1>
+<p><code>not</code> is the functional equivalent of <code>!</code>. It
+is intended to be used with <code>resume(1)</code> that can only accept
+a command as argument.</p>
+<h1 id="examples-1">EXAMPLES</h1>
+<p>Example 1 Direct invocation</p>
+<p>The first following command always fails while the second always
+succeeds.</p>
+<pre><code>$ not true
+$ not false</code></pre>
+<p>Example 2 Combining with <code>resume(1)</code></p>
+<p>The following command is equivalent to logical
+<code>(green | ! red)</code>:</p>
+<pre><code>$ is_green &quot;${color}&quot; || resume not is_red &quot;${color}&quot;</code></pre>
+<h1 id="see-also-1">SEE ALSO</h1>
+<p><code>resume(1)</code></p>
+<h1 id="colophon-1">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% RAISE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-2">NAME</h1>
+<p>raise - raise or reraise an <code>errcode</code></p>
+<h1 id="synopsis-2">SYNOPSIS</h1>
+<p>raise [<em>errcode</em>] [<em>errmsg</em>]</p>
+<h1 id="description-2">DESCRIPTION</h1>
+<p>Raise set an <em>errcode</em> and an <em>errmsg</em> and then fails
+immediately.</p>
+<p>Raise returns the given <em>errcode</em>. If the specified
+<em>errcode</em> is zero, the exit status defaults to one. When no
+<em>errcode</em> is specified, <code>raise</code> returns either the
+last positionned <code>errcode</code> or defaults to one if none.</p>
+<p>If <em>errmsg</em> is not given, <code>raise</code> uses the last
+positionned one or defaults to none.</p>
+<h1 id="examples-2">EXAMPLES</h1>
+<p>Example 1 Direct invocation</p>
+<p>The following command always fails, here <code>raise</code> is
+equivalent to <code>false(1)</code>.</p>
+<pre><code>$ raise</code></pre>
+<p>Example 2 Direct invocation with arguments</p>
+<p>The first two commands fail with exit status 2, the last one with 1.
+In the last two, an error message is also positionned.</p>
+<pre><code>$ raise 2
+$ raise 2 &quot;error message&quot;
+$ raise &quot;error message&quot;</code></pre>
+<p>Example 3 Raising last exit status</p>
+<p>The following commands will raise the exit status returned by
+<code>rm(1)</code> along with an error message for the second one.</p>
+<pre><code>$ rm &quot;${TMPFILE}&quot; \
+  || raise
+$ rm &quot;${TMPFILE}&quot; \
+  || raise &quot;cannot rm ${TMPFILE}&quot;</code></pre>
+<p>Example 4 Raising exit status through calling stack</p>
+<p>The following script will log an error and then exit with status 1.
+The exit status is set in <code>isint</code> and reused upon return by
+<code>error(1)</code>.</p>
+<pre><code>#!/usr/bin/env bash
+# isint.bash -- bashkit example
+source bashkit.bash
+
+isint() {
+  local n
+  printf -v n &#39;%d&#39; &quot;${1:-}&quot; &amp;&gt; /dev/null \
+  || raise &quot;not an int&quot;
+}
+
+isint &quot;abc&quot; \
+|| error
+
+$ bash isint.bash
+2022-10-31 20:44:01+0100 [error] isint:8| not an int</code></pre>
+<p>Example 5 Relocating errors throughout calling points</p>
+<p>In the above example, the error message traced back into
+<code>isint</code>. It is sometimes usefull to relocate the error at the
+calling point:</p>
+<pre><code>#!/usr/bin/env bash
+# isint.bash -- bashkit example
+source bashkit.bash
+
+isint() {
+  local n
+  printf -v n &#39;%d&#39; &quot;${1:-}&quot; &amp;&gt; /dev/null \
+  || raise &quot;not an int&quot;
+}
+
+isint &quot;abc&quot; \
+|| raise \
+|| error
+
+$ bash isint.bash
+2022-10-31 20:47:38+0100 [error] isint.bash:13| not an int</code></pre>
+<h1 id="see-also-2">SEE ALSO</h1>
+<p><code>catch(1)</code>, <code>resume(1)</code></p>
+<h1 id="colophon-2">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% RESUME(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-3">NAME</h1>
+<p>resume - abort a raising <code>errcode</code> and resume
+execution</p>
+<h1 id="synopsis-3">SYNOPSIS</h1>
+<p>resume [<em>command</em>]</p>
+<h1 id="description-3">DESCRIPTION</h1>
+<p>Unlike <code>catch(1)</code>, <code>resume</code> executes in the
+<em>same context</em> as the error. It allows the flow of control to
+abort the raising <code>errcode</code> and to recover execution by
+running the command that follows it.</p>
+<h1 id="examples-3">EXAMPLES</h1>
+<p>Example 1 Direct invocation</p>
+<p>The following command always succeed, here <code>resume</code> is
+equivalent to builtin <code>:</code>.</p>
+<pre><code>$ resume</code></pre>
+<p>Example 2 Direct invocation with a command argument</p>
+<p>The following command displays a message, here <code>resume</code> is
+a no-op:</p>
+<pre><code>$ resume echo &quot;resumed!&quot;</code></pre>
+<p>Example 3 Error flow of control handling</p>
+<pre><code>$ (( n &gt; 0 &amp;&amp; n &amp; 0x1 )) &amp;&amp; echo &quot;odd&quot; || resume echo &quot;even&quot;</code></pre>
+<p>Without <code>resume</code> the above command will stop short
+<em>before</em> <code>||</code> for any even number: it will not display
+“even”.</p>
+<p>Example 4 Combining with <code>not(1)</code> or builtin
+<code>let</code></p>
+<p><code>resume</code> argument must be a <em>command</em>, unary
+operator or litteral values are not supported. This is why we have to
+use <code>not(1)</code> in the following construct:</p>
+<pre><code>$ is_green &quot;${color}&quot; || resume not is_red &quot;${color}&quot;</code></pre>
+<p>The same goes for assignations:</p>
+<pre><code>$ is_even &quot;${x}&quot; || resume let x=$((x + 1))</code></pre>
+<h1 id="see-also-3">SEE ALSO</h1>
+<p><code>catch(1)</code>, <code>raise(1)</code>, <code>not(1)</code></p>
+<h1 id="colophon-3">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% COLOR::ENCODE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-4">NAME</h1>
+<p>color::encode - compute an 8 colors ANSI code from a color
+description</p>
+<h1 id="synopsis-4">SYNOPSIS</h1>
+<p>color::encode [<em>description</em>]</p>
+<h1 id="description-4">DESCRIPTION</h1>
+<p><code>color::encode</code> encodes a color description into an ANSI
+color escape code. The code is always stored in special bashkit variable
+<code>$__</code>.</p>
+<p>If no <em>description</em> is specified, the code defaults to
+<code>ESC[m</code>, the reset code.</p>
+<p>The description must be written according to the following
+grammar:</p>
+<pre><code>description = color &quot;text&quot; [ color &quot;background&quot; ]
+            | &quot;reset&quot;
+
+color = &quot;&quot;
+      | attributes brightness base
+
+attributes=? a list of unique modifiers ?
+
+modifiers = &quot;&quot;
+          | &quot;regular&quot; | &quot;bold&quot; | &quot;dim&quot; | &quot;italic&quot; | &quot;underlined&quot; | &quot;blinking&quot;
+          | modifiers, { modifiers }
+
+brightness = &quot;&quot;
+           | &quot;bright&quot;
+
+base = &quot;black&quot; | &quot;red&quot; | &quot;green&quot; | &quot;yellow&quot;
+     | &quot;blue&quot; | &quot;magenta&quot; | &quot;cyan&quot; | &quot;white&quot;
+     | &quot;default&quot;</code></pre>
+<p>The smallest descriptions of all are <code>"text"</code> and
+<code>"reset"</code>. The later is always the ANSI <code>ESC[m</code>
+reset code while the former is the current system-defined default.</p>
+<p><code>color::encode</code> returns with an exit code of zero upon
+successful encoding. It returns <code>E_PARAM_ERR/9</code>
+otherwise.</p>
+<h1 id="examples-4">EXAMPLES</h1>
+<p>The description must always be written without quote when invoking
+directly:</p>
+<pre><code>  $ color::encode underlined blinking bold white text red background
+  $ echo &quot;${__}&quot;
+  \x1b[4;5;1;37;41m</code></pre>
+<h1 id="see-also-4">SEE ALSO</h1>
+<p>https://en.wikipedia.org/wiki/ANSI_escape_code</p>
+<p><code>color::table(1)</code></p>
+<h1 id="colophon-4">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% COLOR::IS_ENABLED(1) Bashkit User Manuals % Wuage % October
+2022</p>
+<h1 id="name-5">NAME</h1>
+<p>color::is_enabled - test if color is supported</p>
+<h1 id="synopsis-5">SYNOPSIS</h1>
+<p>color::is_enabled</p>
+<h1 id="description-5">DESCRIPTION</h1>
+<p><code>color::is_enabled</code> test if color is not <em>disabled</em>
+and terminal is compatible. One can <em>disable</em> color by setting
+<code>$NO_COLOR</code> before running scripts.</p>
+<p><code>color::is_enabled</code> returns 0 if colors are available and
+&gt;0 otherwise.</p>
+<h1 id="example-5">EXAMPLE</h1>
+<pre><code>$ color::is_enabled &amp;&amp; echo &quot;colors are available&quot; || resume echo &quot;no color&quot;</code></pre>
+<h1 id="see-also-5">SEE ALSO</h1>
+<p><code>color::encode(1)</code>, <code>color::table(1)</code></p>
+<h1 id="colophon-5">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% COLOR::TABLE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-6">NAME</h1>
+<p>color::table - compute 8 colors ANSI code from a description
+dictionary</p>
+<h1 id="synopsis-6">SYNOPSIS</h1>
+<p>color::table [<em>dict</em>]</p>
+<h1 id="description-6">DESCRIPTION</h1>
+<p><code>color::table</code> replaces descriptions found in an
+associative array by corresponding ASCII 8-color codes. The
+<em>dict</em> can subsequently be used as a
+<code>lookup table</code>.</p>
+<p>The descriptions must be written for
+<code>color::encode(1)</code>.</p>
+<p>If there is a type mismatch or if <em>dict</em> is undefined,
+<code>color::table</code> panics by calling <code>fatal(1)</code>.</p>
+<p><code>color::table</code> returns with an exit code of zero upon
+successful encoding. It errors with exit status
+<code>E_PARAM_ERR/9</code> otherwise. The content of the original dict
+is undefined in the later case.</p>
+<h1 id="example-6">EXAMPLE</h1>
+<pre><code>$ declare -A COLPAL=(  # color palette
+    [panic]=&#39;underlined blinking bold white text red background&#39;
+    [alert]=&#39;bold white text red background&#39;
+    [crit]=&#39;underlined bold red text&#39;
+    [fatal]=&#39;bold red text&#39;
+    [error]=&#39;red text&#39;
+    [warn]=&#39;yellow text&#39;
+    [note]=&#39;blue text&#39;
+    [info]=&#39;green text&#39;
+    [debug]=&#39;magenta text&#39;
+    [reset]=&#39;reset&#39;
+  )
+$ color::table COLPAL
+$ echo &quot;${COLPAL[panic]}&quot;
+\x1b[4;5;1;37;41m</code></pre>
+<h1 id="see-also-6">SEE ALSO</h1>
+<p><code>color::encode(1)</code>, <code>error(1)</code>,
+<code>fatal(1)</code></p>
+<h1 id="colophon-6">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% BREAKPOINT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-7">NAME</h1>
+<p>breakpoint - set an intentional pausing place for debugging
+purpose</p>
+<h1 id="synopsis-7">SYNOPSIS</h1>
+<p>breakpoint</p>
+<h1 id="description-7">DESCRIPTION</h1>
+<p>When used in conjunction of <code>errcode::trap breakpoint</code>
+mode or if <code>$DEBUG</code> is set beforehand,
+<code>breakpoint</code> pauses the script runtime and throws a minimal
+console to the controlling tty <code>/dev/tty</code>. Otherwise,
+<code>breakpoint</code> is a no op.</p>
+<h1 id="example-7">EXAMPLE</h1>
+<pre><code>$ errcode::trap breakpoint
+$ breakpoint
+# breakpoint (0)
+debug&gt;</code></pre>
+<h1 id="see-also-7">SEE ALSO</h1>
+<p><code>errcode::trap(1)</code></p>
+<h1 id="colophon-7">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ERRCODE::TRAP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-8">NAME</h1>
+<p>errcode::trap - get or set <code>errcode</code> mode</p>
+<h1 id="synopsis-8">SYNOPSIS</h1>
+<p>errcode::trap [<em>command</em>]</p>
+<h1 id="description-8">DESCRIPTION</h1>
+<p><em>command</em> is one of <code>default</code> | <code>enable</code>
+| <code>disable</code> | <code>breakpoint</code> | <code>status</code>.
+If no <em>command</em> is given, it defaults to <code>status</code>.
+<code>errcode::trap</code> panics by calling <code>fatal(1)</code>
+otherwise.</p>
+<p><code>errcode::trap</code> returns with an exit code of zero if a
+<code>errcode</code> is enabled, &gt;0 otherwise.</p>
+<p><em>Disabling <code>errcode</code> <code>trap</code> is strongly
+discouraged as it may result in non obvious bad script side
+effects</em>.</p>
+<h1 id="example-8">EXAMPLE</h1>
+<pre><code>$ errcode::trap \
+&amp;&amp; echo &quot;errcode trap is enabled&quot; \
+|| resume echo &quot;errcode is disabled&quot;
+errcode is enabled</code></pre>
+<h1 id="see-also-8">SEE ALSO</h1>
+<p><code>breakpoint(1)</code></p>
+<h1 id="colophon-8">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloadeded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ERROR::CLASS(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-9">NAME</h1>
+<p>error::class - error classifying tool</p>
+<h1 id="synopsis-9">SYNOPSIS</h1>
+<p>error::class <em>error</em></p>
+<h1 id="description-9">DESCRIPTION</h1>
+<p>With <em>error</em> either a positive integer in range [0-255] or a
+valid name:</p>
+<pre><code>^E_([A-Z1-9]+)((_([A-Z1-9])+)*)$</code></pre>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>range</th>
+<th>names</th>
+<th>owner</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0-3</td>
+<td>E_SUCCESS - E_UNSUPPORTED</td>
+<td>bash</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4-7</td>
+<td>N/A</td>
+<td>unused</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>8-32</td>
+<td>E_BASHKIT - E_CUSTOM</td>
+<td>bashkit</td>
+<td>highest bit is 3 or 4</td>
+</tr>
+<tr class="even">
+<td>33-123</td>
+<td>custom names</td>
+<td>user</td>
+<td>highest bit is 5 or 6 but lesser than 124</td>
+</tr>
+<tr class="odd">
+<td>124-128</td>
+<td>E_TIMEOUT - E_INVALID_EXIT</td>
+<td>bash</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>129-192</td>
+<td>E_SIGHUP - E_SIGRTMAX</td>
+<td>signal</td>
+<td>highest bit is 7 low bits for signum</td>
+</tr>
+<tr class="odd">
+<td>193-254</td>
+<td>N/A</td>
+<td>unused</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>255</td>
+<td>E_OUT_OF_RANGE</td>
+<td>bash</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The queried error class is printed on <code>stdout</code>
+<em>and</em> stored in special variable <code>$__</code>.</p>
+<p><code>error::class</code> returns 0 on success &gt;0 otherwise.</p>
+<h1 id="examples-5">EXAMPLES</h1>
+<pre><code>$ error::class 129
+signal
+$ error::class E_SIGHUP
+signal</code></pre>
+<h1 id="see-also-9">SEE ALSO</h1>
+<p><code>error::custom(1)</code>, <code>error::list(1)</code>,
+<code>error::whatis(1)</code></p>
+<h1 id="colophon-9">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ERROR::CUSTOM(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-10">NAME</h1>
+<p>error::custom - register a custom error</p>
+<h1 id="synopsis-10">SYNOPSIS</h1>
+<p>error::custom <em>rawname</em> <em>rawcode</em></p>
+<h1 id="description-10">DESCRIPTION</h1>
+<p>With <em>rawname</em> a string and <em>rawcode</em> a positive
+integer in range [1-90], <code>error::custom</code> registers
+<code>$E_&lt;RAWNAME&gt;</code> wich equals <code>$E_CUSTOM</code> +
+<em>rawcode</em>.</p>
+<p><em>rawname</em> is valid if it matches:</p>
+<pre><code>^E_([A-Z1-9]+)((_([A-Z1-9])+)*)$</code></pre>
+<p><code>error::custom</code> returns 0 if successful. It returns
+<code>$E_PARAM_ERR</code> when <em>rawname</em> or <em>rawcode</em> are
+already defined or if <em>rawcode</em> is out of range.</p>
+<h1 id="example-9">EXAMPLE</h1>
+<pre><code>$ error::custom empty_buffer 1
+$ echo &quot;${__}&quot;
+E_EMPTY_BUFFER=33
+$ echo ${E_EMPTY_BUFFER}
+33</code></pre>
+<h1 id="see-also-10">SEE ALSO</h1>
+<p><code>error::class(1)</code>, <code>error::list(1)</code>,
+<code>error::whatis(1)</code></p>
+<h1 id="colophon-10">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ERROR::LIST(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-11">NAME</h1>
+<p>error::list - error class listing tool</p>
+<h1 id="synopsis-11">SYNOPSIS</h1>
+<p>error::list <em>errclass</em></p>
+<h1 id="description-11">DESCRIPTION</h1>
+<p>With <em>errclass</em> is one of <code>all</code> | <code>bash</code>
+| <code>bashkit</code> | <code>custom</code> | <code>signal</code>. When
+<em>errclass</em> is not given it defaults to <code>all</code>.
+<code>error::list</code> panics by calling <code>fatal(1)</code>
+otherwise.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>range</th>
+<th>names</th>
+<th>owner</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0-3</td>
+<td>E_SUCCESS - E_UNSUPPORTED</td>
+<td>bash</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4-7</td>
+<td>N/A</td>
+<td>unused</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>8-32</td>
+<td>E_BASHKIT - E_CUSTOM</td>
+<td>bashkit</td>
+<td>highest bit is 3 or 4</td>
+</tr>
+<tr class="even">
+<td>33-123</td>
+<td>custom names</td>
+<td>user</td>
+<td>highest bit is 5 or 6 but lesser than 124</td>
+</tr>
+<tr class="odd">
+<td>124-128</td>
+<td>E_TIMEOUT - E_INVALID_EXIT</td>
+<td>bash</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>129-192</td>
+<td>E_SIGHUP - E_SIGRTMAX</td>
+<td>signal</td>
+<td>highest bit is 7 low bits for signum</td>
+</tr>
+<tr class="odd">
+<td>193-254</td>
+<td>N/A</td>
+<td>unused</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>255</td>
+<td>E_OUT_OF_RANGE</td>
+<td>bash</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The queried error list is printed on <code>stdout</code>.</p>
+<p><code>error::list</code> always returns 0 unless invoked with a bad
+<em>errclass</em>.</p>
+<h1 id="example-10">EXAMPLE</h1>
+<pre><code>$ error::list | column -t -s &quot;=&quot;
+E_SUCCESS            0
+E_FAILURE            1
+...
+E_SIGRTMAX           192</code></pre>
+<h1 id="see-also-11">SEE ALSO</h1>
+<p><code>error::class(1)</code>, <code>error::custom(1)</code>,
+<code>error::whatis(1)</code></p>
+<h1 id="colophon-11">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ERROR::WHATIS(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-12">NAME</h1>
+<p>error::whatis - bidirectional mapper between error codes and
+names</p>
+<h1 id="synopsis-12">SYNOPSIS</h1>
+<p>error::whaits <em>error</em></p>
+<h1 id="description-12">DESCRIPTION</h1>
+<p>With <em>error</em> either a positive integer in range [0-255] or a
+valid name:</p>
+<pre><code>^E_([A-Z1-9]+)((_([A-Z1-9])+)*)$</code></pre>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>range</th>
+<th>names</th>
+<th>owner</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0-3</td>
+<td>E_SUCCESS - E_UNSUPPORTED</td>
+<td>bash</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4-7</td>
+<td>N/A</td>
+<td>unused</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>8-32</td>
+<td>E_BASHKIT - E_CUSTOM</td>
+<td>bashkit</td>
+<td>highest bit is 3 or 4</td>
+</tr>
+<tr class="even">
+<td>33-123</td>
+<td>custom names</td>
+<td>user</td>
+<td>highest bit is 5 or 6 but lesser than 124</td>
+</tr>
+<tr class="odd">
+<td>124-128</td>
+<td>E_TIMEOUT - E_INVALID_EXIT</td>
+<td>bash</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>129-192</td>
+<td>E_SIGHUP - E_SIGRTMAX</td>
+<td>signal</td>
+<td>highest bit is 7 low bits for signum</td>
+</tr>
+<tr class="odd">
+<td>193-254</td>
+<td>N/A</td>
+<td>unused</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>255</td>
+<td>E_OUT_OF_RANGE</td>
+<td>bash</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The queried error code/name is printed on <code>stdout</code>
+<em>and</em> stored in special variable <code>$__</code>.</p>
+<p><code>error::whatis</code> returns 0 on success &gt;0 otherwise.</p>
+<h1 id="examples-6">EXAMPLES</h1>
+<pre><code>$ error::whatis 129
+E_SIGHUP
+$ error::class E_SIGHUP
+129</code></pre>
+<h1 id="see-also-12">SEE ALSO</h1>
+<p><code>error::class</code>, <code>error::custom(1)</code>,
+<code>error::list(1)</code></p>
+<h1 id="colophon-12">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ALERT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-13">NAME</h1>
+<p>alert - display an alert message</p>
+<h1 id="synopsis-13">SYNOPSIS</h1>
+<p>alert [<em>message</em> …]</p>
+<h1 id="description-13">DESCRIPTION</h1>
+<p>With <em>message</em> a string, <code>alert</code> takes an arbitrary
+number of <em>message</em> arguments. <em>message</em> can be set in
+special variable <code>$__</code> or by calling
+<code>raise(1)</code>.</p>
+<p>If <code>$LOGLEVEL</code> is &gt;= 1 beforehand or set at runtime
+each message argument is displayed on its own.</p>
+<p><code>alert</code> is an <code>errcode</code> handler, it returns
+previous <code>$?</code> unless a write or assignment error occurs.</p>
+<h1 id="examples-7">EXAMPLES</h1>
+<pre><code>$ alert
+2022-11-07 16:50:12+0100 [alert] bash:1|
+
+$ alert &quot;alert message&quot;
+2022-11-07 16:50:14+0100 [alert] bash:1| alert message
+
+$ __=&#39;preset error&#39;; false \
+|| alert
+2022-11-07 16:52:11+0100 [alert] bash:1| preset error
+
+$ false || alert &#39;failure!&#39;
+2022-11-07 16:53:44+0100 [alert] bash:1| failure!
+
+$ false \
+  || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
+  || alert
+2022-11-07 16:59:33+0100 [alert] bash:1| not good</code></pre>
+<h1 id="see-also-13">SEE ALSO</h1>
+<p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code>,
+<code>errcode::trap(1)</code>, <code>raise(1)</code></p>
+<h1 id="colophon-13">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% CRIT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-14">NAME</h1>
+<p>crit - display a critical message</p>
+<h1 id="synopsis-14">SYNOPSIS</h1>
+<p>crit [<em>message</em> …]</p>
+<h1 id="description-14">DESCRIPTION</h1>
+<p>With <em>message</em> a string, <code>crit</code> takes an arbitrary
+number of <em>message</em> arguments. <em>message</em> can be set in
+special variable <code>$__</code> or by calling
+<code>raise(1)</code>.</p>
+<p>If <code>$LOGLEVEL</code> is &gt;= 2 beforehand or set at runtime
+each message argument is displayed on its own.</p>
+<p><code>crit</code> is an <code>errcode</code> handler, it returns
+previous <code>$?</code> unless a write or assignment error occurs.</p>
+<h1 id="examples-8">EXAMPLES</h1>
+<pre><code>$ crit
+2022-11-07 16:50:12+0100 [crit] bash:1|
+
+$ crit &quot;crit message&quot;
+2022-11-07 16:50:14+0100 [crit] bash:1| crit message
+
+$ __=&#39;preset error&#39;; false \
+|| crit
+2022-11-07 16:52:11+0100 [crit] bash:1| preset error
+
+$ false || crit &#39;failure!&#39;
+2022-11-07 16:53:44+0100 [crit] bash:1| failure!
+
+$ false \
+  || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
+  || crit
+2022-11-07 16:59:33+0100 [crit] bash:1| not good</code></pre>
+<h1 id="see-also-14">SEE ALSO</h1>
+<p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code>,
+<code>errcode::trap(1)</code>, <code>raise(1)</code></p>
+<h1 id="colophon-14">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% DEBUG(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-15">NAME</h1>
+<p>debug - display a debugging message</p>
+<h1 id="synopsis-15">SYNOPSIS</h1>
+<p>debug [<em>message</em> …]</p>
+<h1 id="description-15">DESCRIPTION</h1>
+<p>With <em>message</em> a string, <code>debug</code> takes an arbitrary
+number of <em>message</em> arguments. <em>message</em> can be set in
+special variable <code>$__</code>.</p>
+<p>If <code>$LOGLEVEL</code> is set to 7 beforehand or at runtime each
+message is displayed on its own.</p>
+<p>When <code>$TRACE</code> or <code>$REPORT</code> are set,
+<code>$LOGLEVEL</code> defaults to 7</p>
+<p><code>debug</code> returns success unless a write or assignment error
+occurs.</p>
+<h1 id="examples-9">EXAMPLES</h1>
+<pre><code>$ debug
+2022-11-08 00:59:32+0100 [debug] bash:1|
+
+$ debug &quot;debug message&quot;
+2022-11-08 01:00:03+0100 [debug] bash:1| debug message
+
+$ __=&#39;preset message&#39; &amp;&amp; debug
+2022-11-08 01:00:57+0100 [debug] bash:1| preset message</code></pre>
+<h1 id="see-also-15">SEE ALSO</h1>
+<p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code></p>
+<h1 id="colophon-15">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ERROR(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-16">NAME</h1>
+<p>error - display an error message</p>
+<h1 id="synopsis-16">SYNOPSIS</h1>
+<p>error [<em>message</em> …]</p>
+<h1 id="description-16">DESCRIPTION</h1>
+<p>With <em>message</em> a string, <code>error</code> takes an arbitrary
+number of <em>message</em> arguments. <em>message</em> can be set in
+special variable <code>$__</code> or by calling
+<code>raise(1)</code>.</p>
+<p>If <code>$LOGLEVEL</code> is &gt;= 3 beforehand or set during runtime
+each message is displayed on its own.</p>
+<p><code>error</code> is an <code>errcode</code> handler, it returns
+previous <code>$?</code> unless a write or assignment error occurs.</p>
+<h1 id="examples-10">EXAMPLES</h1>
+<pre><code>$ error
+2022-11-07 16:50:12+0100 [error] bash:1|
+
+$ error &quot;error message&quot;
+2022-11-07 16:50:14+0100 [error] bash:1| error message
+
+$ __=&#39;preset error&#39;; false \
+|| error
+2022-11-07 16:52:11+0100 [error] bash:1| preset error
+
+$ false || error &#39;failure!&#39;
+2022-11-07 16:53:44+0100 [error] bash:1| failure!
+
+$ false \
+  || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
+  || error
+2022-11-07 16:59:33+0100 [error] bash:1| not good</code></pre>
+<h1 id="see-also-16">SEE ALSO</h1>
+<p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code>,
+<code>errcode::trap(1)</code>, <code>raise(1)</code></p>
+<h1 id="colophon-16">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% FATAL(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-17">NAME</h1>
+<p>fatal - display a message and panic with an error code</p>
+<h1 id="synopsis-17">SYNOPSIS</h1>
+<p>fatal [<em>message</em> …]</p>
+<h1 id="description-17">DESCRIPTION</h1>
+<p>With <em>message</em> a string, <code>fatal</code> takes an arbitrary
+number of <em>message</em> arguments. <em>message</em> can be set in
+special variable <code>$__</code> or by calling
+<code>raise(1)</code>.</p>
+<p>Each message is always displayed on its own.</p>
+<p><code>fatal</code> is an <code>errcode</code> handler, it returns
+previous <code>$?</code> unless a write or assignment error occurs. If
+previous <code>$?</code> is 0, <code>fatal</code> defaults to 1.</p>
+<h1 id="examples-11">EXAMPLES</h1>
+<pre><code>$ fatal
+2022-11-07 16:50:12+0100 [fatal] bash:1|
+
+$ fatal &quot;fatal message&quot;
+2022-11-07 16:50:14+0100 [fatal] bash:1| fatal message
+
+$ __=&#39;preset fatal&#39;; false \
+|| fatal
+2022-11-07 16:52:11+0100 [fatal] bash:1| preset fatal
+
+$ false || fatal &#39;failure!&#39;
+2022-11-07 16:53:44+0100 [fatal] bash:1| failure!
+
+$ false \
+  || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
+  || fatal
+2022-11-07 16:59:33+0100 [fatal] bash:1| not good</code></pre>
+<h1 id="see-also-17">SEE ALSO</h1>
+<p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code>,
+<code>errcode::trap(1)</code>, <code>raise(1)</code></p>
+<h1 id="colophon-17">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% INFO(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-18">NAME</h1>
+<p>info - display an informational message</p>
+<h1 id="synopsis-18">SYNOPSIS</h1>
+<p>info [<em>message</em> …]</p>
+<h1 id="description-18">DESCRIPTION</h1>
+<p>With <em>message</em> a string, <code>info</code> takes an arbitrary
+number of <em>message</em> arguments. <em>message</em> can be set in
+special variable <code>$__</code>.</p>
+<p>If <code>$LOGLEVEL</code> is &gt;= 6 beforehand or set at runtime
+each message is displayed on its own.</p>
+<p><code>info</code> returns success unless a write or assignment error
+occurs.</p>
+<p><code>info</code> shadows <code>info(1)</code> the bash info document
+reader. If you need to use this reader, invoke it with
+<code>command</code> <code>info</code>.</p>
+<h1 id="examples-12">EXAMPLES</h1>
+<pre><code>$ info
+2022-11-08 00:59:32+0100 [info] bash:1|
+
+$ info &quot;info message&quot;
+2022-11-08 01:00:03+0100 [info] bash:1| info message
+
+$ __=&#39;preset message&#39; &amp;&amp; info
+2022-11-08 01:00:57+0100 [info] bash:1| preset message</code></pre>
+<h1 id="see-also-18">SEE ALSO</h1>
+<p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code></p>
+<p>for <code>info(1)</code> disambiguation:</p>
+<p>builtin <code>command</code>, <code>info(1)</code></p>
+<p>$ command [-pVv] info [arg …]</p>
+<h1 id="colophon-18">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% LOGGING::LEVEL(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-19">NAME</h1>
+<p>logging::level - display the current logging level</p>
+<h1 id="synopsis-19">SYNOPSIS</h1>
+<p>logging::level</p>
+<h1 id="description-19">DESCRIPTION</h1>
+<p><code>logging::level</code> displays the current script logging level
+on <code>stdout</code>.</p>
+<p>It returns success unless a write or assignment error occurs.</p>
+<h1 id="examples-13">EXAMPLES</h1>
+<pre><code>$ logging::level
+6</code></pre>
+<h1 id="see-also-19">SEE ALSO</h1>
+<p><code>logging::setlevel(1)</code></p>
+<h1 id="colophon-19">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% NOTE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-20">NAME</h1>
+<p>note - display a note message</p>
+<h1 id="synopsis-20">SYNOPSIS</h1>
+<p>note [<em>message</em> …]</p>
+<h1 id="description-20">DESCRIPTION</h1>
+<p>With <em>message</em> a string, <code>note</code> takes an arbitrary
+number of <em>message</em> arguments. <em>message</em> can be set in
+special variable <code>$__</code>.</p>
+<p>If <code>$LOGLEVEL</code> is &gt;= 5 beforehand or set at runtime
+each message is displayed on its own.</p>
+<p><code>note</code> returns success unless a write or assignment error
+occurs.</p>
+<h1 id="examples-14">EXAMPLES</h1>
+<pre><code>$ note
+2022-11-08 00:59:32+0100 [note] bash:1|
+
+$ note &quot;note message&quot;
+2022-11-08 01:00:03+0100 [note] bash:1| note message
+
+$ __=&#39;preset message&#39; &amp;&amp; note
+2022-11-08 01:00:57+0100 [note] bash:1| preset message</code></pre>
+<h1 id="see-also-20">SEE ALSO</h1>
+<p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code></p>
+<h1 id="colophon-20">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% PANIC(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-21">NAME</h1>
+<p>panic - display a message and panic with error code 1</p>
+<h1 id="synopsis-21">SYNOPSIS</h1>
+<p>panic [<em>message</em> …]</p>
+<h1 id="description-21">DESCRIPTION</h1>
+<p>With <em>message</em> a string, <code>panic</code> takes an arbitrary
+number of <em>message</em> arguments. <em>message</em> can be set in
+special variable <code>$__</code> or by calling
+<code>raise(1)</code>.</p>
+<p>Each message is always displayed on its own.</p>
+<p><code>panic</code> is an <code>errcode</code> handler, it returns
+1.</p>
+<h1 id="examples-15">EXAMPLES</h1>
+<pre><code>$ panic
+2022-11-07 16:50:12+0100 [panic] bash:1|
+
+$ panic &quot;panic message&quot;
+2022-11-07 16:50:14+0100 [panic] bash:1| panic message
+
+$ __=&#39;preset panic&#39;; false \
+|| panic
+2022-11-07 16:52:11+0100 [panic] bash:1| preset panic
+
+$ false || panic &#39;failure!&#39;
+2022-11-07 16:53:44+0100 [panic] bash:1| failure!
+
+$ false \
+  || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
+  || panic
+2022-11-07 16:59:33+0100 [panic] bash:1| not good</code></pre>
+<h1 id="see-also-21">SEE ALSO</h1>
+<p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code>,
+<code>errcode::trap(1)</code>, <code>raise(1)</code></p>
+<h1 id="colophon-21">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% LOGGING::SETLEVEL(1) Bashkit User Manuals % Wuage % October
+2022</p>
+<h1 id="name-22">NAME</h1>
+<p>logging::setlevel - modify the current logging level</p>
+<h1 id="synopsis-22">SYNOPSIS</h1>
+<p>logging::setlevel [<em>level</em>]</p>
+<h1 id="description-22">DESCRIPTION</h1>
+<p>With <em>level</em> either an integer in [0-7] or a string in: panic
+| emerg | alert | crit | error | warn | note | info | debug,
+<code>logging::setlevel</code> sets the current script logging
+level.</p>
+<p>If <em>level</em> is invalid, the logging level defaults to
+INFO/6.</p>
+<p><code>logging::setlevel</code> returns success.</p>
+<h1 id="examples-16">EXAMPLES</h1>
+<pre><code>$ logging::setlevel 7
+$ logging::setlevel debug</code></pre>
+<h1 id="see-also-22">SEE ALSO</h1>
+<p><code>logging::level(1)</code></p>
+<h1 id="colophon-22">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% WARN(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-23">NAME</h1>
+<p>warn - display a warn message</p>
+<h1 id="synopsis-23">SYNOPSIS</h1>
+<p>warn [<em>message</em> …]</p>
+<h1 id="description-23">DESCRIPTION</h1>
+<p>With <em>message</em> a string, <code>warn</code> takes an arbitrary
+number of <em>message</em> arguments. <em>message</em> can be set in
+special variable <code>$__</code>.</p>
+<p>If <code>$LOGLEVEL</code> is &gt;= 4 beforehand or set at runtime
+each message is displayed on its own.</p>
+<p><code>warn</code> returns success unless a write or assignment error
+occurs.</p>
+<h1 id="examples-17">EXAMPLES</h1>
+<pre><code>$ warn
+2022-11-08 00:59:32+0100 [warn] bash:1|
+
+$ warn &quot;warn message&quot;
+2022-11-08 01:00:03+0100 [warn] bash:1| warn message
+
+$ __=&#39;preset message&#39; &amp;&amp; warn
+2022-11-08 01:00:57+0100 [warn] bash:1| preset message</code></pre>
+<h1 id="see-also-23">SEE ALSO</h1>
+<p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code></p>
+<h1 id="colophon-23">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% TRAP::CALLBACK(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-24">NAME</h1>
+<p>trap::callback - hook a command to a signal</p>
+<h1 id="synopsis-24">SYNOPSIS</h1>
+<p>trap::callback [[<em>arg</em>] <em>signal_spec</em> …]</p>
+<h1 id="description-24">DESCRIPTION</h1>
+<p><code>trap::callback</code> is a wrapper to bash builtin trap that
+goes the extra mile of stacking up <em>arg</em> to already hooked up
+commands.</p>
+<p><em>arg</em> and <em>signal_spec</em> are defined in builtin
+<code>trap</code> help.</p>
+<p>Upon reception of <em>signal_spec</em>, the commands are executed in
+LIFO order.</p>
+<h1 id="example-11">EXAMPLE</h1>
+<pre><code>$ trap::callback &quot;echo goodbye world!&quot; EXIT
+goodbye world!</code></pre>
+<h1 id="see-also-24">SEE ALSO</h1>
+<p>builtin <code>trap</code>, <code>cleanup(1)</code></p>
+<h1 id="colophon-24">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% CLEANUP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-25">NAME</h1>
+<p>cleanup - hook a command to the EXIT signal</p>
+<h1 id="synopsis-25">SYNOPSIS</h1>
+<p>cleanup [<em>arg</em>]</p>
+<h1 id="description-25">DESCRIPTION</h1>
+<p><code>cleanup</code> is a wrapper to bashkit
+<code>trap::callback</code> on the EXIT signal.</p>
+<p><em>arg</em> is defined in bash builtin trap help.</p>
+<p>Upon reception of EXIT, the commands are executed in LIFO order.</p>
+<h1 id="examples-18">EXAMPLES</h1>
+<pre><code>$ cleanup &quot;echo goodbye world!&quot;
+goodbye world!
+$ touch /tmp/tmpfile &amp;&amp; cleanup &#39;rm -f /tmp/tmpfile&#39;</code></pre>
+<h1 id="see-also-25">SEE ALSO</h1>
+<p>builtin <code>trap</code>, <code>trap::callback(1)</code></p>
+<h1 id="colophon-25">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::CONTAINS(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-26">NAME</h1>
+<p>array::contains - test if an array contains a given value</p>
+<h1 id="synopsis-26">SYNOPSIS</h1>
+<p>array::contains <em>A</em> <em>x</em> [<em>idx</em>]</p>
+<h1 id="description-26">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable, <em>x</em> a value and
+<em>idx</em> a variable, <code>array::contains</code> test if <em>x</em>
+exists in <em>A</em> and set <em>idx</em> to <em>x</em> index. If
+<em>idx</em> is not given, the index is set in special variable
+<code>$__</code>.</p>
+<p><code>array::contains</code> returns 0 if <em>x</em> in <em>A</em>,
+&gt;0 otherwise or if an error occurs.</p>
+<h1 id="example-12">EXAMPLE</h1>
+<pre><code>$ declare -a ARRAY=( 1 2 3 4 )
+$ array::contains ARRAY 2 idx
+$ echo $?
+0
+$ echo &quot;${ARRAY[idx]}&quot;
+2</code></pre>
+<h1 id="colophon-26">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::INTER(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-27">NAME</h1>
+<p>array::inter - intersect two arrays</p>
+<h1 id="synopsis-27">SYNOPSIS</h1>
+<p>array::inter <em>A</em> <em>B</em></p>
+<h1 id="description-27">DESCRIPTION</h1>
+<p>With <em>A</em> et <em>B</em> array variables,
+<code>array::inter</code> intersects <em>A</em> and <em>B</em> and set
+the resulting array in <em>A</em>.</p>
+<p><code>array::inter</code> returns 0 unless wrong arguments or error
+&gt;0.</p>
+<h1 id="example-13">EXAMPLE</h1>
+<pre><code>$ declare -a A=( hello world 1 2 3 4 )
+$ declare -a B=( 3 4 5 6 goodbye world )
+$ array::inter A B
+$ echo &quot;${A[@]}&quot;
+3 4 world</code></pre>
+<h1 id="colophon-27">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::MAP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-28">NAME</h1>
+<p>array::map - apply a function to an array elements</p>
+<h1 id="synopsis-28">SYNOPSIS</h1>
+<p>array::map <em>A</em> <em>fun</em></p>
+<h1 id="description-28">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable and <em>fun</em> a bash function
+that transforms <code>$1</code> and prints the result to
+<code>stdout</code>, <code>array::map</code> applies <em>fun</em> in
+place to each elements of <em>A</em>.</p>
+<p><code>array::map</code> returns 0 upon success &gt;0 otherwise.</p>
+<h1 id="examples-19">EXAMPLES</h1>
+<pre><code>$ declare -a A=( {a..e} )
+$ up(){ echo ${1^^}; }
+$ array::map A up
+$ echo &quot;${A[@]}&quot;
+A B C D E</code></pre>
+<h1 id="see-also-26">SEE ALSO</h1>
+<p><code>array::reduce(1)</code></p>
+<h1 id="colophon-28">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::PICK(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-29">NAME</h1>
+<p>array::pick - pick a random array element</p>
+<h1 id="synopsis-29">SYNOPSIS</h1>
+<p>array::pick <em>A</em> [<em>x</em>]</p>
+<h1 id="description-29">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable and <em>x</em> a variable,
+<code>array::pick</code> sets <em>x</em> to a random element of
+<em>A</em>. If <em>x</em> is not specified, it defaults to the special
+variable <code>$__</code>.</p>
+<p><code>array::pick</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="example-14">EXAMPLE</h1>
+<pre><code>$ declare -a A=( 1 2 3 4 )
+$ array::pick A x
+$ echo &quot;${x}&quot;
+3</code></pre>
+<h1 id="colophon-29">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::POP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-30">NAME</h1>
+<p>array::pop - remove the last element from an array</p>
+<h1 id="synopsis-30">SYNOPSIS</h1>
+<p>array::pop <em>A</em> [<em>x</em>]</p>
+<h1 id="description-30">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable and <em>x</em> a variable,
+<code>array::pop</code> sets <em>x</em> to the last element from
+<em>A</em> before removing it. If <em>x</em> is not specified, it
+defaults to the special variable <code>$__</code>.</p>
+<p><code>array::pop</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="example-15">EXAMPLE</h1>
+<pre><code>$ declare -a A=( 1 2 3 4 )
+$ array::pop A x
+$ echo &quot;${A[@]}&quot;
+1 2 3
+$ echo &quot;${x}&quot;
+4</code></pre>
+<h1 id="see-also-27">SEE ALSO</h1>
+<p><code>array::popi(1)</code></p>
+<h1 id="colophon-30">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::POPI(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-31">NAME</h1>
+<p>array::popi - remove the ith element from an array</p>
+<h1 id="synopsis-31">SYNOPSIS</h1>
+<p>array::popi <em>A</em> <em>i</em> [<em>x</em>]</p>
+<h1 id="description-31">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable <em>i</em> an index and <em>x</em>
+a variable, <code>array::popi</code> sets <em>x</em> to the ith element
+from <em>A</em> before removing it. If <em>i</em> is negative, the
+element is removed starting from the end of <em>A</em>. If <em>x</em> is
+not specified, it defaults to the special variable <code>$__</code>.</p>
+<p><code>array::popi</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="example-16">EXAMPLE</h1>
+<pre><code>$ declare -a A=( 1 2 3 4 )
+$ array::popi A 2 x
+$ echo &quot;${A[@]}&quot;
+1 2 4
+$ echo &quot;${x}&quot;
+3</code></pre>
+<h1 id="see-also-28">SEE ALSO</h1>
+<p><code>array::pop(1)</code>, <code>array::shift(1)</code></p>
+<h1 id="colophon-31">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::PUSH(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-32">NAME</h1>
+<p>array::push - add one or more elements to the end of an array</p>
+<h1 id="synopsis-32">SYNOPSIS</h1>
+<p>array::push <em>A</em> [<em>x</em> …]</p>
+<h1 id="description-32">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable <em>x</em> a value,
+<code>array::push</code> adds <em>x</em> at the end of <em>A</em>.</p>
+<p><code>array::push</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="example-17">EXAMPLE</h1>
+<pre><code>$ declare -a A=( {1..11} )
+$ array::push A 12
+$ echo &quot;${A[-1]}&quot;
+12</code></pre>
+<h1 id="colophon-32">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::REDUCE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-33">NAME</h1>
+<p>array::reduce - perform a summary operation of an array</p>
+<h1 id="synopsis-33">SYNOPSIS</h1>
+<p>array::reduce <em>A</em> <em>fun</em> <em>acc</em></p>
+<h1 id="description-33">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable, <em>fun</em> a bash function that
+aggregates <code>$1</code> and <code>$2</code> and prints the result to
+<code>stdout</code> and <em>acc</em> a variable,
+<code>array::reduce</code> sumarizes <em>A</em> into <em>acc</em> by
+repetitively aplying <code>fun acc x</code> for <em>x</em> in
+<em>A</em>.</p>
+<p><code>array::reduce</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-18">EXAMPLE</h1>
+<pre><code>$ declare -a A=( {1..8} )
+$ add() { echo $(( $1 + $2 )); }
+$ acc=0
+$ array::reduce A add acc
+$ echo &quot;${acc}&quot;
+36</code></pre>
+<h1 id="see-also-29">SEE ALSO</h1>
+<p><code>array::map(1)</code></p>
+<h1 id="colophon-33">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::REVERSE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-34">NAME</h1>
+<p>array::reverse - reverse an array in place</p>
+<h1 id="synopsis-34">SYNOPSIS</h1>
+<p>array::reverse <em>A</em></p>
+<h1 id="description-34">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable, <code>array::reverse</code>
+reverses <em>A</em> in place.</p>
+<p><code>array::reverse</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-19">EXAMPLE</h1>
+<pre><code>$ declare -a A=( {1..11} )
+$ array::reverse A
+$ echo &quot;${A[@]}&quot;
+11 10 9 8 7 6 5 4 3 2 1</code></pre>
+<h1 id="colophon-34">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::ROTATE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-35">NAME</h1>
+<p>array::rotate - shift elements of an array to the specified
+positions</p>
+<h1 id="synopsis-35">SYNOPSIS</h1>
+<p>array::rotate <em>A</em> <em>i</em></p>
+<h1 id="description-35">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable and <em>i</em> an integer,
+<code>array::rotate</code> shifts elements of <em>A</em> to the
+specified positions. If <em>i</em> is positive, cycling is done from
+right to left, if <em>i</em> is negative, cycling occurs from left to
+right.</p>
+<p><code>array::rotate</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="examples-20">EXAMPLES</h1>
+<pre><code>$ declare -a A=( {1..8} )
+$ array::rotate A -10
+$ echo &quot;${A[@]}&quot;
+3 4 5 6 7 8 1 2</code></pre>
+<h1 id="colophon-35">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::SHIFT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-36">NAME</h1>
+<p>array::shift - remove the first element of an array</p>
+<h1 id="synopsis-36">SYNOPSIS</h1>
+<p>array::shift <em>A</em> [<em>x</em>]</p>
+<h1 id="description-36">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable and <em>x</em> a variable,
+<code>array::shift</code> removes the first element of <em>A</em> and
+sets <em>x</em> to it. If <em>x</em> is not given, it defaults to
+special variable <code>$__</code>.</p>
+<p><code>array::shift</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-20">EXAMPLE</h1>
+<pre><code>$ declare -a A=( {1..8} )
+$ array::shift A x
+$ (( x == 1 )) &amp;&amp; echo &quot;${A[@]}&quot;
+2 3 4 5 6 7 8</code></pre>
+<h1 id="see-also-30">SEE ALSO</h1>
+<p><code>array::popi(1)</code></p>
+<h1 id="colophon-36">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::SHUFFLE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-37">NAME</h1>
+<p>array::shuffle - randomly reorder elements of an array</p>
+<h1 id="synopsis-37">SYNOPSIS</h1>
+<p>array::shuffle <em>A</em></p>
+<h1 id="description-37">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable, <code>array::shuffle</code>
+performs in place a modern fisher-yates shuffling.</p>
+<p><code>array::shuffle</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-21">EXAMPLE</h1>
+<pre><code>$ declare -a A=( {1..8} )
+$ array::shuffle A
+$ echo &quot;${A[@]}&quot;
+7 6 2 1 3 4 5 8</code></pre>
+<h1 id="see-also-31">SEE ALSO</h1>
+<p>https://en.wikipedia.org/wiki/Fisher–Yates_shuffle#Modern_method</p>
+<h1 id="colophon-37">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::SORT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-38">NAME</h1>
+<p>array::sort - sort elements of an array in place</p>
+<h1 id="synopsis-38">SYNOPSIS</h1>
+<p>array::sort <em>A</em></p>
+<h1 id="description-38">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable, <code>array::sort</code> in place
+sorts the array.</p>
+<p><code>array::sort</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="examples-21">EXAMPLES</h1>
+<pre><code>$ declare -a A=( 8 7 5 6 3 4 1 2 )
+$ array::sort A
+$ echo &quot;${A[@]}&quot;
+1 2 3 4 5 6 7 8</code></pre>
+<h1 id="colophon-38">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::SPLIT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-39">NAME</h1>
+<p>array::split - build an array from a split string</p>
+<h1 id="synopsis-39">SYNOPSIS</h1>
+<p>array::split <em>A</em> <em>str</em> <em>sep</em></p>
+<h1 id="description-39">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable, <em>str</em> and <em>sep</em> two
+strings, <code>array::split</code> divides <em>str</em> into an ordered
+list of substrings by searching for <em>sep</em>, puts these substrings
+in <em>A</em>.</p>
+<p><code>array::split</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-22">EXAMPLE</h1>
+<pre><code>$ declare -a A
+$ array::split A &#39;apples,oranges,pears,grapes&#39; &#39;,&#39;
+$ echo &quot;${A[@]}&quot;
+apples oranges pears grapes</code></pre>
+<h1 id="colophon-39">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::UNIQ(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-40">NAME</h1>
+<p>array::uniq - deduplicate elements of an array</p>
+<h1 id="synopsis-40">SYNOPSIS</h1>
+<p>array::uniq <em>A</em></p>
+<h1 id="description-40">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable, <code>array:uniq</code>
+deduplicates elements in place.</p>
+<p><code>array::uniq</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="examples-22">EXAMPLES</h1>
+<pre><code>$ declare -a A=( {1..8} )
+$ A+=( &quot;${A[@]}&quot; )  # duplicate array items
+$ echo &quot;${A[@]}&quot;
+1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8
+$ array::uniq A
+$ echo &quot;${A[@]}&quot;
+1 2 3 4 5 6 7 8</code></pre>
+<h1 id="colophon-40">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::UNSHIFT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-41">NAME</h1>
+<p>array::unshift - add one or more elements to the beginning of an
+array</p>
+<h1 id="synopsis-41">SYNOPSIS</h1>
+<p>array::unshift <em>A</em> [<em>x</em> …]</p>
+<h1 id="description-41">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable and a list of values <em>x</em>,
+<code>array::unshift</code> adds them to the beginning of <em>A</em></p>
+<p><code>array::unshift</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-23">EXAMPLE</h1>
+<pre><code>$ declare -a A=( {4..8} )
+$ array::unshift A 1 2 3
+$ echo &quot;${A[@]}&quot;
+1 2 3 4 5 6 7 8</code></pre>
+<h1 id="colophon-41">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ARRAY::ZIP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-42">NAME</h1>
+<p>array::zip - merge two arrays in a dictionary</p>
+<h1 id="synopsis-42">SYNOPSIS</h1>
+<p>array::zip <em>D</em> <em>K</em> <em>V</em></p>
+<h1 id="description-42">DESCRIPTION</h1>
+<p>With <em>D</em> an dictionary (ie. associative array), <em>K</em> and
+<em>V</em> two arrays, <code>array::zip</code> merges the arrays into a
+dict where keys are taken from <em>K</em> ans associated to values taken
+in turn fron <em>V</em>.</p>
+<p><code>array::zip</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="example-24">EXAMPLE</h1>
+<pre><code>$ declare -A D
+$ declare -a K=( {a..e} )
+$ declare -a V=( {1..8} )
+$ array::zip D K V
+$ declare -p D
+D=([e]=&quot;5&quot; [d]=&quot;4&quot; [c]=&quot;3&quot; [b]=&quot;2&quot; [a]=&quot;1&quot; )</code></pre>
+<h1 id="see-also-32">SEE ALSO</h1>
+<h1 id="colophon-42">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% CHECK::CMD(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-43">NAME</h1>
+<p>check::cmd - check if a command is available</p>
+<h1 id="synopsis-43">SYNOPSIS</h1>
+<p>check::cmd [<em>cmd</em> …]</p>
+<h1 id="description-43">DESCRIPTION</h1>
+<p>With a list of <em>cmd</em>, <code>check::cmd</code> verify that
+<em>cmd</em> is executable.</p>
+<p><code>check::cmd</code> returns 0 if <em>cmd</em> is executable,
+&gt;0 otherwise.</p>
+<h1 id="example-25">EXAMPLE</h1>
+<pre><code>$ check::cmd ls cat &amp;&amp; echo &quot;ls and cat are available&quot;
+ls and cat are available</code></pre>
+<h1 id="colophon-43">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% CHECK::DIR(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-44">NAME</h1>
+<p>check::dir - ensure a directory exists</p>
+<h1 id="synopsis-44">SYNOPSIS</h1>
+<p>check::dir [<em>dir</em> …]</p>
+<h1 id="description-44">DESCRIPTION</h1>
+<p>With <em>dir</em> a directory, <code>check::dir</code> ensures that
+it exists, if not it creates it.</p>
+<p><code>check::dir</code> returns 0 if <em>dir</em> exists or has been
+created, &gt;0 otherwise.</p>
+<h1 id="example-26">EXAMPLE</h1>
+<pre><code>$ check::dir /usr /tmp/mydir</code></pre>
+<h1 id="colophon-44">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% CHECK::VARTYPE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-45">NAME</h1>
+<p>check::vartype - check variable attributes</p>
+<h1 id="synopsis-45">SYNOPSIS</h1>
+<p>check::vartype <em>attrs</em> <em>var</em></p>
+<h1 id="description-45">DESCRIPTION</h1>
+<p>With <em>attrs</em> an attribute string and <em>var</em> a variable,
+<code>check::vartype</code> checks if <em>var</em> has set
+<em>attrs</em>. It does NOT check the content of <em>var</em>.</p>
+<p>Some <em>attrs</em> are inherited from builtin
+<code>declare</code>:</p>
+<table>
+<thead>
+<tr class="header">
+<th>attr</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><em>a</em></td>
+<td>indexed array</td>
+</tr>
+<tr class="even">
+<td><em>A</em></td>
+<td>dictionary</td>
+</tr>
+<tr class="odd">
+<td><em>i</em></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><em>l</em></td>
+<td>lower case</td>
+</tr>
+<tr class="odd">
+<td><em>n</em></td>
+<td>nameref</td>
+</tr>
+<tr class="even">
+<td><em>r</em></td>
+<td>readonly</td>
+</tr>
+<tr class="odd">
+<td><em>t</em></td>
+<td>trace</td>
+</tr>
+<tr class="even">
+<td><em>u</em></td>
+<td>upper case</td>
+</tr>
+<tr class="odd">
+<td><em>x</em></td>
+<td>export</td>
+</tr>
+</tbody>
+</table>
+<p>to which bashkit adds:</p>
+<table>
+<thead>
+<tr class="header">
+<th>attr</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><em>f</em></td>
+<td>function</td>
+</tr>
+<tr class="even">
+<td><em>s</em></td>
+<td>set</td>
+</tr>
+</tbody>
+</table>
+<p>A <em>var</em> can be set to an empty value. When checking for a
+nameref and more, <em>var</em> is dereferenced before checking for more
+<em>attrs</em> than <em>n</em>.</p>
+<p><code>check::vartype</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="examples-23">EXAMPLES</h1>
+<pre><code>$ declare -a ARR=()
+$ declare -n _A=ARR
+$ check::vartype nas _A &amp;&amp; echo OK
+OK
+$ n=0  # no integer attribute
+$ check::vartype i n || echo NOK
+NOK</code></pre>
+<h1 id="see-also-33">SEE ALSO</h1>
+<p>builtin <code>declare</code></p>
+<h1 id="colophon-45">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% CURL::DOWNLOAD(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-46">NAME</h1>
+<p>curl::download - download a file from an URL and print stats</p>
+<h1 id="synopsis-46">SYNOPSIS</h1>
+<p>curl::download <em>url</em> <em>dest</em></p>
+<h1 id="description-46">DESCRIPTION</h1>
+<p>With <em>dest</em> being a filename, <code>curl::download</code>
+prints a downloading digest that contains the size and md5 hash of the
+downloaded file.</p>
+<p>In baskhit, <code>curl</code> hence <code>curl::download</code> are
+preset with: option | value ——-|—— connect-timeout | 5 continue-at | -
+fail | location | retry | 5 retry-delay | 0 retry-max-time | 40
+show-error | silent |</p>
+<p><code>curl::download</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-27">EXAMPLE</h1>
+<pre><code>$ curl::download http://example.com &quot;${tmpfile}&quot;</code></pre>
+<h1 id="see-also-34">SEE ALSO</h1>
+<p><code>curl(1)</code></p>
+<h1 id="colophon-46">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% FUNLIST(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-47">NAME</h1>
+<p>funlist - list all declared functions</p>
+<h1 id="synopsis-47">SYNOPSIS</h1>
+<p>funlist</p>
+<h1 id="description-47">DESCRIPTION</h1>
+<p><code>funlist</code> is part of bashkit module extras, it lists all
+declared functions by the time of calling.</p>
+<h1 id="example-28">EXAMPLE</h1>
+<pre><code>  $ funlist
+  __unhandled
+  alert
+  bashkit::help
+  bashkit::init
+  bashkit::load
+  bashkit::main
+  ...</code></pre>
+<h1 id="colophon-47">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% ISINT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-48">NAME</h1>
+<p>isint - test for integers</p>
+<h1 id="synopsis-48">SYNOPSIS</h1>
+<p>isint [<em>x</em> …]</p>
+<h1 id="description-48">DESCRIPTION</h1>
+<p><code>isint</code> is part of bashkit module <code>extras</code>,
+given <em>x</em> a value, it tests if <em>x</em> is an integer.</p>
+<p><code>isint</code> returns 0 if all <em>x</em> are integers, &gt;0
+otherwise.</p>
+<h1 id="example-29">EXAMPLE</h1>
+<pre><code>  $ n=10
+  $ isint &quot;${n}&quot; 1 2 3 4 || echo yes
+  $ yes</code></pre>
+<h1 id="colophon-48">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% JOIN(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-49">NAME</h1>
+<p>join - build a string of arguments separated by a given character</p>
+<h1 id="synopsis-49">SYNOPSIS</h1>
+<p>join <em>sep</em> <em>arg</em> [<em>arg</em> …]</p>
+<h1 id="description-49">DESCRIPTION</h1>
+<p><code>join</code> is part of bashkit module <code>extras</code>,
+given <em>sep</em> a single character and <em>arg</em> a list of
+arbitrary strings, it builds a string with all <em>args</em> separated
+by <em>sep</em>.</p>
+<h1 id="examples-24">EXAMPLES</h1>
+<pre><code>  $ join &quot;,&quot; a b c d
+  a,b,c,d
+  $ join &quot;:&quot; a
+  a</code></pre>
+<h1 id="colophon-49">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% NOW(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-50">NAME</h1>
+<p>now - get the number of milliseconds elapsed since EPOCH</p>
+<h1 id="synopsis-50">SYNOPSIS</h1>
+<p>now [<em>dest</em>]</p>
+<h1 id="description-50">DESCRIPTION</h1>
+<p><code>now</code> is part of bashkit module <code>extras</code>, it
+sets <em>dest</em> var to the number of milliseconds elapsed since
+EPOCH. If <em>dest</em> is omitted, <code>now</code> sets the special
+variable <code>$__</code>.</p>
+<h1 id="example-30">EXAMPLE</h1>
+<pre><code>  $ now start
+  $ sleep 1
+  $ now end
+  $ echo $(( end - start ))
+  1008</code></pre>
+<h1 id="colophon-50">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% PROGRESS(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-51">NAME</h1>
+<p>progress - display a progress bar</p>
+<h1 id="synopsis-51">SYNOPSIS</h1>
+<p>progress <em>percent</em> <em>total</em></p>
+<h1 id="description-51">DESCRIPTION</h1>
+<p><code>progress</code> is part of bashkit module <code>extras</code>,
+given two integers <em>percent</em> and <em>total</em>, it displays a
+progress bar. This bar has a len of <em>total</em> dashes.</p>
+<h1 id="example-31">EXAMPLE</h1>
+<pre><code>  $ for (( i=0; i&lt;=100; i++ )); do
+  &gt;   usleep 5
+  &gt;   progress &quot;${i}&quot; 20
+  &gt; done
+  &gt; printf &#39;\n&#39;
+  [--------------------]</code></pre>
+<h1 id="colophon-51">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% URLDECODE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-52">NAME</h1>
+<p>urldecode - percent decode a string</p>
+<h1 id="synopsis-52">SYNOPSIS</h1>
+<p>urldecode <em>url</em></p>
+<h1 id="description-52">DESCRIPTION</h1>
+<p><code>urldecode</code> is part of bashkit module <code>extras</code>,
+given a percent-encoded <em>url</em>, it restores it to its original
+form.</p>
+<p><code>urldecode</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="example-32">EXAMPLE</h1>
+<pre><code>$ urldecode &quot;https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible&quot;
+https://github.com/dylanaraps/pure-bash-bible</code></pre>
+<h1 id="see-also-35">SEE ALSO</h1>
+<p><code>urlencode(1)</code></p>
+<h1 id="colophon-52">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% URLENCODE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-53">NAME</h1>
+<p>urlencode - percent encode a string</p>
+<h1 id="synopsis-53">SYNOPSIS</h1>
+<p>urlencode <em>url</em></p>
+<h1 id="description-53">DESCRIPTION</h1>
+<p><code>urlencode</code> is part of bashkit module <code>extras</code>,
+given an <em>url</em> string, it displays a percent encoded version of
+it.</p>
+<p><code>urlencode</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="example-33">EXAMPLE</h1>
+<pre><code>$ urlencode &quot;https://github.com/dylanaraps/pure-bash-bible&quot;
+https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible</code></pre>
+<h1 id="see-also-36">SEE ALSO</h1>
+<p><code>urldecode(1)</code></p>
+<h1 id="colophon-53">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% USLEEP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-54">NAME</h1>
+<p>usleep - micro sleep</p>
+<h1 id="synopsis-54">SYNOPSIS</h1>
+<p>usleep [<em>n</em>]</p>
+<h1 id="description-54">DESCRIPTION</h1>
+<p><code>usleep</code> is part of bashkit module <code>extras</code>, it
+waits for a delay proportional to <em>n</em>. When <em>n</em> is
+omitted, it defaults to 1.</p>
+<h1 id="example-34">EXAMPLE</h1>
+<pre><code>$ usleep 10</code></pre>
+<h1 id="colophon-54">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% INTERACTIVE::YESNO(1) Bashkit User Manuals % Wuage % October
+2022</p>
+<h1 id="name-55">NAME</h1>
+<p>interactive::yesno - ask a yes/no question to the user</p>
+<h1 id="synopsis-55">SYNOPSIS</h1>
+<p>interactive::yesno <em>question</em> [<em>default</em>]</p>
+<h1 id="description-55">DESCRIPTION</h1>
+<p><code>interactive::yesno</code> displays <em>question</em> and wait
+for the user to answer, if <em>default</em> is given, it is used if the
+user simply presses <code>ENTER</code>.</p>
+<p><code>interactive::yesno</code> returns 0 when user answers
+<code>yes</code>, &gt;0 otherwise</p>
+<h1 id="example-35">EXAMPLE</h1>
+<pre><code>$ interactive::yesno &quot;are you happy?&quot; y
+are you happy? [YES/no]:</code></pre>
+<h1 id="colophon-55">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% JSON::FROM_TOML(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-56">NAME</h1>
+<p>json::from_toml - convert toml to json</p>
+<h1 id="synopsis-56">SYNOPSIS</h1>
+<p>json::from_toml <em>toml</em></p>
+<h1 id="description-56">DESCRIPTION</h1>
+<p>Given a <em>toml</em> string, <code>json::from_toml</code> converts
+it to JSON.</p>
+<p><code>json::from_toml</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="see-also-37">SEE ALSO</h1>
+<p><code>json::to_toml(1)</code></p>
+<h1 id="colophon-56">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% JSON::FROM_YAML(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-57">NAME</h1>
+<p>json::from_yaml - convert yaml to json</p>
+<h1 id="synopsis-57">SYNOPSIS</h1>
+<p>json::from_yaml <em>yaml</em></p>
+<h1 id="description-57">DESCRIPTION</h1>
+<p>Given a <em>yaml</em> string, <code>json::from_yaml</code> converts
+it to json.</p>
+<p><code>json::from_yaml</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="see-also-38">SEE ALSO</h1>
+<p><code>json::to_yaml(1)</code></p>
+<h1 id="colophon-57">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% JSON::INTO_ARRAY(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-58">NAME</h1>
+<p>json::into_array - load a json array into a bash array</p>
+<h1 id="synopsis-58">SYNOPSIS</h1>
+<p>json::into_array <em>A</em> <em>jarr</em></p>
+<h1 id="description-58">DESCRIPTION</h1>
+<p>With <em>A</em> an array variable and <em>jarr</em> a string
+representing a json array, <code>json::into_array</code> loads
+<em>jarr</em> content into <em>A</em>.</p>
+<p><code>json::into_array</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-36">EXAMPLE</h1>
+<pre><code>$ json=&#39;[&quot;a&quot;, &quot;b&quot;, 3, 7]&#39;
+$ declare -a A
+$ json::into_array A &lt;&lt;&lt; &quot;${json}&quot;
+$ echo &quot;${A[@]}&quot;
+a b 3 7</code></pre>
+<h1 id="see-also-39">SEE ALSO</h1>
+<p><code>json::into_dict(1)</code></p>
+<h1 id="colophon-58">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% JSON::INTO_DICT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-59">NAME</h1>
+<p>json::into_dict - load a json dictionary into a bash one</p>
+<h1 id="synopsis-59">SYNOPSIS</h1>
+<p>json::into_dict <em>D</em> <em>jdict</em></p>
+<h1 id="description-59">DESCRIPTION</h1>
+<p>With <em>D</em> an associative array variable and <em>jdict</em> a
+json dictionary, <code>json::into_dict</code> loads <em>jdict</em>
+content into <em>D</em>. It does NOT recurse because bash does not
+support nested dictionaries.</p>
+<p><code>json::into_dict</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-37">EXAMPLE</h1>
+<pre><code>$ json=&#39;{&quot;a&quot;: 3, &quot;7&quot;: { &quot;sub&quot;: [3, true, &quot;x&quot;] }}&#39;
+$ declare -A D
+$ json::into_dict D &lt;&lt;&lt; &quot;${json}&quot;
+$ echo &quot;${!D[@]}
+a 7
+$ echo &quot;${D[7]}&quot;
+{ &quot;sub&quot;: [3, true, &quot;x&quot;] }</code></pre>
+<h1 id="see-also-40">SEE ALSO</h1>
+<p><code>json::into_array(1)</code></p>
+<h1 id="colophon-59">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% JSON::TO_TOML(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-60">NAME</h1>
+<p>json::to_toml - convert json to toml</p>
+<h1 id="synopsis-60">SYNOPSIS</h1>
+<p>json::to_toml <em>fd</em></p>
+<h1 id="description-60">DESCRIPTION</h1>
+<p>With <em>fd</em> a file descriptor, <code>json::to_toml</code> reads
+json from <em>fd</em> and prints the resulting toml to
+<code>stdout</code>.</p>
+<p><code>json::to_toml</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-38">EXAMPLE</h1>
+<pre><code>$ printf &#39;%s\n&#39; &quot;${json}&quot; | json::to_toml /dev/stdin</code></pre>
+<h1 id="see-also-41">SEE ALSO</h1>
+<p><code>json::from_toml(1)</code></p>
+<h1 id="colophon-60">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% JSON::TO_YAML(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-61">NAME</h1>
+<p>json::to_yaml - convert json to toml</p>
+<h1 id="synopsis-61">SYNOPSIS</h1>
+<p>json::to_yaml <em>fd</em></p>
+<h1 id="description-61">DESCRIPTION</h1>
+<p>With <em>fd</em> a file descriptor, <code>json::to_yaml</code> reads
+json from <em>fd</em> and prints the resulting yaml to
+<code>stdout</code>.</p>
+<p><code>json::to_yaml</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-39">EXAMPLE</h1>
+<pre><code>$ printf &#39;%s\n&#39; &quot;${json}&quot; | json::to_yaml /dev/stdin</code></pre>
+<h1 id="see-also-42">SEE ALSO</h1>
+<p><code>json::from_yaml(1)</code></p>
+<h1 id="colophon-61">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% PATCH::APPLY(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-62">NAME</h1>
+<p>patch::apply - apply a patch</p>
+<h1 id="synopsis-62">SYNOPSIS</h1>
+<p>patch::apply <em>dir</em> <em>patch</em></p>
+<h1 id="description-62">DESCRIPTION</h1>
+<p>Witn <em>dir</em> a destination directory and <em>patch</em> a patch
+file, <code>patch::apply</code> applies modification from <em>patch</em>
+to <em>dir</em> files.</p>
+<p><code>patch::apply</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-40">EXAMPLE</h1>
+<pre><code>$ patch::apply &quot;${DIR}&quot; &quot;a.patch&quot;</code></pre>
+<h1 id="see-also-43">SEE ALSO</h1>
+<p><code>diff(1)</code>, <code>patch(1)</code>,
+<code>patch::batch(1)</code></p>
+<h1 id="colophon-62">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% PATCH::BATCH(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-63">NAME</h1>
+<p>patch::batch - apply all patches from a patch directory onto files in
+a target directory</p>
+<h1 id="synopsis-63">SYNOPSIS</h1>
+<p>patch::batch <em>target</em> <em>patches</em></p>
+<h1 id="description-63">DESCRIPTION</h1>
+<p>Witn <em>target</em> a destination directory and <em>patches</em> a
+patch directory, <code>patch::batch</code> applies modification from
+<em>patches</em> to <em>target</em> files.</p>
+<p><code>patch::batch</code> returns 0 upon success, &gt;0
+otherwise.</p>
+<h1 id="example-41">EXAMPLE</h1>
+<pre><code>$ patch::batch &quot;${TARGET_DIR}&quot; &quot;${PATCH_DIR}&quot;</code></pre>
+<h1 id="see-also-44">SEE ALSO</h1>
+<p><code>diff(1)</code>, <code>patch(1)</code>,
+<code>patch::apply(1)</code></p>
+<h1 id="colophon-63">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% PERMS::GID(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-64">NAME</h1>
+<p>perms::gid - convert group name to gid</p>
+<h1 id="synopsis-64">SYNOPSIS</h1>
+<p>perms::gid <em>group</em></p>
+<h1 id="description-64">DESCRIPTION</h1>
+<p>With <em>group</em> a group name as given by <code>id -g</code>,
+<code>perms::gid</code> converts it to a gid integer as given by
+<code>id -gn</code>.</p>
+<p><code>perms::gid</code> returns 0 upon success, &gt;0 and logs an
+error otherwise.</p>
+<h1 id="example-42">EXAMPLE</h1>
+<pre><code>$ perms::gid wheel
+0</code></pre>
+<h1 id="see-also-45">SEE ALSO</h1>
+<p><code>id(1)</code>, <code>perms::uid(1)</code></p>
+<h1 id="colophon-64">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% PERMS::MODE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-65">NAME</h1>
+<p>perms::mode - convert symbolic file mode to absolute notation</p>
+<h1 id="synopsis-65">SYNOPSIS</h1>
+<p>perms::mode <em>mode</em></p>
+<h1 id="description-65">DESCRIPTION</h1>
+<p>With <em>mode</em> an absolute mode as defined in
+<code>chmod(1)</code>, <code>perms::mode</code> convert it to its
+absolute representation.</p>
+<p><code>perms::mode</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="example-43">EXAMPLE</h1>
+<pre><code>$ perms::mode &quot;-rw-r--r--&quot;
+0644</code></pre>
+<h1 id="see-also-46">SEE ALSO</h1>
+<p><code>chmod(1)</code></p>
+<h1 id="colophon-65">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% PERMS::UID(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-66">NAME</h1>
+<p>perms::uid - convert user name to uid</p>
+<h1 id="synopsis-66">SYNOPSIS</h1>
+<p>perms::uid <em>user</em></p>
+<h1 id="description-66">DESCRIPTION</h1>
+<p>With <em>user</em> a user name as given by <code>id -u</code>,
+<code>perms::uid</code> converts it to an uid integer as given by
+<code>id -un</code>.</p>
+<p><code>perms::uid</code> returns 0 upon success, &gt;0 and logs an
+error otherwise.</p>
+<h1 id="example-44">EXAMPLE</h1>
+<pre><code>$ perms::uid root
+0</code></pre>
+<h1 id="see-also-47">SEE ALSO</h1>
+<p><code>id(1)</code>, <code>perms::gid(1)</code></p>
+<h1 id="colophon-66">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% READLINKF(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-67">NAME</h1>
+<p>readlinkf - display symbolic link target status</p>
+<h1 id="synopsis-67">SYNOPSIS</h1>
+<p>readlinkf <em>filelink</em></p>
+<h1 id="description-67">DESCRIPTION</h1>
+<p>With <em>filelink</em> a symbolic link, <code>readlinkf</code>
+resolves paths and displays the corresponding absolute pathname.</p>
+<p><code>readlinkf</code> returns 0 upon success, &gt;0 otherwise.</p>
+<h1 id="see-also-48">SEE ALSO</h1>
+<p><code>readlink(1)</code>, https://github.com/ko1nksm/readlinkf</p>
+<h1 id="colophon-67">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% SHOPT::POP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-68">NAME</h1>
+<p>shopt::pop - restores previous shopt context</p>
+<h1 id="synopsis-68">SYNOPSIS</h1>
+<p>shopt::pop</p>
+<h1 id="description-68">DESCRIPTION</h1>
+<p><code>shopt::pop</code> restores a builtin <code>shopt</code> context
+previously created by calling <code>shopt::push(1)</code>.</p>
+<p><code>shopt::pop</code> always succeeds and returns 0.</p>
+<h1 id="example-45">EXAMPLE</h1>
+<pre><code>$ shopt::push
+$ shopt -s extdebug
+$ do_something_with_extdebug_on
+$ shopt::pop</code></pre>
+<h1 id="see-also-49">SEE ALSO</h1>
+<p>builtin <code>shopt</code>, <code>shopt::push(1)</code></p>
+<h1 id="colophon-68">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% SHOPT::PUSH(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-69">NAME</h1>
+<p>shopt::push - create a new shopt context</p>
+<h1 id="synopsis-69">SYNOPSIS</h1>
+<p>shopt::push</p>
+<h1 id="description-69">DESCRIPTION</h1>
+<p><code>shopt::push</code> creates a new <code>shopt</code> context
+that can be modified and discarded later by a call to
+<code>shopt::pop(1)</code>.</p>
+<p><code>shopt::push</code> always succeeds and returns 0.</p>
+<h1 id="example-46">EXAMPLE</h1>
+<pre><code>$ shopt::push
+$ shopt -s extdebug
+$ do_something_with_extdebug_on
+$ shopt::pop</code></pre>
+<h1 id="see-also-50">SEE ALSO</h1>
+<p>builtin <code>shopt</code>, <code>shopt::push(1)</code></p>
+<h1 id="colophon-69">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% STRING::LSTRIP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-70">NAME</h1>
+<p>string::lstrip - remove pattern from start of string</p>
+<h1 id="synopsis-70">SYNOPSIS</h1>
+<p>string::lstrip <em>str</em> <em>pat</em></p>
+<h1 id="description-70">DESCRIPTION</h1>
+<p>With <em>str</em> and <em>pat</em> two strings,
+<code>string::lstrip</code> removes <em>pat</em> occuring at
+<em>str</em> start (or left side).</p>
+<h1 id="examples-25">EXAMPLES</h1>
+<pre><code>$ string::lstrip &#39;The Quick Brown Fox&#39; &#39;The &#39;
+Quick Brown Fox</code></pre>
+<h1 id="see-also-51">SEE ALSO</h1>
+<p><code>string::rstrip(1)</code>, <code>string::strip(1)</code>,
+<code>string::stripall(1)</code></p>
+<h1 id="colophon-70">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% STRING::REGEX(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-71">NAME</h1>
+<p>string::regex - match string against regular expression</p>
+<h1 id="synopsis-71">SYNOPSIS</h1>
+<p>string::regex <em>str</em> <em>rex</em></p>
+<h1 id="description-71">DESCRIPTION</h1>
+<p>With <em>str</em> and <em>rex</em> two strings,
+<code>string::regex</code> matches <em>str</em> again regular expression
+<em>rex</em> and displays the matching part of <em>str</em>.</p>
+<p><code>string::regex</code> returns 0 upon match, &gt;0 otherwise.</p>
+<h1 id="example-47">EXAMPLE</h1>
+<pre><code>$ string::regex &#39;    hello&#39; &#39;^[[:space:]]*(.*)&#39;
+hello</code></pre>
+<h1 id="colophon-71">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% STRING::RSTRIP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-72">NAME</h1>
+<p>string::rstrip - remove pattern from end of string</p>
+<h1 id="synopsis-72">SYNOPSIS</h1>
+<p>string::rstrip <em>str</em> <em>pat</em></p>
+<h1 id="description-72">DESCRIPTION</h1>
+<p>With <em>str</em> and <em>pat</em> two strings,
+<code>string::rstrip</code> removes <em>pat</em> occuring at
+<em>str</em> end (or right side).</p>
+<h1 id="example-48">EXAMPLE</h1>
+<pre><code>$ string::rstrip &#39;The Quick Brown Fox&#39; &#39; Fox&#39;
+The Quick Brown</code></pre>
+<h1 id="see-also-52">SEE ALSO</h1>
+<p><code>string::lstrip(1)</code>, <code>string::strip(1)</code>,
+<code>string::stripall(1)</code></p>
+<h1 id="colophon-72">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% STRING::SPLIT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-73">NAME</h1>
+<p>string::split - extract substrings delimited by a separator from
+string</p>
+<h1 id="synopsis-73">SYNOPSIS</h1>
+<p>string::split <em>str</em> <em>sep</em></p>
+<h1 id="description-73">DESCRIPTION</h1>
+<p>With <em>str</em> and <em>sep</em>, two strings,
+<code>string::split</code> splits <em>str</em> on <em>sep</em>
+occurences.</p>
+<h1 id="example-49">EXAMPLE</h1>
+<pre><code>$ string::split &#39;apples,oranges,pears,grapes&#39; &#39;,&#39;
+apples oranges pears grapes</code></pre>
+<h1 id="colophon-73">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% STRING::STRIP(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-74">NAME</h1>
+<p>string::strip - remove first occuring pattern from string</p>
+<h1 id="synopsis-74">SYNOPSIS</h1>
+<p>string::strip <em>str</em> <em>pat</em></p>
+<h1 id="description-74">DESCRIPTION</h1>
+<p>With <em>str</em> and <em>pat</em> two strings,
+<code>string::strip</code> removes the first occurence of <em>pat</em>
+in <em>str</em>.</p>
+<h1 id="example-50">EXAMPLE</h1>
+<pre><code>$ string::strip &#39;The Quick Brown Fox&#39; &#39;[aeiou]&#39;
+Th Quick Brown Fox</code></pre>
+<h1 id="see-also-53">SEE ALSO</h1>
+<p><code>string::stripall(1)</code>, <code>string::lstrip(1)</code>,
+<code>string::rstrip(1)</code></p>
+<h1 id="colophon-74">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% STRING::STRIPALL(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-75">NAME</h1>
+<p>string::stripall - remove pattern from string</p>
+<h1 id="synopsis-75">SYNOPSIS</h1>
+<p>string::stripall <em>str</em> <em>pat</em></p>
+<h1 id="description-75">DESCRIPTION</h1>
+<p>With <em>str</em> and <em>pat</em> two strings,
+<code>string::stripall</code> removes all occurences of <em>pat</em> in
+<em>str</em>.</p>
+<h1 id="example-51">EXAMPLE</h1>
+<pre><code>$ string::strip &#39;The Quick Brown Fox&#39; &#39;[aeiou]&#39;
+Th Quck Brwn Fx</code></pre>
+<h1 id="see-also-54">SEE ALSO</h1>
+<p><code>string::strip(1)</code>, <code>string::lstrip(1)</code>,
+<code>string::rstrip(1)</code></p>
+<h1 id="colophon-75">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% STRING::TRIM(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="name-76">NAME</h1>
+<p>string::trim - remove leadind and trailing spaces from string</p>
+<h1 id="synopsis-76">SYNOPSIS</h1>
+<p>string::trim <em>str</em></p>
+<h1 id="description-76">DESCRIPTION</h1>
+<p><code>string::trim</code> removes all leading and trailing spaces
+from string <em>str</em>.</p>
+<h1 id="example-52">EXAMPLE</h1>
+<p>$ string::trim ’ Hello, world ’ Hello, world</p>
+<h1 id="colophon-76">COLOPHON</h1>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+</body>
+</html>
