@@ -1,3 +1,20 @@
+#!/usr/bin/env make
+# Sensible Makefile defaults, inspired from
+# https://tech.davis-hansson.com/p/make/
+# (ɔ) 2022 wuage.org
+
+SHELL := bash
+.SHELLFLAGS := -eu -o pipefail -c
+.ONESHELL: # run shell commands as one single shell session
+.DELETE_ON_ERROR: # target file deleted on error, guards against broken files
+.SUFFIXES: # delete the default suffixes, same as `--no-builtin-rules`
+LOCAL_MAKEFLAGS = --warn-undefined-variables --no-print-directory
+MAKEFLAGS += $(LOCAL_MAKEFLAGS)
+unexport MAKEFLAGS MFLAGS # no arguments to sub-make
+
+# .DEFAULT_GOAL := help
+# .PHONY: help all 
+
 ####################################################################################################
 # Configuration
 ####################################################################################################
@@ -6,13 +23,14 @@
 
 BUILD = build
 MAKEFILE = Makefile
-OUTPUT_FILENAME = book
+OUTPUT_FILENAME = manual
 METADATA = metadata.yaml
 # CHAPTERS = chapters/*.md
-CHAPTERS+=$(addprefix ./src/,\
- *.md\
- 04-man/*/*/*.md\
-)
+# CHAPTERS+=$(addprefix ./src/,\
+#  *.md\
+#  04-man/*/*/*.md\
+# )
+CHAPTERS+=$(addprefix ./src/,*.md)
 TOC = --toc --toc-depth 2
 METADATA_ARGS = --metadata-file $(METADATA)
 IMAGES = $(shell find images -type f)
@@ -44,15 +62,18 @@ PANDOC_COMMAND = pandoc
 DOCX_ARGS = --standalone --reference-doc templates/docx.docx
 EPUB_ARGS = --template templates/epub.html --epub-cover-image $(COVER_IMAGE)
 HTML_ARGS = --template templates/html.html --standalone --to html5
-PDF_ARGS = --template templates/pdf.latex --pdf-engine xelatex
+PDF_ARGS = --template templates/eisvogel.latex --pdf-engine xelatex
+MAN_ARGS = --standalone --to man
+
 
 # Per-format file dependencies
 
-BASE_DEPENDENCIES = $(MAKEFILE) $(CHAPTERS) $(METADATA) $(IMAGES) $(TEMPLATES)
+BASE_DEPENDENCIES = $(MAKEFILE) $(CHAPTERS) $(MANPAGES) $(METADATA) $(IMAGES) $(TEMPLATES)
 DOCX_DEPENDENCIES = $(BASE_DEPENDENCIES)
 EPUB_DEPENDENCIES = $(BASE_DEPENDENCIES)
 HTML_DEPENDENCIES = $(BASE_DEPENDENCIES)
 PDF_DEPENDENCIES = $(BASE_DEPENDENCIES)
+MAN_DEPENDENCIES = $(BASE_DEPENDENCIES)
 
 # Detected Operating System
 
@@ -75,11 +96,11 @@ ECHO_BUILT = @echo "$@ was built\n"
 # Basic actions
 ####################################################################################################
 
-.PHONY: all book clean epub html pdf docx
+.PHONY: all manual clean epub html pdf docx man
 
-all:	book
+all:	manual
 
-book:	epub html pdf docx
+manual:	epub html pdf docx
 
 clean:
 	$(RMDIR_CMD) $(BUILD)
@@ -120,3 +141,20 @@ $(BUILD)/docx/$(OUTPUT_FILENAME).docx:	$(DOCX_DEPENDENCIES)
 	$(MKDIR_CMD) $(BUILD)/docx
 	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(DOCX_ARGS) -o $@
 	$(ECHO_BUILT)
+
+
+ ${program_C_SRCS:.c=.o}
+
+SRCEXT := 1.md
+DSTEXT := 1
+MANPGSRC += $(addprefix ./src/,04-man/*/*/*.1.md)
+MANPAGES := ${MANPGSRC:.md=.1} 
+
+man: $(MANPAGES)
+	echo $(MANPGSRC)
+
+$(BUILD)/manpages:
+	$(MKDIR_CMD) $(BUILD)/manpages
+
+%.1: %.1.md | $(BUILD)/manpages 
+	@echo $(PANDOC_COMMAND) $(MAN_ARGS) $< -o $@

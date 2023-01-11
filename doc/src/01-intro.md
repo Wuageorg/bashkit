@@ -6,6 +6,7 @@ IEEE POSIX P1003.2/ISO 9945.2. It supplements bash as a collection of modules ak
 development library*. It consists mostly in pure bash functions with very few dependencies.
 
 Bashkit is a scripting model that proposes idioms and tools for:
+
 * fail fast scripting
 * avoiding some bash scripting pitfalls
 * runtime error handling and event logging
@@ -13,6 +14,7 @@ Bashkit is a scripting model that proposes idioms and tools for:
 Bashkit comes with 8 *core* and 11 *standard* function modules. A bashkit script is a bash script that, at some point *sources* bashkit and modules and starts calling their functions. *Custom modules* are easy to write and module boilerplates are kept small. Nonetheless, a proper error handling surely requires editing.
 
 Core modules implement:
+
 * *revised control flows*
 * *ANSI color for the masses*
 * *error code handling*
@@ -22,6 +24,7 @@ Core modules implement:
 * *stateful bashkit versionning*
 
 Standard modules bring:
+
 * *easy array manipulations*
 * *advanced checking, including variable type checking*
 * *curl download integration*
@@ -44,10 +47,13 @@ TODO
 
 # Getting involved
 TODO
+
 ## Development
 TODO
+
 ## Translating Bashkit
 TODO
+
 ## Maintainer
 TODO
 
