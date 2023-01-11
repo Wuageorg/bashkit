@@ -1,8 +1,9 @@
 ---
 title: Bashkit
-author: [Erik Adelbert <ea@wuage.org>, Hugues Morisset <hm@wuage.org>]
+author: [Erik Adelbert <ea@wuage.org>, Hugues Morisset <huguesm@wuage.org>]
 rights:  Creative Commons Attribution 4.0 International
 language: en-US
+lang: en-US
 tags: [bashkit]
 abstract: |
   Wuage bashkit is a bash script programming model along with

@@ -12,149 +12,104 @@ LOCAL_MAKEFLAGS = --warn-undefined-variables --no-print-directory
 MAKEFLAGS += $(LOCAL_MAKEFLAGS)
 unexport MAKEFLAGS MFLAGS # no arguments to sub-make
 
-# .DEFAULT_GOAL := help
-# .PHONY: help all 
+.DEFAULT_GOAL := help
+.PHONY: $(.PHONY) help
 
-####################################################################################################
-# Configuration
-####################################################################################################
+MAKEOVERRIDES ?=
 
-# Build configuration
+# https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+help:
+	@printf '%s%b%s%b%s\n' '-------------------------------- ' '\033[31m' 'TARGETS' '\033[39m' ' -----------------------------------------------------'
+	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk -v target_ml=56 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-" target_ml "s\033[39m %s\n", $$1, $$2}' | awk '{print NR%2 ? $$0 : "\033[48;5;236m" $$0 "\033[49m" }'
+	@printf '%s%b%s%b%s\n' '-------------------------------- ' '\033[31m' 'OPTIONS' '\033[39m' ' -----------------------------------------------------'
+	@awk '/^##.*$$/,/?=/ { if ($$0 ~ /?=/) { printf "%s %s\n", $$0, comm } }; { comm=$$0 }' $(MAKEFILE_LIST) | sort | awk -v key_ml=23 -v value_ml=32 'BEGIN {FS = ".=| ## "}; { val=$$2; val_len=length(val); if (val_len > value_ml) { mid = int(value_ml / 2); val=sprintf("%s...%s", substr(val, 0, mid), substr(val, val_len - mid + 4, val_len)); } printf "\033[36m%-" key_ml "s\033[39m=\033[35m%-" value_ml "s\033[39m %s\n", $$1, val, $$3}' | awk '{print NR%2 ? $$0 : "\033[48;5;236m" $$0 "\033[49m"  }'
 
-BUILD = build
-MAKEFILE = Makefile
-OUTPUT_FILENAME = manual
+# Make does not offer a recursive wildcard function, so here's one (https://stackoverflow.com/a/12959764)
+rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+
+.PHONY: $(.PHONY) all manual clean epub html pdf docx man
+
+## Output directory
+OUT ?= out
+## Source directory
+SRC ?= src
+## Output filename without extension
+OUTPUT_FILENAME ?= manual
+
+# Input doc files
+SRCS_MARKDOWN = $(call rwildcard,$(SRC)/,*.md)
+# Output troff files
+OUTS_MAN = $(patsubst $(SRC)/%,$(OUT)/%,$(patsubst %.md,%.roff,$(SRCS_MARKDOWN)))
+# Output pdf files
+OUTS_PDF = $(patsubst $(SRC)/%,$(OUT)/%,$(patsubst %.md,%.pdf,$(SRCS_MARKDOWN)))
+# Output html files
+OUTS_HTML = $(patsubst $(SRC)/%,$(OUT)/%,$(patsubst %.md,%.html,$(SRCS_MARKDOWN)))
+
 METADATA = metadata.yaml
-# CHAPTERS = chapters/*.md
-# CHAPTERS+=$(addprefix ./src/,\
-#  *.md\
-#  04-man/*/*/*.md\
-# )
-CHAPTERS+=$(addprefix ./src/,*.md)
 TOC = --toc --toc-depth 2
 METADATA_ARGS = --metadata-file $(METADATA)
-IMAGES = $(shell find images -type f)
-TEMPLATES = $(shell find templates/ -type f)
-COVER_IMAGE = images/cover.png
 MATH_FORMULAS = --webtex
-
-# Chapters content
-CONTENT = awk 'FNR==1 && NR!=1 {print "\n\n"}{print}' $(CHAPTERS)
-CONTENT_FILTERS = tee # Use this to add sed filters or other piped commands
 
 # Debugging
 
 DEBUG_ARGS = --verbose
 
-# Pandoc filtes - uncomment the following variable to enable cross references filter. For more
-# information, check the "Cross references" section on the README.md file.
+PD_ARGS = $(TOC) $(MATH_FORMULAS) $(METADATA_ARGS) $(DEBUG_ARGS)
 
-# FILTER_ARGS = --filter pandoc-crossref
-
-# Combined arguments
-
-ARGS = $(TOC) $(MATH_FORMULAS) $(METADATA_ARGS) $(FILTER_ARGS) $(DEBUG_ARGS)
-
-PANDOC_COMMAND = pandoc
+PD = pandoc
+MD = mkdir -p
+RM = rm -rf
 
 # Per-format options
+# EPUB_ARGS = --template templates/epub.html
+HTML_ARGS = --template templates/html.html --to html5
+PDF_ARGS = --pdf-engine xelatex --to pdf
+MAN_ARGS = --verbose --standalone --to man
 
-DOCX_ARGS = --standalone --reference-doc templates/docx.docx
-EPUB_ARGS = --template templates/epub.html --epub-cover-image $(COVER_IMAGE)
-HTML_ARGS = --template templates/html.html --standalone --to html5
-PDF_ARGS = --template templates/eisvogel.latex --pdf-engine xelatex
-MAN_ARGS = --standalone --to man
+TEMPLATES = $(call rwildcard,templates/,*)
+EXTRA_DEPS = $(METADATA) $(MAKEFILE_LIST) $(TEMPLATES)
 
+all:	doc ## Build all
 
-# Per-format file dependencies
+doc:	man epub html pdf ## Build documentation for every target formats
 
-BASE_DEPENDENCIES = $(MAKEFILE) $(CHAPTERS) $(MANPAGES) $(METADATA) $(IMAGES) $(TEMPLATES)
-DOCX_DEPENDENCIES = $(BASE_DEPENDENCIES)
-EPUB_DEPENDENCIES = $(BASE_DEPENDENCIES)
-HTML_DEPENDENCIES = $(BASE_DEPENDENCIES)
-PDF_DEPENDENCIES = $(BASE_DEPENDENCIES)
-MAN_DEPENDENCIES = $(BASE_DEPENDENCIES)
-
-# Detected Operating System
-
-OS = $(shell sh -c 'uname -s 2>/dev/null || echo Unknown')
-
-# OS specific commands
-
-ifeq ($(OS),Darwin) # Mac OS X
-	COPY_CMD = cp -P
-else # Linux
-	COPY_CMD = cp --parent
-endif
-
-MKDIR_CMD = mkdir -p
-RMDIR_CMD = rm -r
-ECHO_BUILDING = @echo "building $@..."
-ECHO_BUILT = @echo "$@ was built\n"
-
-####################################################################################################
-# Basic actions
-####################################################################################################
-
-.PHONY: all manual clean epub html pdf docx man
-
-all:	manual
-
-manual:	epub html pdf docx
-
-clean:
-	$(RMDIR_CMD) $(BUILD)
+clean: ## Clean
+	@$(RM) -rf $(OUT)
 
 ####################################################################################################
 # File builders
 ####################################################################################################
 
-epub:	$(BUILD)/epub/$(OUTPUT_FILENAME).epub
+html:	$(OUT)/$(OUTPUT_FILENAME).html $(EXTRA_DEPS) ## Build html
 
-html:	$(BUILD)/html/$(OUTPUT_FILENAME).html
+pdf:	$(OUT)/$(OUTPUT_FILENAME).pdf $(EXTRA_DEPS) ## Build pdf
 
-pdf:	$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
+man: $(OUT)/$(OUTPUT_FILENAME).man $(EXTRA_DEPS) ## Build manpage
 
-docx:	$(BUILD)/docx/$(OUTPUT_FILENAME).docx
+# Merging rules
 
-$(BUILD)/epub/$(OUTPUT_FILENAME).epub:	$(EPUB_DEPENDENCIES)
-	$(ECHO_BUILDING)
-	$(MKDIR_CMD) $(BUILD)/epub
-	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(EPUB_ARGS) -o $@
-	$(ECHO_BUILT)
+$(OUT)/$(OUTPUT_FILENAME).man: $(OUTS_MAN)
+	@$(MD) $(@D) # Create target directory
+	@$(PD) $(PD_ARGS) $(MAN_ARGS) --from man $^ --to man -o $@
 
-$(BUILD)/html/$(OUTPUT_FILENAME).html:	$(HTML_DEPENDENCIES)
-	$(ECHO_BUILDING)
-	$(MKDIR_CMD) $(BUILD)/html
-	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(HTML_ARGS) -o $@
-	#$(COPY_CMD) $(IMAGES) $(BUILD)/html/
-	$(ECHO_BUILT)
+$(OUT)/$(OUTPUT_FILENAME).pdf: $(OUTS_PDF)
+	@$(MD) $(@D) # Create target directory
+	@$(PD) $(PD_ARGS) $(PDF_ARGS) --from pdf $^ --to pdf -o $@
 
-$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf:	$(PDF_DEPENDENCIES)
-	$(ECHO_BUILDING)
-	$(MKDIR_CMD) $(BUILD)/pdf
-	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(PDF_ARGS) -o $@
-	$(ECHO_BUILT)
+$(OUT)/$(OUTPUT_FILENAME).html: $(OUTS_HTML)
+	@$(MD) $(@D) # Create target directory
+	@$(PD) $(PD_ARGS) $(HTML_ARGS) --from html $^ --to html -o $@
 
-$(BUILD)/docx/$(OUTPUT_FILENAME).docx:	$(DOCX_DEPENDENCIES)
-	$(ECHO_BUILDING)
-	$(MKDIR_CMD) $(BUILD)/docx
-	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(DOCX_ARGS) -o $@
-	$(ECHO_BUILT)
+# Per file rules
 
+$(OUT)/%.man: $(SRC)/%.md
+	@$(MD) $(@D) # Create target directory
+	@$(PD) $(MAN_ARGS) $< -o $@
 
- ${program_C_SRCS:.c=.o}
+$(OUT)/%.pdf: $(SRC)/%.md
+	@$(MD) $(@D) # Create target directory
+	@$(PD) $(PDF_ARGS) $< -o $@
 
-SRCEXT := 1.md
-DSTEXT := 1
-MANPGSRC += $(addprefix ./src/,04-man/*/*/*.1.md)
-MANPAGES := ${MANPGSRC:.md=.1} 
-
-man: $(MANPAGES)
-	echo $(MANPGSRC)
-
-$(BUILD)/manpages:
-	$(MKDIR_CMD) $(BUILD)/manpages
-
-%.1: %.1.md | $(BUILD)/manpages 
-	@echo $(PANDOC_COMMAND) $(MAN_ARGS) $< -o $@
+$(OUT)/%.html: $(SRC)/%.md
+	@$(MD) $(@D) # Create target directory
+	@$(PD) $(HTML_ARGS) $< -o $@
