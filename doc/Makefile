@@ -105,7 +105,7 @@ $(OUT)/$(OUTPUT_FILENAME).html: $(SRCS_CHAPTERS_MARKDOWN) $(OUTS_PROCESSED_MD)
 
 $(OUT)/%.processed.md: $(SRC)/%.md
 	@$(MD) $(@D) # Create target directory
-	@awk 'BEGIN { title=""; out=1; } /^title:/ { title=$$2; } /^---$$/ { out=!out; next; } /# AUTHORS/,/full documentation./ {next} { sub(/NAME/, title); if ($$0 ~ "^#" && $$2 != title ) sub(/# /, "### "); if (out) print > "$@"; }' $<
+	@awk 'BEGIN { title=""; out=1; } /^title:/ { title=tolower($$2); } /^---$$/ { out=!out; next; } /# AUTHORS/,/full documentation./ {next} { sub(/NAME/, title); if ($$0 ~ "^#" && $$2 != title ) sub(/# /, "### "); if (out) print > "$@"; }' $<
 
 $(OUT)/%.roff: $(SRC)/%.md
 	@$(MD) $(@D) # Create target directory
