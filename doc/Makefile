@@ -27,7 +27,7 @@ help:
 # Make does not offer a recursive wildcard function, so here's one (https://stackoverflow.com/a/12959764)
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 
-.PHONY: $(.PHONY) all manual clean epub html pdf docx man
+.PHONY: $(.PHONY) all manual clean html pdf man
 
 ## Output directory
 OUT ?= out
@@ -37,13 +37,12 @@ SRC ?= src
 OUTPUT_FILENAME ?= manual
 
 # Input doc files
-SRCS_MARKDOWN = $(call rwildcard,$(SRC)/,*.md)
-# Output troff files
-OUTS_MAN = $(patsubst $(SRC)/%,$(OUT)/%,$(patsubst %.md,%.roff,$(SRCS_MARKDOWN)))
-# Output pdf files
-OUTS_PDF = $(patsubst $(SRC)/%,$(OUT)/%,$(patsubst %.md,%.pdf,$(SRCS_MARKDOWN)))
-# Output html files
-OUTS_HTML = $(patsubst $(SRC)/%,$(OUT)/%,$(patsubst %.md,%.html,$(SRCS_MARKDOWN)))
+SRCS_MAN_MARKDOWN = $(call rwildcard,$(SRC)/04-man/,*.md)
+SRCS_CHAPTERS_MARKDOWN = $(wildcard $(SRC)/*.md)
+
+OUTS_MAN = $(patsubst $(SRC)/%,$(OUT)/%,$(patsubst %.md,%.roff,$(SRCS_MAN_MARKDOWN) $(SRCS_CHAPTERS_MARKDOWN)))
+# Output md files
+OUTS_PROCESSED_MD = $(patsubst $(SRC)/%,$(OUT)/%,$(patsubst %.md,%.processed.md,$(SRCS_MAN_MARKDOWN)))
 
 METADATA = metadata.yaml
 TOC = --toc --toc-depth 2
@@ -62,8 +61,8 @@ RM = rm -rf
 
 # Per-format options
 # EPUB_ARGS = --template templates/epub.html
-HTML_ARGS = --template templates/html.html --to html5
-PDF_ARGS = --pdf-engine xelatex --to pdf
+HTML_ARGS = --template templates/html.html --standalone --to html5
+PDF_ARGS = --standalone --pdf-engine xelatex --to pdf
 MAN_ARGS = --verbose --standalone --to man
 
 TEMPLATES = $(call rwildcard,templates/,*)
@@ -80,36 +79,35 @@ clean: ## Clean
 # File builders
 ####################################################################################################
 
-html:	$(OUT)/$(OUTPUT_FILENAME).html $(EXTRA_DEPS) ## Build html
+html: $(OUT)/$(OUTPUT_FILENAME).html $(EXTRA_DEPS) ## Build html
 
-pdf:	$(OUT)/$(OUTPUT_FILENAME).pdf $(EXTRA_DEPS) ## Build pdf
+pdf: $(OUT)/$(OUTPUT_FILENAME).pdf $(EXTRA_DEPS) ## Build pdf
 
-man: $(OUT)/$(OUTPUT_FILENAME).man $(EXTRA_DEPS) ## Build manpage
+man: $(OUTS_MAN) $(EXTRA_DEPS) ## Build manpage
+
+md: $(OUT)/$(OUTPUT_FILENAME).md $(EXTRA_DEPS) ## Build markdown
 
 # Merging rules
 
-$(OUT)/$(OUTPUT_FILENAME).man: $(OUTS_MAN)
+$(OUT)/$(OUTPUT_FILENAME).md: $(SRCS_CHAPTERS_MARKDOWN) $(OUTS_PROCESSED_MD)
 	@$(MD) $(@D) # Create target directory
-	@$(PD) $(PD_ARGS) $(MAN_ARGS) --from man $^ --to man -o $@
+	@$(PD) $(PD_ARGS) --from markdown $^ --to markdown -o $@
 
-$(OUT)/$(OUTPUT_FILENAME).pdf: $(OUTS_PDF)
+$(OUT)/$(OUTPUT_FILENAME).pdf: $(SRCS_CHAPTERS_MARKDOWN) $(OUTS_PROCESSED_MD)
 	@$(MD) $(@D) # Create target directory
-	@$(PD) $(PD_ARGS) $(PDF_ARGS) --from pdf $^ --to pdf -o $@
+	@$(PD) $(PD_ARGS) $(PDF_ARGS) --from markdown $^ --to pdf -o $@
 
-$(OUT)/$(OUTPUT_FILENAME).html: $(OUTS_HTML)
+$(OUT)/$(OUTPUT_FILENAME).html: $(SRCS_CHAPTERS_MARKDOWN) $(OUTS_PROCESSED_MD)
 	@$(MD) $(@D) # Create target directory
-	@$(PD) $(PD_ARGS) $(HTML_ARGS) --from html $^ --to html -o $@
+	@$(PD) $(PD_ARGS) $(HTML_ARGS) --from markdown $^ --to html -o $@
 
 # Per file rules
 
-$(OUT)/%.man: $(SRC)/%.md
+$(OUT)/%.processed.md: $(SRC)/%.md
+	@$(MD) $(@D) # Create target directory
+	@awk 'BEGIN { title=""; out=1; } /^title:/ { title=$$2; } /^---$$/ { out=!out; next; } /# AUTHORS/,/full documentation./ {next} { sub(/NAME/, title); if ($$0 ~ "^#" && $$2 != title ) sub(/# /, "### "); if (out) print > "$@"; }' $<
+
+$(OUT)/%.roff: $(SRC)/%.md
 	@$(MD) $(@D) # Create target directory
 	@$(PD) $(MAN_ARGS) $< -o $@
 
-$(OUT)/%.pdf: $(SRC)/%.md
-	@$(MD) $(@D) # Create target directory
-	@$(PD) $(PDF_ARGS) $< -o $@
-
-$(OUT)/%.html: $(SRC)/%.md
-	@$(MD) $(@D) # Create target directory
-	@$(PD) $(HTML_ARGS) $< -o $@
