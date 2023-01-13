@@ -37,10 +37,10 @@ Standard modules bring:
 * *string manipulations*
 
 # Download
-Stable releases can be found at [wuage](<http://bashkit.wuage.org>).
+Stable releases can be found at [wuage](<https://github.com/Wuageorg/bashkit>).
 
 # Documentation
-Documentation for Bashkit is available [online](<http://bashkit.wuage.org>). You may also find information on Bashkit by running TODO.
+Documentation for Bashkit is available [online](<http://bashkit.wuage.io>). You may also find information on Bashkit by running TODO.
 
 # Mailing Lists
 TODO
