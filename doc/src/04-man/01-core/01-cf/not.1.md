@@ -43,6 +43,6 @@ Written by \\Nuage
 
 # COLOPHON
 This page is part of the wuage bashkit framework. Source code and all
-documentation maybe downloaded from <http://bashkit.wuage.org>
+documentation maybe downloaded from <https://bashkit.wuage.io>
 
 The `doc` directory distributed with `bashkit` contains full documentation.
