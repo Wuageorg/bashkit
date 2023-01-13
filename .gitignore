@@ -1,0 +1,59 @@
+# Bashkit doc/build
+doc/build/
+
+# Linux 
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+# Darwin general
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Darwin icon must end with two \r
+Icon
+
+# Darwin thumbnails
+._*
+
+# Darwin files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Darwin directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+
+# VSC
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# VSC Local History
+.history/
+
+# VSC Built Extensions
+*.vsix
