@@ -358,7 +358,7 @@ In Bash, a process may choose to perform a different action, rather than exiting
 
 The simplest signal handling a process can choose to perform is to ignore a signal. This is generally a *bad idea*, unless it is done for a very specific purpose. Ignoring signals often leads to runaway processes which consume all available CPU.
 
-Bashkit `trap` module utilities extend bash command behavior. Namely, `trap::callback` enables a script to register *multiple callback functions or plain sources* that are called in LIFO order upon receving selected signals.
+Bashkit `trap` module utilities extend bash command behavior. Namely, `trap::callback` enables a script to register *multiple callback functions or plain sources* that are called in LIFO order upon receiving selected signals.
 
 More commonly, traps can be set up to intercept a fatal signal, perform cleanup, and then exit gracefully. For example, a program that creates temporary files might wish to remove them before exiting. If the program is forced to exit by a signal, it won't be able to remove the files unless it catches the signal.
 

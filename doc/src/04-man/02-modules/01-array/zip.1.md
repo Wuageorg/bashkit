@@ -18,7 +18,7 @@ array::zip *D* *K* *V*
 
 With *D* an dictionary (ie. associative array), *K* and *V* two arrays,
 `array::zip` merges the arrays into a dict where keys are taken from *K*
-ans associated to values taken in turn fron *V*.
+ans associated to values taken in turn from *V*.
 
 `array::zip` returns 0 upon success, >0 otherwise.
 
