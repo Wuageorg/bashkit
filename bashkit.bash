@@ -67,10 +67,13 @@ bashkit::init() {
 
         full=${dir}/${name}
 
-        repo=$(
-            git rev-parse --show-toplevel 2>/dev/null \
-            || printf ''
-        )
+        repo=${3:-}
+        if [[ -z "${repo:-}" ]]; then
+            repo=$(
+                git rev-parse --show-toplevel 2>/dev/null \
+                || printf ''
+            )
+        fi
 
         __INFOS=(
             [basedir]=${dir}      # /absolute_path
@@ -83,7 +86,7 @@ bashkit::init() {
 
     # global variables
     declare -g -A BASHKIT
-    init__pathinfo BASHKIT "${BASH_SOURCE[0]}"
+    init__pathinfo BASHKIT "${BASH_SOURCE[0]}" "${BASHKIT_REPOSITORY:-}"
 
     declare -g -A SCRIPT
     init__pathinfo SCRIPT "$0"
