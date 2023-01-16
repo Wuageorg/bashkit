@@ -192,7 +192,7 @@ declare -f fatal &> /dev/null \
     {
         shopt -s extdebug       # create BASH_ARGV
         # `source bashkit.bash` has no arg
-        if [[ ${BASH_ARGV[0]} == "${BASH_SOURCE[0]}" ]]; then
+        if [[ ${BASH_ARGV[0]:-} == "${BASH_SOURCE[0]:-}" ]]; then
             __BASHKIT_ARGV=() # clear `${__BASHKIT_ARGV[@]}`
         fi
     }
