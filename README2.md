@@ -204,7 +204,7 @@ diff <(sort A) <(sort B)
 ### Error code mapping
 Bashkit defines an error code mapping that closely follows [bash definition](https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html) and adds additional constraints to it:
 
-- an error is a global variable with a name prefixed by "E_" followed by words connected with "_" ex. `$E_FAILURE` but not ~~$E_FAILURE_~~
+- an error is a global variable with a name prefixed by "E_" followed by words connected with "_" ex. `$E_FAILURE` but not ~~`$E_FAILURE_`~~
 - such a variable contains a *uniquely* assigned integer, a preset ex. `E_FAILURE=1`
 - bashkit owns some of the preset errors
 - bash is said to own some other preset errors
