@@ -1,30 +1,103 @@
-# Table of Contents
-  1. [Logging](#logging)
-      1. [Standard logging](#standard-logging)
-      2. [JSON logging](#json-logging)
-      3. [Panicking](#panicking)
-      4. [Report and Trace](#report-and-trace)
-  2. [Error Handling](#error-handling)
-      1. [Discussion](#discussion)
-      2. [Error code mapping](#error-code-mapping)
-      3. [Flow of control with true](#flow-of-control-with-true)
-      4. [raise, catch and resume](#raise-catch-and-resume)
-  3. [Bashkit scripting](#bashkit-scripting)
-      1. [Unhandled errors](#unhandled-errors)
-      2. [Fail fast](#fail-fast)
-      3. [Traps and cleanup](#traps-and-cleanup)
-      4. [Colors](#colors)
+# Bashkit [![\Nuage][wuage-img]][wuage]
 
-# Basic Bashkit features
+<img src="./doc/images/bashkit_badge.svg" align="right"
+     alt="Bashkit - Scripts made sturdy by Wuage.org" width="180" height="178">
 
-Bashkit is an acronym for `Bourne-Again SHell KIT`. It supplements Bash and can not be used
-without. This chapter briefly summarizes the bashkit’s *building blocks*: logging, control structures,
-functions, and how the shell executes commands with active bashkit.
+`Bashkit` is an opiniated scripting model and framework for `Bash` `5.x`. It is intended 
+to help writing more robust scripts in which unhandled errors are preferably fatal. 
+It does so by enforcing and exploiting selected bashisms and sometimes moving away 
+from IEEE POSIX P1003.2/ISO 9945.2. It supplements bash as a collection of modules 
+akin to a script development library. It consists mostly in pure bash functions 
+with few to no dependencies.
 
-## Logging
+* **Fail Fast Scripting** and **Error-Handling** support.
+* **Advanced Logging** functions.
+* Add **ANSI colors** to your script output.
+* **Modular** to fit different use cases: modules can be included whenever you need them.
+* **Lightweight**, you won't notice any performance penalty.
 
-Bashkit as a proper software framework offers a logging system. A bashkit script can and should record
-software events in a structured way. Bashkit follows `syslog(1)` levels to implement *logging routines*:
+
+When using **Bashkit**, you will still recognise your Bash scripts:
+
+```sh
+source bashkit.bash
+
+isint() {
+    local n
+    printf -v n '%d' "${1:-}" &> /dev/null \
+    || raise "not an int"
+}
+
+isint "abc" \
+|| error
+
+2022-11-28 12:22:51+0100 [error] isint:5| not an int
+```
+
+Bashkit as a pure bash functions collection will fit right into your environment:
+
+<p align="center">
+  <img src="./doc/images/screenshot.png" alt="Screenshot of VS session" width="650">
+</p>
+
+[wuage-img]:     ./doc/images/wuage_badge.svg
+[wuage]:         https:bashkit.wuage.io
+
+## Who Uses Bashkit
+
+Here at [Wuage](https://github.com/Wuageorg), we are building a fast and low energy cloud infrastructure stack. In our world, we are used to write and deploy scripts at a massive scale. Those scripts are useful to assert node states, deploy new projects and features and even mass-administer a number of machines at once. The thing we don't want is to see our scripts *improvising* ops on their own! We would rather prefer them to fail as soon and loudly as possible in case of an unfortunate event.
+
+In our past lives we had to officially push `Bash` away because it was deemed unsuitable for our day to day ops. Instead of using It, we had to write `Python` scripts along with a decent load of `Yaml` descriptions. Our work was fed to a gigantic puzzler and it was hopefully delivered to production. But as time passed, we were eventually writing... `Bash` scripts again usually to overcome some gigantic limitations or counter-performances.
+
+This is why we developed `Bashkit`: we believe that with a few pushes here and there `Bash` is a premium scripting tool!
+
+Whatever the purpose of your scripts, if they are meant to do something non-interactively, fail fast and report, you will find `Bashkit` useful.
+
+If you start using `Bashkit` and find it worthy, drop us a message and we will publish a list of users right here!
+
+## How It Works
+Bashkit comes with 7 core and 10 standard function modules. A bashkit script is a bash script that, at some point sources bashkit and modules and starts calling their functions. Custom modules are easy to write and module boilerplates are kept small. Nonetheless, a proper error handling surely requires editing.
+
+Core modules implement:
+
+1. Revised control flows
+2. ANSI color for the masses
+3. Error code handling
+4. Exhaustive error scheme
+5. Advanced logging routines
+6. Thorough signal trap handling
+7. Stateful bashkit versionning
+
+Standard modules bring:
+
+1. Easy array manipulations
+2. Advanced checking, including variable type checking
+3. Curl download integration
+4. Yes/no interaction support
+5. Json conversions
+6. Patch integration
+7. File permissions conversion
+8. Readlink as a function
+9. Shopt stacking
+10. String manipulation
+
+> A module can be loaded either when sourcing `Bashkit` or by calling `bashkit::load(1)`
+<details><summary><b>Show example</b></summary>
+
+```sh
+source bashkit.bash check shopt # load bashkit along with check and shopt modules
+
+bashkit::load array # load array module
+```
+</details>
+
+## Bashkit Scripting
+
+Bashkit favors `fail` `fast` like scripting patterns: by combining Conditional Constructs [[...]] and ((...)) with errcode and handlers scripts can achieve useful and robust behaviors. Bashkit scripts can setup LIFO traps on any signal and cleanup command easily enables deferred actions upon script exit. It is also very easy to add text color to outputs.
+
+### Logging
+
+Bashkit as a proper software framework offers a logging system. A bashkit script can and should record software events in a structured way. Bashkit follows syslog(1) levels to implement logging routines:
 
 | routine | panic | alert | crit | error | warn | note | info | debug |
 | ------ | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
@@ -33,13 +106,9 @@ software events in a structured way. Bashkit follows `syslog(1)` levels to imple
 Logging level is controlled either by setting the global variable `$LOGLEVEL` beforehand or by calling `logging:setlevel` at runtime. Default logging level is `INFO/6`. As expected, a logging routine displays a message when the current logging level is *lower or equal* to its own, otherwise the message is silenced
 but planned side-effects occur (see `errcode`).
 
-> there's a bashkit routine named `info`. It shadows `info(1)` the bash
-info document reader. If you need to use `info(1)`, call it with
-`command` `info` `[args]`.
+<details><summary><b>Show example</b></summary>
 
-#### Example:
-
-```{.bash .numberLines}
+```sh
 bash-5.2$ cat hello.bash
 #!/usr/bin/env bash
 source ${SOME_PATH_TO_BASHKIT}/bashkit.bash
@@ -48,6 +117,13 @@ info 'hello world!'
 bash-5.2$ bash -c ./hello.bash
 2022-10-12 18:27:33+0200 [ info] ./hello.bash:3| hello world!
 ```
+
+</details>
+
+> there's a bashkit routine named `info`. It shadows `info(1)` the bash
+info document reader. If you need to use `info(1)`, call it with
+`command` `info` `[args]`.
+
 
 ### Standard logging
 
@@ -65,25 +141,28 @@ standard logging routines display a default format:
 | LINENO| integer of calling time \$LINENO value |
 | MSG| arbitrary bash expandable string after "\| " |
 
-
-
 ### JSON logging
 
 JSON logging happens on `stderr`, it is enabled by setting the global variable `$JSON` beforehand. When activated, it replaces standard logging output. Messages are emitted in [NDJSON](http://ndjson.org) format and consist in valid json values with no color and a fix layout:
 
-```{.bash .numberLines}
+```sh
 '{ "date": "STAMP", "level": "LEVEL", "func": "ORIGIN", "lineno": "LINENO", "text": "MSG" }\n'
 ```
 
 Fields STAMP, LEVEL, ..., MSG are similar to standard logging except for LEVEL that is not padded nor bracketed. They are all enclosed in double-quotes.
 
-#### Example:
+<details><summary><b>Show example</b></summary>
 
-```{.bash .numberLines}
+```sh
+bash-5.2$ cat hello.bash
+#!/usr/bin/env bash
+source ${SOME_PATH_TO_BASHKIT}/bashkit.bash
+info 'hello world!'
+
 bash-5.2$ bash -c 'JSON=1 ./hello.bash'
 { "date": "2022-10-13 17:35:04+0200", "level": "info", "func": "./hello.bash", "lineno": "3", "text": "hello world!" }
-bash-5.2$
 ```
+</details>
 
 ### Panicking
 
@@ -118,7 +197,7 @@ Bash basic exit status handling is flawed by decisions made early during bash de
 
 Bashkit helps scripts to efficiently handle errors or fail fast in most of the cases. One should be aware that some bash quirks are simply unreachable to address within bash itself. Don't do this:
 
-```{.bash .numberLines}
+```sh
 diff <(sort A) <(sort B)
 ```
 
@@ -150,7 +229,7 @@ Bashkit defines an error code mapping that closely follows [bash definition](htt
 ### Flow of control with true
 Using `true` as a control flow mechanism is already a bash idiom:
 
-```{.bash .numberLines}
+```sh
 #!/usr/bin/env bash
 up_the_game
 rm some_random_file_that_could_not_exist || true
@@ -159,7 +238,7 @@ echo "all went well!"
 
 Under `errcode`, the bashkit error handling system, you can do the same:
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 up_the_game
@@ -173,7 +252,7 @@ echo "all went well!"
 
 ### raise, catch and resume
 
-```{.bash .numberLines}
+```sh
 check_cmd() {
     command -v "${cmd}" &> /dev/null
 }
@@ -182,7 +261,7 @@ check_cmd() {
 It returns exit status `0` if `$cmd` is executable or fails with `1` if not. As stated before, under `errcode` (bashkit error handling support) when `$cmd` is not available, it is a fatal error.
 To be more on point, `check_cmd` should be more flexible than silently failing (thanks to redirecting to `/dev/null`), it could at least `log` an error. Consider the `bashkit idiom` to just do that:
 
-```{.bash .numberLines}
+```sh
 check_cmd() {
     local cmd=$1
     command -v "${cmd}" &> /dev/null \
@@ -194,7 +273,7 @@ bash-5.2$ bash -c 'source bashkit.bash; check_cmd(){... ; check_cmd inexistent'
 ```
 It is slightly better but still lacks some genericity: what if we just want to know if a command exists and proceed with a workaround if not? Enter `raise` that ultimately enables more efficient error handling patterns:
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 check_cmd() {
@@ -208,7 +287,7 @@ check_cmd inexistent \
 ```
 Invoked like this, `raise` position a `message` along with the `exit status` *before* returning to the caller. It becomes the caller's responsibility to chose what to do when `check_cmd` fails. For now, as previously, the script logs the error and then crashes. But a more convenient flow is within reach by using `catch`:
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 check_cmd isint \
@@ -233,7 +312,7 @@ In this situation, when `check_cmd` raises a failure, the `catch` block is able 
 
 Now consider this example where `maybe` has 50% chances of failure:
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 maybe()(( $1 < RANDOM%100 ))
@@ -245,7 +324,7 @@ maybe 50 \
 
 Bashkit error handling trap will stop short right after the `maybe` call if it fails. In the long run, the script prints "yep" in one out of two runs but will never print "nope". Under `errcode` it does not work because `echo` is not an *errcode compatible handler*. The idiomatic way here, is to use `resume`:
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 maybe()(( $1 < RANDOM%100 ))
@@ -261,7 +340,7 @@ This time, the script will print either "yep" or "nope" with the same frequency.
 
 > Because bash unary negation operator `!` is not a command, `resume` can not transfer control to it. It can be replaced by `not`. `not` is defined to return the logical negation of its argument.
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 maybe()(( $1 < RANDOM%100 ))
@@ -274,15 +353,11 @@ maybe 50 \
 
 In the long run, this script will rather succeed (75%) than log an error and fail (25%).
 
-## Bashkit scripting
-
-Bashkit favors `fail fast` like scripting patterns: by combining [`Conditional Constructs`](https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html) `[[...]]` and `((...))` with `errcode` and `handlers` scripts can achieve useful and robust behaviors. Bashkit scripts can setup LIFO `traps` on any signal and `cleanup` command easily enables deferred actions upon script exit. It is also very easy to add `text color` to outputs.
-
 ### Unhandled errors
 
 Bashkit can detect a set but unhandled error that otherwise would go silent. In this case, the script will  **crit** log the error:
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash extras
 
 isint not_an_integer
@@ -290,13 +365,13 @@ isint not_an_integer
 
 When ran, the above script outputs:
 
-```{.bash .numberLines}
+```sh
 bash-5.2$ ./noint.bash
 2022-10-24 15:14:52+0200 [ crit] isint:33| invalid number
 ```
 
 ### Fail fast
-[`Fail fast`](https://www.martinfowler.com/ieeeSoftware/failFast.pdf) is a simple technique that is known to ease finding most defects in a software. A software that fails fast, will stop visibly as soon as a problem occurs: bugs are easier to find and fix so, hopefully, fewer make it to production.
+[`Fail` `fast`](https://www.martinfowler.com/ieeeSoftware/failFast.pdf) is a simple technique that is known to ease finding most defects in a software. A software that fails fast, will stop visibly as soon as a problem occurs: bugs are easier to find and fix so, hopefully, fewer make it to production.
 
 #### Assertions
 
@@ -304,9 +379,9 @@ Usually `assertions` are different from exceptions in the way that assertions ca
 
 Bash has no support built-in support for *assertions*. Bashkit which is mostly written in pure-bash does not either implement a *per-se* assertion system: instead it *emulates* them using `conditional construcs` and `errcode`: Namely a tests followed by a `|| raise` pattern that exploits `raise` polymorphism *is* an `assertion`.
 
-#### Example:
+<details><summary><b>Show example</b></summary>
 
-```{.bash .numberLines}
+```sh
 array::pick() {
     local -n A=$1
     local -n acc=${2:-__}
@@ -323,7 +398,7 @@ array::pick() {
 
 Being a publicly exposed function of bashkit module `array`, `array::pick` should remediate these situations. The proper way is to add a bunch of tests akin to `assertions` and combine `errcode handlers` to always achieve a useful behavior:
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 array::pick() {
@@ -353,6 +428,8 @@ array::pick() {
 > - next test *asserts* a non-empty array and once again, raises any failure to `array::pick` caller
 > - at this point, there is no way the function could fail anymore and it will eventually select and copy a random element from `$A[@]` to `$acc`
 
+</details>
+
 ### Traps and cleanup
 
 In Bash, a process may choose to perform a different action, rather than exiting, upon receiving a signal. This is done by setting up a signal handler (or trap). The trap must be set before the signal is received. A process that receives a signal for which it has set a trap is said to have caught the signal.
@@ -365,7 +442,7 @@ More commonly, traps can be set up to intercept a fatal signal, perform cleanup,
 
 Bashkit `cleanup` utility is a `trap::callback` wrapper dedicated to hook instructions to signal `EXIT/0`. It can be called anytime from anywhere in the script, registered functions will run in LIFO order at the script top level. As in bash, a mistake in a callback could abort the entire cleanup process but won't prevent the script from exiting.
 
-#### Example:
+<details><summary><b>Show example</b></summary>
 
 ```{.bash .numberLines}
 source bashkit.bash
@@ -375,6 +452,7 @@ scratch=$(mktemp) \
 
 cleanup 'rm -f "${scratch}"'
 ```
+</details>
 
 > When `panicking`, a bashkit script will `cleanup` before exiting. But there are situations beyond reach, like arithmetic exceptions or uncatchable signals that can prevent `cleanup` to take place.
 
@@ -402,9 +480,9 @@ base = "black" | "red" | "green" | "yellow" | "blue" | "magenta" | "cyan"
 
 The smallest descriptions of all are `"text"` and `"reset"`. The later is always the ANSI `ESC[m` reset code while the former is the current system-defined default.
 
-#### Example:
+<details><summary><b>Show example</b></summary>
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 color::encode bold green text; bold_green=${__}
@@ -417,6 +495,7 @@ printf "%b%s%b" "${bold_green}" NATURE "${reset} does not hurry, yet everything 
 >  - after a successful encoding, ANSI code is stord in `${__}`
 >  - `%b` is the required verb for an escape code when colorizing with `printf`
 >  - any compatible terminal that receives such codes will interpret them as color commands
+</details>
 
 Declaring colors can be a tidy task, the following example shows how to build a *color palette*:
 
