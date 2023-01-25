@@ -8,5 +8,4 @@ not, please email us at [Wuage](mailto:bashkit@wuage.org?subject=[Bashkit]%20Lic
 * [readlinkf (readlink)](https://github.com/ko1nksm/readlinkf/blob/master/test.sh)
 * [strict-mode (bashkit::init)](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
 * [strings and more (string)](https://github.com/dylanaraps/pure-bash-bible)
-
-
+* [semver-tool (semver)](https://github.com/fsaintjacques/semver-tool)
