@@ -49,10 +49,9 @@ semver::parse() {
         build=${build:1} # remove leading +
         __=("${major}" "${minor}" "${patch}" "${prere}" "${build}")
     else
-        raise "version ${version} does not match the semver scheme 'X.Y.Z(-PRERELEASE)(+BUILD)'."
+        raise "${version} does not match semver 'X.Y.Z(-PRERELEASE)(+BUILD)'."
     fi
 }
-
 
 semver::compare() {
     svc__cmp_digit() {
@@ -69,7 +68,7 @@ semver::compare() {
 
     svc__is_digit() {
         local DIGIT='0|[1-9][0-9]*'
-        [[ "$1" =~ ^(${DIGIT})$ ]]
+        [[ $1 =~ ^(${DIGIT})$ ]]
     }
 
     # shellcheck disable=SC2250  # no {} for single letter vars 
@@ -121,7 +120,6 @@ semver::compare() {
     local b=( "${vb[0]}" "${vb[1]}" "${vb[2]}" )
 
     svc__cmp_fields a b
-    # shellcheck disable=SC2128 # __ not an array here
     if (( __ != 0 )); then
         return
     fi
