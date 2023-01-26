@@ -1,7 +1,8 @@
-# Bashkit [![\Nuage][wuage-img]][wuage]
 
-<img src="./doc/images/bashkit_badge.svg" align="right"
+<img src="./doc/images/bashkit_badge.svg" align="center"
      alt="Bashkit - Scripts made sturdy by Wuage.org" width="180" height="178">
+
+# [![\Nuage][wuage-img]][wuage]
 
 `Bashkit` is an opiniated scripting model and framework for `Bash` `5.x`. It is intended 
 to help writing more robust scripts in which unhandled errors are preferably fatal. 
@@ -41,7 +42,7 @@ Bashkit as a pure bash functions collection will fit right into your environment
 </p>
 
 [wuage-img]:     ./doc/images/wuage_badge.svg
-[wuage]:         https:bashkit.wuage.io
+[wuage]:         https://bashkit.wuage.io
 
 ## Who Uses Bashkit
 
@@ -444,7 +445,7 @@ Bashkit `cleanup` utility is a `trap::callback` wrapper dedicated to hook instru
 
 <details><summary><b>Show example</b></summary>
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 scratch=$(mktemp) \
@@ -499,7 +500,7 @@ printf "%b%s%b" "${bold_green}" NATURE "${reset} does not hurry, yet everything 
 
 Declaring colors can be a tidy task, the following example shows how to build a *color palette*:
 
-```{.bash .numberLines}
+```sh
 source bashkit.bash
 
 declare -A COLPAL=(  # color palette
