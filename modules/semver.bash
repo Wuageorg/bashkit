@@ -37,8 +37,7 @@ semver::parse() {
 
     local SEMVER="^[vV]?(${DIGIT})\\.(${DIGIT})\\.(${DIGIT})(\\-(${IDENT})(\\.(${IDENT}))*)?(\\+${FIELD}(\\.${FIELD})*)?$"
 
-    local version=$1
-    if [[ ${version} =~ ${SEMVER} ]]; then
+    if [[ $1 =~ ${SEMVER} ]]; then
         local \
             major=${BASH_REMATCH[1]} \
             minor=${BASH_REMATCH[2]} \
@@ -49,7 +48,7 @@ semver::parse() {
         build=${build:1} # remove leading +
         __=("${major}" "${minor}" "${patch}" "${prere}" "${build}")
     else
-        raise "${version} does not match semver 'X.Y.Z(-PRERELEASE)(+BUILD)'."
+        raise "$1 does not match semver 'X.Y.Z(-PRERELEASE)(+BUILD)'."
     fi
 }
 
@@ -71,21 +70,20 @@ semver::compare() {
         [[ $1 =~ ^(${DIGIT})$ ]]
     }
 
-    # shellcheck disable=SC2250  # no {} for single letter vars 
+    # shellcheck disable=SC2250  # no {} for single letter vars
     svc__cmp_fields() {
         local aver="$1[@]"
         local bver="$2[@]"
         local \
             afields=( "${!aver}" ) \
             bfields=( "${!bver}" )
-        local a b
 
         __=0
         local i=0
         for((i=0; __ == 0; i++)); do
-           
-            a="${afields[i]:-}"
-            b="${bfields[i]:-}"
+            local \
+                a="${afields[i]:-}" \
+                b="${bfields[i]:-}"
 
             if [[ -z "$a" && -z "$b" ]]; then
                 break;
@@ -109,15 +107,18 @@ semver::compare() {
     || raise "${E_PARAM_ERR}" 'incorrect invocation' \
     || fatal
 
-    local va vb
-    semver::parse "$1" || return
-    va=("${__[@]}")
-    semver::parse "$2" || return
-    vb=("${__[@]}")
+    semver::parse "$1" \
+    && local va=("${__[@]}") \
+    || return
+
+    semver::parse "$2" \
+    && local vb=("${__[@]}") \
+    || return
 
     # compare major, minor, patch
-    local a=( "${va[0]}" "${va[1]}" "${va[2]}" )
-    local b=( "${vb[0]}" "${vb[1]}" "${vb[2]}" )
+    local \
+        a=( "${va[0]}" "${va[1]}" "${va[2]}" ) \
+        b=( "${vb[0]}" "${vb[1]}" "${vb[2]}" )
 
     svc__cmp_fields a b
     if (( __ != 0 )); then
@@ -125,21 +126,22 @@ semver::compare() {
     fi
 
     # compare pre-release ids when M.m.p are equal
-    local prerela="${va[3]}"
-    local prerelb="${vb[3]}"
-    readarray -d' ' -t a < <(printf '%s' "${prerela//./ }")
-    readarray -d' ' -t b < <(printf '%s' "${prerelb//./ }")
+    local \
+        prerela="${va[3]}" \
+        prerelb="${vb[3]}"
 
     # if a and b have no pre-release part, then a equals b
     # if only one of a/b has pre-release part, that one is less than simple M.m.p
     if [[ -z "${prerela}" && -z "${prerelb}" ]]; then
-        __=0 
+        __=0
     elif [[ -z "${prerela}" ]]; then
         __=1
     elif [[ -z "${prerelb}" ]]; then
         __=-1
     else
         # otherwise, compare the pre-release id's
+        readarray -d' ' -t a < <(printf '%s' "${prerela//./ }")
+        readarray -d' ' -t b < <(printf '%s' "${prerelb//./ }")
         svc__cmp_fields a b
     fi
 }

@@ -12,7 +12,7 @@ bashkit_mock
 source patch.bash && patch::init
 
 
-@test "apply all in directory" {
+@test "applies all in directory" {
     mkdir -p "${BATS_TEST_TMPDIR}/patches"
     # create files to patch
     cat > "${BATS_TEST_TMPDIR}/patches/ptch1.patch" <<-EOF
@@ -34,7 +34,7 @@ EOF
     [[ -f "${BATS_TEST_TMPDIR}/d" ]]  # created file
 }
 
-@test "fail on missing directory" {
+@test "fails on missing directory" {
     E_ASSERT_FAILED=10
     patch::batch "${BATS_TEST_TMPDIR}" 'inexistent' \
     || _rc=${?}
@@ -42,7 +42,7 @@ EOF
     assert_equal "${__}" 'dir not found: inexistent'
 }
 
-@test "fatal on incorrect invocation" {
+@test "fatals on incorrect invocation" {
     f() {
         patch::batch
     }
