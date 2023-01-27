@@ -30,7 +30,7 @@ The version is stored in special bashkit variable `$__` or in `$VAR` if present.
 
 # SEE ALSO
 
-`state(1)`
+`version::state(1)`
 
 # COLOPHON
 This page is part of the wuage bashkit framework. Source code and all

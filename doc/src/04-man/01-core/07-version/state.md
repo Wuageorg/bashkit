@@ -15,7 +15,7 @@ version::state [VAR]
 The state is stored in special bashkit variable `$__` or in `$VAR` if present.
 
 `version::state` outputs a string containing local files version information,
-and is the input of `hash` version field see `bashkit(1)`.
+and is the input of `hash` version field see `version::bashkit(1)`.
 
 `version::state` outputs nothing if local files are not modified.
 
@@ -26,7 +26,7 @@ and is the input of `hash` version field see `bashkit(1)`.
 
 # SEE ALSO
 
-`bashkit(1)`
+`version::bashkit(1)`
 
 # COLOPHON
 This page is part of the wuage bashkit framework. Source code and all
