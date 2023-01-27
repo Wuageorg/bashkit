@@ -4,11 +4,11 @@
 
 # [![\Nuage][wuage-img]][wuage]
 
-`Bashkit` is an opiniated scripting model and framework for `Bash` `5.x`. It is intended 
-to help writing more robust scripts in which unhandled errors are preferably fatal. 
-It does so by enforcing and exploiting selected bashisms and sometimes moving away 
-from IEEE POSIX P1003.2/ISO 9945.2. It supplements bash as a collection of modules 
-akin to a script development library. It consists mostly in pure bash functions 
+`Bashkit` is an opiniated scripting model and framework for `Bash` `5.x`. It is intended
+to help writing more robust scripts in which unhandled errors are preferably fatal.
+It does so by enforcing and exploiting selected bashisms and sometimes moving away
+from IEEE POSIX P1003.2/ISO 9945.2. It supplements bash as a collection of modules
+akin to a script development library. It consists mostly in pure bash functions
 with few to no dependencies.
 
 * **Fail Fast Scripting** and **Error-Handling** support.
@@ -57,7 +57,7 @@ Whatever the purpose of your scripts, if they are meant to do something non-inte
 If you start using `Bashkit` and find it worthy, drop us a message and we will publish a list of users right here!
 
 ## How It Works
-Bashkit comes with 7 core and 10 standard function modules. A bashkit script is a bash script that, at some point sources bashkit and modules and starts calling their functions. Custom modules are easy to write and module boilerplates are kept small. Nonetheless, a proper error handling surely requires editing.
+Bashkit comes with 7 core and 11 standard function modules. A bashkit script is a bash script that, at some point sources bashkit and modules and starts calling their functions. Custom modules are easy to write and module boilerplates are kept small. Nonetheless, a proper error handling surely requires editing.
 
 Core modules implement:
 
@@ -80,7 +80,8 @@ Standard modules bring:
 7. File permissions conversion
 8. Readlink as a function
 9. Shopt stacking
-10. String manipulation
+10. Semver comparison
+11. String manipulation
 
 > A module can be loaded either when sourcing `Bashkit` or by calling `bashkit::load(1)`
 <details><summary><b>Show example</b></summary>
@@ -133,7 +134,7 @@ Whenever color is unsuitable, it can be disabled by setting the global variable 
 standard logging routines display a default format:
 
     YYYY-MM-DD HH:MM:SS+hhmm [LEVEL] ORIGIN:LINENO| MSG
-    
+
 | field | format |
 |-|--------|
 | STAMP| ISO-8601 extended offset date-time format |
@@ -192,7 +193,7 @@ Trace mode is controlled by `$TRACE`. When activated:
 Bashkit proposes a unique yet classical error handling coding patterns. They extend bash error semantic by exploiting conditional statements. They assemble into error handling pipelines. Bashkit uses a trap to catch errors as they arise. If they are handled locally, the flow of control proceeds. Otherwise, the error is bubbled up the calling stack until handled. When an unhandled error reaches its calling-stack root, the calling script usually crashes. In Bashkit, almost *all errors are fatal*.
 
 ### Discussion
-Handling error in bash is difficult: The query "error handling in bash", on the biggest search engine, returns +88M links as of October 2022. On [SO](https://stackoverflow.com/questions/64786/error-handling-in-bash), a closely related question, asked in 2008, was viewed +410k times and received answers as late as early 2022. Eventually, it was deemed "opinion-based" by moderators and closed to more answers. 
+Handling error in bash is difficult: The query "error handling in bash", on the biggest search engine, returns +88M links as of October 2022. On [SO](https://stackoverflow.com/questions/64786/error-handling-in-bash), a closely related question, asked in 2008, was viewed +410k times and received answers as late as early 2022. Eventually, it was deemed "opinion-based" by moderators and closed to more answers.
 
 Bash basic exit status handling is flawed by decisions made early during bash design along with heavy POSIX constraints on the subject. The resulting `set -e` mode is unsatisfactory and error-prone: whenever scripts are thought to fail fast, they could just behave in unintuitive ways, fallen into one of the many bash pitfalls.
 
@@ -470,7 +471,7 @@ color = ""
       | attributes brightness base
 attributes=? a list of unique modifiers ?
 modifiers = ""
-          | "regular" | "bold" | "dim" | "italic" | "underlined" 
+          | "regular" | "bold" | "dim" | "italic" | "underlined"
           | "blinking"
           | modifiers, { modifiers }
 brightness = ""

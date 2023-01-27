@@ -11,7 +11,7 @@ Bashkit is a scripting model that proposes idioms and tools for:
 * avoiding some bash scripting pitfalls
 * runtime error handling and event logging
 
-Bashkit comes with 7 *core* and 10 *standard* function modules. A bashkit script is a bash script that, at some point *sources* bashkit and modules and starts calling their functions. *Custom modules* are easy to write and module boilerplates are kept small. Nonetheless, a proper error handling surely requires editing.
+Bashkit comes with 7 *core* and 11 *standard* function modules. A bashkit script is a bash script that, at some point *sources* bashkit and modules and starts calling their functions. *Custom modules* are easy to write and module boilerplates are kept small. Nonetheless, a proper error handling surely requires editing.
 
 Core modules implement:
 
@@ -34,6 +34,7 @@ Standard modules bring:
 * *file permissions conversion*
 * *readlink as a function*
 * *shopt stacking*
+* *semver comparison*
 * *string manipulations*
 
 # Download
@@ -56,4 +57,3 @@ TODO
 
 ## Maintainer
 TODO
-
