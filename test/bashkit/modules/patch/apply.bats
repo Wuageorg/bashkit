@@ -12,7 +12,7 @@ bashkit_mock
 source patch.bash && patch::init
 
 
-@test "patch a file" {
+@test "patches a file" {
     # create file to patch
     cat > "${BATS_TEST_TMPDIR}/ptch.patch" <<-EOF
 --- /dev/null 2022-09-10 23:25:01.256633871 +0200
@@ -26,7 +26,7 @@ EOF
     [[ -f "${BATS_TEST_TMPDIR}/c" ]] # File created
 }
 
-@test 'fail on missing file' {
+@test 'fails on missing file' {
     # create file to patch
 
     E_ASSERT_FAILED=10
@@ -36,7 +36,7 @@ EOF
     assert_equal "${__}" 'file not found: inexistent'
 }
 
-@test 'fatal on incorrect invocation' {
+@test 'fatals on incorrect invocation' {
     run -9 patch::apply
     assert_output 'fatal: incorrect invocation'
 }
