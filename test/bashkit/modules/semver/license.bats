@@ -7,7 +7,7 @@
 bats_require_minimum_version 1.5.0
 SRC_ROOT=${BATS_TEST_FILENAME%/test*}
 
-@test "ensure SPDX tag is present" {
-	run grep -E '^# SPDX-License-Identifier: Apache-2.0$' "${SRC_ROOT}"/modules/semver.bash
-	[ "$status" -eq 0 ]
+@test "ensures SPDX tag is present" {
+    run grep -E '^# SPDX-License-Identifier: Apache-2.0$' "${SRC_ROOT}/modules/semver.bash"
+    (( status == 0 ))
 }

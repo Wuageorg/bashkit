@@ -40,7 +40,7 @@ setup() {
     assert_output -p 'test'
 }
 
-@test "fix source argument passing" {
+@test "fixes source argument passing" {
     printf '%s\n'                           \
         "#!/bin/env bash"                   \
         "source bashkit.bash"               \
