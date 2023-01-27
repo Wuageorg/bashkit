@@ -37,6 +37,12 @@ Standard modules bring:
 * *semver comparison*
 * *string manipulations*
 
+> A module can be loaded either when sourcing `Bashkit` or by calling `bashkit::load(1)`
+```{.bash .numberLines}
+  source bashkit.bash check shopt # load bashkit along with check and shopt modules
+  bashkit::load array # load array module
+```
+
 # Download
 Stable releases can be found at [wuage](<https://github.com/Wuageorg/bashkit>).
 
