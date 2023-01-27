@@ -15,7 +15,7 @@ version::update
 `version::update` is intended to be used by bashkit developers,
 it allows updating `version.bash` with current version informations.
 
-`version::update` generates values for both `bashkit(1)` and `version::state(1)`.
+`version::update` generates values for both `version::bashkit(1)` and `version::state(1)`.
 
 # EXAMPLE
 
