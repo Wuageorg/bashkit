@@ -617,6 +617,7 @@ handling</a></li>
 <li><a href="#bashkit-scripting" id="toc-bashkit-scripting">Bashkit
 scripting</a></li>
 </ul></li>
+<li><a href="#bashkitload" id="toc-bashkitload">bashkit::load</a></li>
 <li><a href="#catch" id="toc-catch">catch</a></li>
 <li><a href="#not" id="toc-not">not</a></li>
 <li><a href="#raise" id="toc-raise">raise</a></li>
@@ -729,7 +730,7 @@ functions with very few dependencies.</p>
 <li>avoiding some bash scripting pitfalls</li>
 <li>runtime error handling and event logging</li>
 </ul>
-<p>Bashkit comes with 8 <em>core</em> and 11 <em>standard</em> function
+<p>Bashkit comes with 7 <em>core</em> and 11 <em>standard</em> function
 modules. A bashkit script is a bash script that, at some point
 <em>sources</em> bashkit and modules and starts calling their functions.
 <em>Custom modules</em> are easy to write and module boilerplates are
@@ -756,15 +757,23 @@ editing.</p>
 <li><em>file permissions conversion</em></li>
 <li><em>readlink as a function</em></li>
 <li><em>shopt stacking</em></li>
+<li><em>semver comparison</em></li>
 <li><em>string manipulations</em></li>
 </ul>
+<blockquote>
+<p>A module can be loaded either when sourcing <code>Bashkit</code> or
+by calling <code>bashkit::load(1)</code></p>
+</blockquote>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a>  <span class="bu">source</span> bashkit.bash check shopt <span class="co"># load bashkit along with check and shopt modules</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>  <span class="ex">bashkit::load</span> array <span class="co"># load array module</span></span></code></pre></div>
 <h1 id="download">Download</h1>
 <p>Stable releases can be found at <a
 href="https://github.com/Wuageorg/bashkit">wuage</a>.</p>
 <h1 id="documentation">Documentation</h1>
 <p>Documentation for Bashkit is available <a
-href="https://bashkit.wuage.io">online</a>. You may also find
-information on Bashkit by running TODO.</p>
+href="http://bashkit.wuage.io">online</a>. You may also find information
+on Bashkit by running TODO.</p>
 <h1 id="mailing-lists">Mailing Lists</h1>
 <p>TODO</p>
 <h1 id="getting-involved">Getting involved</h1>
@@ -936,15 +945,21 @@ way. Bashkit follows <code>syslog(1)</code> levels to implement
 when the current logging level is <em>lower or equal</em> to its own,
 otherwise the message is silenced but planned side-effects occur (see
 <code>errcode</code>).</p>
+<blockquote>
+<p>there’s a bashkit routine named <code>info</code>. It shadows
+<code>info(1)</code> the bash info document reader. If you need to use
+<code>info(1)</code>, call it with <code>command</code>
+<code>info</code> <code>[args]</code>.</p>
+</blockquote>
 <h4 id="example">Example:</h4>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">bash-5.2$</span> cat hello.bash</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#!/usr/bin/env bash</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="bu">source</span> <span class="va">${SOME_PATH_TO_BASHKIT}</span>/bashkit.bash</span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="ex">info</span> <span class="st">&#39;hello world!&#39;</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a></span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="ex">bash-5.2$</span> bash <span class="at">-c</span> ./hello.bash</span>
-<span id="cb1-7"><a href="#cb1-7"></a><span class="ex">2022-10-12</span> 18:27:33+0200 [ info] ./hello.bash:3<span class="kw">|</span> <span class="ex">hello</span> world!</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="ex">bash-5.2$</span> cat hello.bash</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="bu">source</span> <span class="va">${SOME_PATH_TO_BASHKIT}</span>/bashkit.bash</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="ex">info</span> <span class="st">&#39;hello world!&#39;</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="ex">bash-5.2$</span> bash <span class="at">-c</span> ./hello.bash</span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="ex">2022-10-12</span> 18:27:33+0200 [ info] ./hello.bash:3<span class="kw">|</span> <span class="ex">hello</span> world!</span></code></pre></div>
 <h3 id="standard-logging">Standard logging</h3>
 <p>Standard logging happens on <code>stderr</code>, when on a supported
 terminal it is colorized by default. Whenever color is unsuitable, it
@@ -987,28 +1002,22 @@ brackets</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>there’s a bashkit routine named <code>info</code>. It shadows
-<code>info(1)</code> the bash info document reader. If you need to use
-<code>info(1)</code>, call it with <code>command</code>
-<code>info</code> <code>[args]</code>.</p>
-</blockquote>
 <h3 id="json-logging">JSON logging</h3>
 <p>JSON logging happens on <code>stderr</code>, it is enabled by setting
 the global variable <code>$JSON</code> beforehand. When activated, it
 replaces standard logging output. Messages are emitted in <a
 href="http://ndjson.org">NDJSON</a> format and consist in valid json
 values with no color and a fix layout:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="st">&#39;{ &quot;date&quot;: &quot;STAMP&quot;, &quot;level&quot;: &quot;LEVEL&quot;, &quot;func&quot;: &quot;ORIGIN&quot;, &quot;lineno&quot;: &quot;LINENO&quot;, &quot;text&quot;: &quot;MSG&quot; }\n&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="st">&#39;{ &quot;date&quot;: &quot;STAMP&quot;, &quot;level&quot;: &quot;LEVEL&quot;, &quot;func&quot;: &quot;ORIGIN&quot;, &quot;lineno&quot;: &quot;LINENO&quot;, &quot;text&quot;: &quot;MSG&quot; }\n&#39;</span></span></code></pre></div>
 <p>Fields STAMP, LEVEL, …, MSG are similar to standard logging except
 for LEVEL that is not padded nor bracketed. They are all enclosed in
 double-quotes.</p>
 <h4 id="example-1">Example:</h4>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">bash-5.2$</span> bash <span class="at">-c</span> <span class="st">&#39;JSON=1 ./hello.bash&#39;</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">{</span> <span class="st">&quot;date&quot;</span><span class="ex">:</span> <span class="st">&quot;2022-10-13 17:35:04+0200&quot;</span>, <span class="st">&quot;level&quot;</span>: <span class="st">&quot;info&quot;</span>, <span class="st">&quot;func&quot;</span>: <span class="st">&quot;./hello.bash&quot;</span>, <span class="st">&quot;lineno&quot;</span>: <span class="st">&quot;3&quot;</span>, <span class="st">&quot;text&quot;</span>: <span class="st">&quot;hello world!&quot;</span> }</span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="ex">bash-5.2$</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">bash-5.2$</span> bash <span class="at">-c</span> <span class="st">&#39;JSON=1 ./hello.bash&#39;</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="kw">{</span> <span class="st">&quot;date&quot;</span><span class="ex">:</span> <span class="st">&quot;2022-10-13 17:35:04+0200&quot;</span>, <span class="st">&quot;level&quot;</span>: <span class="st">&quot;info&quot;</span>, <span class="st">&quot;func&quot;</span>: <span class="st">&quot;./hello.bash&quot;</span>, <span class="st">&quot;lineno&quot;</span>: <span class="st">&quot;3&quot;</span>, <span class="st">&quot;text&quot;</span>: <span class="st">&quot;hello world!&quot;</span> }</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="ex">bash-5.2$</span></span></code></pre></div>
 <h3 id="panicking">Panicking</h3>
 <p><code>panic</code> and <code>fatal</code> are special logging
 routines that stop the ordinary flow of control and begin
@@ -1036,14 +1045,14 @@ and exit whenever an error is detected by bashkit.</p>
 <li>logging level is set to <code>DEBUG/7</code></li>
 </ul>
 <h2 id="error-handling">Error handling</h2>
-<p>Bashkit proposes unique yet classical error handling coding patterns.
-They extend bash error semantic by exploiting conditional statements.
-They assemble into error handling pipelines. Bashkit uses a trap to
-catch errors as they arise. If they are handled locally, the flow of
-control proceeds. Otherwise, the error is bubbled up the calling stack
-until handled. When an unhandled error reaches its calling-stack root,
-the calling script usually crashes. In Bashkit, almost <em>all errors
-are fatal</em>.</p>
+<p>Bashkit proposes a unique yet classical error handling coding
+patterns. They extend bash error semantic by exploiting conditional
+statements. They assemble into error handling pipelines. Bashkit uses a
+trap to catch errors as they arise. If they are handled locally, the
+flow of control proceeds. Otherwise, the error is bubbled up the calling
+stack until handled. When an unhandled error reaches its calling-stack
+root, the calling script usually crashes. In Bashkit, almost <em>all
+errors are fatal</em>.</p>
 <h3 id="discussion">Discussion</h3>
 <p>Handling error in bash is difficult: The query “error handling in
 bash”, on the biggest search engine, returns +88M links as of October
@@ -1061,8 +1070,8 @@ pitfalls.</p>
 <p>Bashkit helps scripts to efficiently handle errors or fail fast in
 most of the cases. One should be aware that some bash quirks are simply
 unreachable to address within bash itself. Don’t do this:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">diff</span> <span class="op">&lt;(</span><span class="fu">sort</span> A<span class="op">)</span> <span class="op">&lt;(</span><span class="fu">sort</span> B<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">diff</span> <span class="op">&lt;(</span><span class="fu">sort</span> A<span class="op">)</span> <span class="op">&lt;(</span><span class="fu">sort</span> B<span class="op">)</span></span></code></pre></div>
 <h3 id="error-code-mapping">Error code mapping</h3>
 <p>Bashkit defines an error code mapping that closely follows <a
 href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">bash
@@ -1153,19 +1162,19 @@ preset ex. <code>E_FAILURE=1</code></li>
 <h3 id="flow-of-control-with-true">Flow of control with true</h3>
 <p>Using <code>true</code> as a control flow mechanism is already a bash
 idiom:</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">#!/usr/bin/env bash</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="ex">up_the_game</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="fu">rm</span> some_random_file_that_could_not_exist <span class="kw">||</span> <span class="fu">true</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="bu">echo</span> <span class="st">&quot;all went well!&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="ex">up_the_game</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="fu">rm</span> some_random_file_that_could_not_exist <span class="kw">||</span> <span class="fu">true</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="bu">echo</span> <span class="st">&quot;all went well!&quot;</span></span></code></pre></div>
 <p>Under <code>errcode</code>, the bashkit error handling system, you
 can do the same:</p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="bu">source</span> bashkit.bash</span>
-<span id="cb7-2"><a href="#cb7-2"></a></span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="ex">up_the_game</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="fu">rm</span> some_random_file_that_could_not_exist <span class="kw">||</span> <span class="fu">true</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="bu">echo</span> <span class="st">&quot;all went well!&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="bu">source</span> bashkit.bash</span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="ex">up_the_game</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="fu">rm</span> some_random_file_that_could_not_exist <span class="kw">||</span> <span class="fu">true</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="bu">echo</span> <span class="st">&quot;all went well!&quot;</span></span></code></pre></div>
 <p><code>true</code>, is the most basic <code>errcode handler</code> of
 all. Using <code>true</code> to handle an error means this error is
 irrelevant to the flow of control.</p>
@@ -1175,10 +1184,10 @@ irrelevant to the flow of control.</p>
 preserved.</p>
 </blockquote>
 <h3 id="raise-catch-and-resume">raise, catch and resume</h3>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">check_cmd()</span> <span class="kw">{</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a>    <span class="bu">command</span> <span class="at">-v</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st">&quot;</span> <span class="op">&amp;&gt;</span> /dev/null</span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="kw">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">check_cmd()</span> <span class="kw">{</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>    <span class="bu">command</span> <span class="at">-v</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st">&quot;</span> <span class="op">&amp;&gt;</span> /dev/null</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="kw">}</span></span></code></pre></div>
 <p><code>command</code> is a bash <code>builtin</code>. When used with
 <code>-v</code> option, it prints a description similar to the
 <code>type</code> builtin. It returns exit status <code>0</code> if
@@ -1189,51 +1198,51 @@ To be more on point, <code>check_cmd</code> should be more flexible than
 silently failing (thanks to redirecting to <code>/dev/null</code>), it
 could at least <code>log</code> an error. Consider the
 <code>bashkit idiom</code> to just do that:</p>
-<div class="sourceCode" id="cb9"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">check_cmd()</span> <span class="kw">{</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a>    <span class="bu">local</span> <span class="va">cmd</span><span class="op">=</span><span class="va">$1</span></span>
-<span id="cb9-3"><a href="#cb9-3"></a>    <span class="bu">command</span> <span class="at">-v</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st">&quot;</span> <span class="op">&amp;&gt;</span> /dev/null <span class="dt">\</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a>    <span class="kw">||</span> <span class="ex">error</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st"> not found&quot;</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a><span class="kw">}</span></span>
-<span id="cb9-6"><a href="#cb9-6"></a></span>
-<span id="cb9-7"><a href="#cb9-7"></a><span class="ex">bash-5.2$</span> bash <span class="at">-c</span> <span class="st">&#39;source bashkit.bash; check_cmd(){... ; check_cmd inexistent&#39;</span></span>
-<span id="cb9-8"><a href="#cb9-8"></a><span class="ex">2022-10-17</span> 16:18:02+0200 [error] bash:1<span class="kw">|</span> <span class="ex">inexistent</span> not found</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">check_cmd()</span> <span class="kw">{</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>    <span class="bu">local</span> <span class="va">cmd</span><span class="op">=</span><span class="va">$1</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a>    <span class="bu">command</span> <span class="at">-v</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st">&quot;</span> <span class="op">&amp;&gt;</span> /dev/null <span class="dt">\</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>    <span class="kw">||</span> <span class="ex">error</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st"> not found&quot;</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="kw">}</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="ex">bash-5.2$</span> bash <span class="at">-c</span> <span class="st">&#39;source bashkit.bash; check_cmd(){... ; check_cmd inexistent&#39;</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="ex">2022-10-17</span> 16:18:02+0200 [error] bash:1<span class="kw">|</span> <span class="ex">inexistent</span> not found</span></code></pre></div>
 <p>It is slightly better but still lacks some genericity: what if we
 just want to know if a command exists and proceed with a workaround if
 not? Enter <code>raise</code> that ultimately enables more efficient
 error handling patterns:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="bu">source</span> bashkit.bash</span>
-<span id="cb10-2"><a href="#cb10-2"></a></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="fu">check_cmd()</span> <span class="kw">{</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a>    <span class="bu">local</span> <span class="va">cmd</span><span class="op">=</span><span class="va">$1</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a>    <span class="bu">command</span> <span class="at">-v</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st">&quot;</span> <span class="op">&amp;&gt;</span> /dev/null <span class="dt">\</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a>    <span class="kw">||</span> <span class="ex">raise</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st"> not found&quot;</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a><span class="kw">}</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a></span>
-<span id="cb10-9"><a href="#cb10-9"></a><span class="ex">check_cmd</span> inexistent <span class="dt">\</span></span>
-<span id="cb10-10"><a href="#cb10-10"></a><span class="kw">||</span> <span class="ex">error</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="bu">source</span> bashkit.bash</span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="fu">check_cmd()</span> <span class="kw">{</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>    <span class="bu">local</span> <span class="va">cmd</span><span class="op">=</span><span class="va">$1</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a>    <span class="bu">command</span> <span class="at">-v</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st">&quot;</span> <span class="op">&amp;&gt;</span> /dev/null <span class="dt">\</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a>    <span class="kw">||</span> <span class="ex">raise</span> <span class="st">&quot;</span><span class="va">${cmd}</span><span class="st"> not found&quot;</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="kw">}</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="ex">check_cmd</span> inexistent <span class="dt">\</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="kw">||</span> <span class="ex">error</span></span></code></pre></div>
 <p>Invoked like this, <code>raise</code> position a <code>message</code>
 along with the <code>exit status</code> <em>before</em> returning to the
 caller. It becomes the caller’s responsibility to chose what to do when
 <code>check_cmd</code> fails. For now, as previously, the script logs
 the error and then crashes. But a more convenient flow is within reach
 by using <code>catch</code>:</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="bu">source</span> bashkit.bash</span>
-<span id="cb11-2"><a href="#cb11-2"></a></span>
-<span id="cb11-3"><a href="#cb11-3"></a><span class="ex">check_cmd</span> isint <span class="dt">\</span></span>
-<span id="cb11-4"><a href="#cb11-4"></a><span class="kw">||</span> <span class="kw">{</span></span>
-<span id="cb11-5"><a href="#cb11-5"></a>  <span class="ex">catch</span></span>
-<span id="cb11-6"><a href="#cb11-6"></a>  <span class="fu">isint()</span> <span class="kw">{</span></span>
-<span id="cb11-7"><a href="#cb11-7"></a>     <span class="bu">printf</span> <span class="st">&#39;%d&#39;</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="dt">\</span></span>
-<span id="cb11-8"><a href="#cb11-8"></a>     <span class="kw">||</span> <span class="ex">raise</span> <span class="st">&quot;invalid number: </span><span class="va">$1</span><span class="st">&quot;</span></span>
-<span id="cb11-9"><a href="#cb11-9"></a>  <span class="kw">}</span></span>
-<span id="cb11-10"><a href="#cb11-10"></a><span class="kw">}</span></span>
-<span id="cb11-11"><a href="#cb11-11"></a></span>
-<span id="cb11-12"><a href="#cb11-12"></a><span class="ex">isint</span> 1 <span class="dt">\</span></span>
-<span id="cb11-13"><a href="#cb11-13"></a><span class="kw">&amp;&amp;</span> <span class="ex">info</span> integer <span class="dt">\</span></span>
-<span id="cb11-14"><a href="#cb11-14"></a><span class="kw">||</span> <span class="ex">error</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="bu">source</span> bashkit.bash</span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="ex">check_cmd</span> isint <span class="dt">\</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="kw">||</span> <span class="kw">{</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a>  <span class="ex">catch</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>  <span class="fu">isint()</span> <span class="kw">{</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a>     <span class="bu">printf</span> <span class="st">&#39;%d&#39;</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="dt">\</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a>     <span class="kw">||</span> <span class="ex">raise</span> <span class="st">&quot;invalid number: </span><span class="va">$1</span><span class="st">&quot;</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a>  <span class="kw">}</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="kw">}</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a></span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="ex">isint</span> 1 <span class="dt">\</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a><span class="kw">&amp;&amp;</span> <span class="ex">info</span> integer <span class="dt">\</span></span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="kw">||</span> <span class="ex">error</span></span></code></pre></div>
 <p>In this situation, when <code>check_cmd</code> raises a failure, the
 <code>catch</code> block is able to: 1) consume this failure 2) define a
 replacement function</p>
@@ -1242,20 +1251,6 @@ invocation logs an informational “integer” (rather than error log
 “invalid number”).</p>
 <p>Now consider this example where <code>maybe</code> has 50% chances of
 failure:</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="bu">source</span> bashkit.bash</span>
-<span id="cb12-2"><a href="#cb12-2"></a></span>
-<span id="cb12-3"><a href="#cb12-3"></a><span class="fu">maybe()</span><span class="kw">((</span> <span class="va">$1</span> <span class="op">&lt;</span> <span class="va">RANDOM</span><span class="op">%</span><span class="dv">100</span> <span class="kw">))</span></span>
-<span id="cb12-4"><a href="#cb12-4"></a></span>
-<span id="cb12-5"><a href="#cb12-5"></a><span class="ex">maybe</span> 50 <span class="dt">\</span></span>
-<span id="cb12-6"><a href="#cb12-6"></a><span class="kw">&amp;&amp;</span> <span class="bu">echo</span> yep <span class="dt">\</span></span>
-<span id="cb12-7"><a href="#cb12-7"></a><span class="kw">||</span> <span class="bu">echo</span> nope <span class="co"># not an errcode handler</span></span></code></pre></div>
-<p>Bashkit error handling trap will stop short right after the
-<code>maybe</code> call if it fails. In the long run, the script prints
-“yep” in one out of two runs but will never print “nope”. Under
-<code>errcode</code> it does not work because <code>echo</code> is not
-an <em>errcode compatible handler</em>. The idiomatic way here, is to
-use <code>resume</code>:</p>
 <div class="sourceCode" id="cb13"><pre
 class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="bu">source</span> bashkit.bash</span>
 <span id="cb13-2"><a href="#cb13-2"></a></span>
@@ -1263,7 +1258,21 @@ class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><
 <span id="cb13-4"><a href="#cb13-4"></a></span>
 <span id="cb13-5"><a href="#cb13-5"></a><span class="ex">maybe</span> 50 <span class="dt">\</span></span>
 <span id="cb13-6"><a href="#cb13-6"></a><span class="kw">&amp;&amp;</span> <span class="bu">echo</span> yep <span class="dt">\</span></span>
-<span id="cb13-7"><a href="#cb13-7"></a><span class="kw">||</span> <span class="ex">resume</span> echo nope</span></code></pre></div>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="kw">||</span> <span class="bu">echo</span> nope <span class="co"># not an errcode handler</span></span></code></pre></div>
+<p>Bashkit error handling trap will stop short right after the
+<code>maybe</code> call if it fails. In the long run, the script prints
+“yep” in one out of two runs but will never print “nope”. Under
+<code>errcode</code> it does not work because <code>echo</code> is not
+an <em>errcode compatible handler</em>. The idiomatic way here, is to
+use <code>resume</code>:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1"></a><span class="bu">source</span> bashkit.bash</span>
+<span id="cb14-2"><a href="#cb14-2"></a></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="fu">maybe()</span><span class="kw">((</span> <span class="va">$1</span> <span class="op">&lt;</span> <span class="va">RANDOM</span><span class="op">%</span><span class="dv">100</span> <span class="kw">))</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="ex">maybe</span> 50 <span class="dt">\</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="kw">&amp;&amp;</span> <span class="bu">echo</span> yep <span class="dt">\</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="kw">||</span> <span class="ex">resume</span> echo nope</span></code></pre></div>
 <p>This time, the script will print either “yep” or “nope” with the same
 frequency. <code>resume</code> consumes the error and restores control
 to the command that immediately follows, in this case:
@@ -1275,15 +1284,15 @@ to the command that immediately follows, in this case:
 by <code>not</code>. <code>not</code> is defined to return the logical
 negation of its argument.</p>
 </blockquote>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1"></a><span class="bu">source</span> bashkit.bash</span>
-<span id="cb14-2"><a href="#cb14-2"></a></span>
-<span id="cb14-3"><a href="#cb14-3"></a><span class="fu">maybe()</span><span class="kw">((</span> <span class="va">$1</span> <span class="op">&lt;</span> <span class="va">RANDOM</span><span class="op">%</span><span class="dv">100</span> <span class="kw">))</span></span>
-<span id="cb14-4"><a href="#cb14-4"></a><span class="fu">abort()</span><span class="kw">((</span> <span class="va">RANDOM</span> <span class="op">&amp;</span> <span class="bn">0x1</span> <span class="kw">))</span></span>
-<span id="cb14-5"><a href="#cb14-5"></a></span>
-<span id="cb14-6"><a href="#cb14-6"></a><span class="ex">maybe</span> 50 <span class="dt">\</span></span>
-<span id="cb14-7"><a href="#cb14-7"></a><span class="kw">||</span> <span class="ex">resume</span> not abort <span class="dt">\</span></span>
-<span id="cb14-8"><a href="#cb14-8"></a><span class="kw">||</span> <span class="ex">error</span> <span class="st">&#39;can not proceed&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1"></a><span class="bu">source</span> bashkit.bash</span>
+<span id="cb15-2"><a href="#cb15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="fu">maybe()</span><span class="kw">((</span> <span class="va">$1</span> <span class="op">&lt;</span> <span class="va">RANDOM</span><span class="op">%</span><span class="dv">100</span> <span class="kw">))</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="fu">abort()</span><span class="kw">((</span> <span class="va">RANDOM</span> <span class="op">&amp;</span> <span class="bn">0x1</span> <span class="kw">))</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="ex">maybe</span> 50 <span class="dt">\</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="kw">||</span> <span class="ex">resume</span> not abort <span class="dt">\</span></span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="kw">||</span> <span class="ex">error</span> <span class="st">&#39;can not proceed&#39;</span></span></code></pre></div>
 <p>In the long run, this script will rather succeed (75%) than log an
 error and fail (25%).</p>
 <h2 id="bashkit-scripting">Bashkit scripting</h2>
@@ -1300,14 +1309,14 @@ outputs.</p>
 <p>Bashkit can detect a set but unhandled error that otherwise would go
 silent. In this case, the script will <strong>crit</strong> log the
 error:</p>
-<div class="sourceCode" id="cb15"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1"></a><span class="bu">source</span> bashkit.bash extras</span>
-<span id="cb15-2"><a href="#cb15-2"></a></span>
-<span id="cb15-3"><a href="#cb15-3"></a><span class="ex">isint</span> not_an_integer</span></code></pre></div>
-<p>When ran, the above script outputs:</p>
 <div class="sourceCode" id="cb16"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="ex">bash-5.2$</span> ./noint.bash</span>
-<span id="cb16-2"><a href="#cb16-2"></a><span class="ex">2022-10-24</span> 15:14:52+0200 [ crit] isint:33<span class="kw">|</span> <span class="ex">invalid</span> number</span></code></pre></div>
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="bu">source</span> bashkit.bash extras</span>
+<span id="cb16-2"><a href="#cb16-2"></a></span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="ex">isint</span> not_an_integer</span></code></pre></div>
+<p>When ran, the above script outputs:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1"></a><span class="ex">bash-5.2$</span> ./noint.bash</span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="ex">2022-10-24</span> 15:14:52+0200 [ crit] isint:33<span class="kw">|</span> <span class="ex">invalid</span> number</span></code></pre></div>
 <h3 id="fail-fast">Fail fast</h3>
 <p><a
 href="https://www.martinfowler.com/ieeeSoftware/failFast.pdf"><code>Fail fast</code></a>
@@ -1328,14 +1337,14 @@ Namely a tests followed by a <code>|| raise</code> pattern that exploits
 <code>raise</code> polymorphism <em>is</em> an
 <code>assertion</code>.</p>
 <h4 id="example-2">Example:</h4>
-<div class="sourceCode" id="cb17"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">array::pick()</span> <span class="kw">{</span></span>
-<span id="cb17-2"><a href="#cb17-2"></a>    <span class="bu">local</span> <span class="at">-n</span> <span class="va">A</span><span class="op">=</span><span class="va">$1</span></span>
-<span id="cb17-3"><a href="#cb17-3"></a>    <span class="bu">local</span> <span class="at">-n</span> <span class="va">acc</span><span class="op">=</span><span class="va">${2</span><span class="op">:-</span>__<span class="va">}</span></span>
-<span id="cb17-4"><a href="#cb17-4"></a></span>
-<span id="cb17-5"><a href="#cb17-5"></a>    <span class="bu">local</span> <span class="va">i</span><span class="op">=</span><span class="va">$((</span> <span class="va">RANDOM</span> <span class="op">%</span> <span class="va">${</span><span class="op">#</span><span class="va">A</span><span class="op">[@]</span><span class="va">}</span> <span class="va">))</span></span>
-<span id="cb17-6"><a href="#cb17-6"></a>    <span class="bu">printf</span> <span class="at">-v</span> acc <span class="st">&#39;%s\n&#39;</span> <span class="st">&quot;</span><span class="va">${A</span><span class="op">[</span>i<span class="op">]</span><span class="va">}</span><span class="st">&quot;</span></span>
-<span id="cb17-7"><a href="#cb17-7"></a><span class="kw">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">array::pick()</span> <span class="kw">{</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a>    <span class="bu">local</span> <span class="at">-n</span> <span class="va">A</span><span class="op">=</span><span class="va">$1</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>    <span class="bu">local</span> <span class="at">-n</span> <span class="va">acc</span><span class="op">=</span><span class="va">${2</span><span class="op">:-</span>__<span class="va">}</span></span>
+<span id="cb18-4"><a href="#cb18-4"></a></span>
+<span id="cb18-5"><a href="#cb18-5"></a>    <span class="bu">local</span> <span class="va">i</span><span class="op">=</span><span class="va">$((</span> <span class="va">RANDOM</span> <span class="op">%</span> <span class="va">${</span><span class="op">#</span><span class="va">A</span><span class="op">[@]</span><span class="va">}</span> <span class="va">))</span></span>
+<span id="cb18-6"><a href="#cb18-6"></a>    <span class="bu">printf</span> <span class="at">-v</span> acc <span class="st">&#39;%s\n&#39;</span> <span class="st">&quot;</span><span class="va">${A</span><span class="op">[</span>i<span class="op">]</span><span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb18-7"><a href="#cb18-7"></a><span class="kw">}</span></span></code></pre></div>
 <p><code>array::pick</code> takes two bash <a
 href="https://www.gnu.org/software/bash/manual/html_node/Shell-Parameters.html">namerefs</a>.
 The first one points to an array <code>A</code> while the second,
@@ -1349,26 +1358,26 @@ empty array</p>
 situations. The proper way is to add a bunch of tests akin to
 <code>assertions</code> and combine <code>errcode handlers</code> to
 always achieve a useful behavior:</p>
-<div class="sourceCode" id="cb18"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1"></a><span class="bu">source</span> bashkit.bash</span>
-<span id="cb18-2"><a href="#cb18-2"></a></span>
-<span id="cb18-3"><a href="#cb18-3"></a><span class="fu">array::pick()</span> <span class="kw">{</span></span>
-<span id="cb18-4"><a href="#cb18-4"></a>    <span class="kw">((</span> <span class="va">$#</span> <span class="op">==</span> <span class="dv">1</span> <span class="kw">||</span> <span class="va">$#</span> <span class="op">==</span> <span class="dv">2</span> <span class="kw">))</span> <span class="dt">\</span></span>
-<span id="cb18-5"><a href="#cb18-5"></a>    <span class="kw">||</span> <span class="ex">raise</span> <span class="st">&quot;</span><span class="va">${E_PARAM_ERR}</span><span class="st">&quot;</span> <span class="st">&#39;incorrect invocation&#39;</span> <span class="dt">\</span></span>
-<span id="cb18-6"><a href="#cb18-6"></a>    <span class="kw">||</span> <span class="ex">fatal</span></span>
-<span id="cb18-7"><a href="#cb18-7"></a></span>
-<span id="cb18-8"><a href="#cb18-8"></a>    <span class="bu">local</span> <span class="at">-n</span> <span class="va">A</span><span class="op">=</span><span class="va">$1</span></span>
-<span id="cb18-9"><a href="#cb18-9"></a>    <span class="bu">local</span> <span class="at">-n</span> <span class="va">acc</span><span class="op">=</span><span class="va">${2</span><span class="op">:-</span>__<span class="va">}</span></span>
-<span id="cb18-10"><a href="#cb18-10"></a></span>
-<span id="cb18-11"><a href="#cb18-11"></a>    <span class="ex">check::vartype</span> as A <span class="dt">\</span></span>
-<span id="cb18-12"><a href="#cb18-12"></a>    <span class="kw">||</span> <span class="ex">raise</span></span>
-<span id="cb18-13"><a href="#cb18-13"></a></span>
-<span id="cb18-14"><a href="#cb18-14"></a>    <span class="kw">((</span> <span class="va">${</span><span class="op">#</span><span class="va">A</span><span class="op">[@]</span><span class="va">}</span> <span class="op">!=</span> <span class="dv">0</span> <span class="kw">))</span> <span class="dt">\</span></span>
-<span id="cb18-15"><a href="#cb18-15"></a>    <span class="kw">||</span> <span class="ex">raise</span> <span class="st">&quot;</span><span class="va">${E_PARAM_ERR}</span><span class="st">&quot;</span> <span class="st">&#39;array is empty&#39;</span></span>
-<span id="cb18-16"><a href="#cb18-16"></a></span>
-<span id="cb18-17"><a href="#cb18-17"></a>    <span class="bu">local</span> <span class="va">i</span><span class="op">=</span><span class="va">$((</span> <span class="va">RANDOM</span> <span class="op">%</span> <span class="va">${</span><span class="op">#</span><span class="va">A</span><span class="op">[@]</span><span class="va">}</span> <span class="va">))</span></span>
-<span id="cb18-18"><a href="#cb18-18"></a>    <span class="bu">printf</span> <span class="at">-v</span> acc <span class="st">&#39;%s\n&#39;</span> <span class="st">&quot;</span><span class="va">${A</span><span class="op">[</span>i<span class="op">]</span><span class="va">}</span><span class="st">&quot;</span></span>
-<span id="cb18-19"><a href="#cb18-19"></a><span class="kw">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1"></a><span class="bu">source</span> bashkit.bash</span>
+<span id="cb19-2"><a href="#cb19-2"></a></span>
+<span id="cb19-3"><a href="#cb19-3"></a><span class="fu">array::pick()</span> <span class="kw">{</span></span>
+<span id="cb19-4"><a href="#cb19-4"></a>    <span class="kw">((</span> <span class="va">$#</span> <span class="op">==</span> <span class="dv">1</span> <span class="kw">||</span> <span class="va">$#</span> <span class="op">==</span> <span class="dv">2</span> <span class="kw">))</span> <span class="dt">\</span></span>
+<span id="cb19-5"><a href="#cb19-5"></a>    <span class="kw">||</span> <span class="ex">raise</span> <span class="st">&quot;</span><span class="va">${E_PARAM_ERR}</span><span class="st">&quot;</span> <span class="st">&#39;incorrect invocation&#39;</span> <span class="dt">\</span></span>
+<span id="cb19-6"><a href="#cb19-6"></a>    <span class="kw">||</span> <span class="ex">fatal</span></span>
+<span id="cb19-7"><a href="#cb19-7"></a></span>
+<span id="cb19-8"><a href="#cb19-8"></a>    <span class="bu">local</span> <span class="at">-n</span> <span class="va">A</span><span class="op">=</span><span class="va">$1</span></span>
+<span id="cb19-9"><a href="#cb19-9"></a>    <span class="bu">local</span> <span class="at">-n</span> <span class="va">acc</span><span class="op">=</span><span class="va">${2</span><span class="op">:-</span>__<span class="va">}</span></span>
+<span id="cb19-10"><a href="#cb19-10"></a></span>
+<span id="cb19-11"><a href="#cb19-11"></a>    <span class="ex">check::vartype</span> as A <span class="dt">\</span></span>
+<span id="cb19-12"><a href="#cb19-12"></a>    <span class="kw">||</span> <span class="ex">raise</span></span>
+<span id="cb19-13"><a href="#cb19-13"></a></span>
+<span id="cb19-14"><a href="#cb19-14"></a>    <span class="kw">((</span> <span class="va">${</span><span class="op">#</span><span class="va">A</span><span class="op">[@]</span><span class="va">}</span> <span class="op">!=</span> <span class="dv">0</span> <span class="kw">))</span> <span class="dt">\</span></span>
+<span id="cb19-15"><a href="#cb19-15"></a>    <span class="kw">||</span> <span class="ex">raise</span> <span class="st">&quot;</span><span class="va">${E_PARAM_ERR}</span><span class="st">&quot;</span> <span class="st">&#39;array is empty&#39;</span></span>
+<span id="cb19-16"><a href="#cb19-16"></a></span>
+<span id="cb19-17"><a href="#cb19-17"></a>    <span class="bu">local</span> <span class="va">i</span><span class="op">=</span><span class="va">$((</span> <span class="va">RANDOM</span> <span class="op">%</span> <span class="va">${</span><span class="op">#</span><span class="va">A</span><span class="op">[@]</span><span class="va">}</span> <span class="va">))</span></span>
+<span id="cb19-18"><a href="#cb19-18"></a>    <span class="bu">printf</span> <span class="at">-v</span> acc <span class="st">&#39;%s\n&#39;</span> <span class="st">&quot;</span><span class="va">${A</span><span class="op">[</span>i<span class="op">]</span><span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb19-19"><a href="#cb19-19"></a><span class="kw">}</span></span></code></pre></div>
 <blockquote>
 <p>This example also shows that <code>raise</code> is polymorphic.</p>
 <ul>
@@ -1414,13 +1423,13 @@ will run in LIFO order at the script top level. As in bash, a mistake in
 a callback could abort the entire cleanup process but won’t prevent the
 script from exiting.</p>
 <h4 id="example-3">Example:</h4>
-<div class="sourceCode" id="cb19"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1"></a><span class="bu">source</span> bashkit.bash</span>
-<span id="cb19-2"><a href="#cb19-2"></a></span>
-<span id="cb19-3"><a href="#cb19-3"></a><span class="va">scratch</span><span class="op">=</span><span class="va">$(</span><span class="fu">mktemp</span><span class="va">)</span> <span class="dt">\</span></span>
-<span id="cb19-4"><a href="#cb19-4"></a><span class="kw">||</span> <span class="bu">exit</span></span>
-<span id="cb19-5"><a href="#cb19-5"></a></span>
-<span id="cb19-6"><a href="#cb19-6"></a><span class="ex">cleanup</span> <span class="st">&#39;rm -f &quot;${scratch}&quot;&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1"></a><span class="bu">source</span> bashkit.bash</span>
+<span id="cb20-2"><a href="#cb20-2"></a></span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="va">scratch</span><span class="op">=</span><span class="va">$(</span><span class="fu">mktemp</span><span class="va">)</span> <span class="dt">\</span></span>
+<span id="cb20-4"><a href="#cb20-4"></a><span class="kw">||</span> <span class="bu">exit</span></span>
+<span id="cb20-5"><a href="#cb20-5"></a></span>
+<span id="cb20-6"><a href="#cb20-6"></a><span class="ex">cleanup</span> <span class="st">&#39;rm -f &quot;${scratch}&quot;&#39;</span></span></code></pre></div>
 <blockquote>
 <p>When <code>panicking</code>, a bashkit script will
 <code>cleanup</code> before exiting. But there are situations beyond
@@ -1434,31 +1443,31 @@ href="https://en.wikipedia.org/wiki/ANSI_escape_code">ANSI 8 colors
 model</a>.</p>
 <p><code>color::encode</code> supports a tiny english color description
 language:</p>
-<div class="sourceCode" id="cb20"><pre
-class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb20-1"><a href="#cb20-1"></a>description = color &quot;text&quot; [ color &quot;background&quot; ]</span>
-<span id="cb20-2"><a href="#cb20-2"></a>            | &quot;reset&quot;</span>
-<span id="cb20-3"><a href="#cb20-3"></a>color = &quot;&quot;</span>
-<span id="cb20-4"><a href="#cb20-4"></a>      | attributes brightness base</span>
-<span id="cb20-5"><a href="#cb20-5"></a>attributes=? a list of unique modifiers ?</span>
-<span id="cb20-6"><a href="#cb20-6"></a>modifiers = &quot;&quot;</span>
-<span id="cb20-7"><a href="#cb20-7"></a>          | &quot;regular&quot; | &quot;bold&quot; | &quot;dim&quot; | &quot;italic&quot; | &quot;underlined&quot; </span>
-<span id="cb20-8"><a href="#cb20-8"></a>          | &quot;blinking&quot;</span>
-<span id="cb20-9"><a href="#cb20-9"></a>          | modifiers, { modifiers }</span>
-<span id="cb20-10"><a href="#cb20-10"></a>brightness = &quot;&quot;</span>
-<span id="cb20-11"><a href="#cb20-11"></a>           | &quot;bright&quot;</span>
-<span id="cb20-12"><a href="#cb20-12"></a>base = &quot;black&quot; | &quot;red&quot; | &quot;green&quot; | &quot;yellow&quot; | &quot;blue&quot; | &quot;magenta&quot; | &quot;cyan&quot;</span>
-<span id="cb20-13"><a href="#cb20-13"></a>     | &quot;white&quot; | &quot;default&quot;</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb21-1"><a href="#cb21-1"></a>description = color &quot;text&quot; [ color &quot;background&quot; ]</span>
+<span id="cb21-2"><a href="#cb21-2"></a>            | &quot;reset&quot;</span>
+<span id="cb21-3"><a href="#cb21-3"></a>color = &quot;&quot;</span>
+<span id="cb21-4"><a href="#cb21-4"></a>      | attributes brightness base</span>
+<span id="cb21-5"><a href="#cb21-5"></a>attributes=? a list of unique modifiers ?</span>
+<span id="cb21-6"><a href="#cb21-6"></a>modifiers = &quot;&quot;</span>
+<span id="cb21-7"><a href="#cb21-7"></a>          | &quot;regular&quot; | &quot;bold&quot; | &quot;dim&quot; | &quot;italic&quot; | &quot;underlined&quot; </span>
+<span id="cb21-8"><a href="#cb21-8"></a>          | &quot;blinking&quot;</span>
+<span id="cb21-9"><a href="#cb21-9"></a>          | modifiers, { modifiers }</span>
+<span id="cb21-10"><a href="#cb21-10"></a>brightness = &quot;&quot;</span>
+<span id="cb21-11"><a href="#cb21-11"></a>           | &quot;bright&quot;</span>
+<span id="cb21-12"><a href="#cb21-12"></a>base = &quot;black&quot; | &quot;red&quot; | &quot;green&quot; | &quot;yellow&quot; | &quot;blue&quot; | &quot;magenta&quot; | &quot;cyan&quot;</span>
+<span id="cb21-13"><a href="#cb21-13"></a>     | &quot;white&quot; | &quot;default&quot;</span></code></pre></div>
 <p>The smallest descriptions of all are <code>"text"</code> and
 <code>"reset"</code>. The later is always the ANSI <code>ESC[m</code>
 reset code while the former is the current system-defined default.</p>
 <h4 id="example-4">Example:</h4>
-<div class="sourceCode" id="cb21"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1"></a><span class="bu">source</span> bashkit.bash</span>
-<span id="cb21-2"><a href="#cb21-2"></a></span>
-<span id="cb21-3"><a href="#cb21-3"></a><span class="ex">color::encode</span> bold green text<span class="kw">;</span> <span class="va">bold_green</span><span class="op">=</span><span class="va">${__}</span></span>
-<span id="cb21-4"><a href="#cb21-4"></a><span class="ex">color::encode</span> reset<span class="kw">;</span> <span class="va">reset</span><span class="op">=</span><span class="va">${__}</span></span>
-<span id="cb21-5"><a href="#cb21-5"></a></span>
-<span id="cb21-6"><a href="#cb21-6"></a><span class="bu">printf</span> <span class="st">&quot;%b%s%b&quot;</span> <span class="st">&quot;</span><span class="va">${bold_green}</span><span class="st">&quot;</span> NATURE <span class="st">&quot;</span><span class="va">${reset}</span><span class="st"> does not hurry, yet everything is accomplished\n&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1"></a><span class="bu">source</span> bashkit.bash</span>
+<span id="cb22-2"><a href="#cb22-2"></a></span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="ex">color::encode</span> bold green text<span class="kw">;</span> <span class="va">bold_green</span><span class="op">=</span><span class="va">${__}</span></span>
+<span id="cb22-4"><a href="#cb22-4"></a><span class="ex">color::encode</span> reset<span class="kw">;</span> <span class="va">reset</span><span class="op">=</span><span class="va">${__}</span></span>
+<span id="cb22-5"><a href="#cb22-5"></a></span>
+<span id="cb22-6"><a href="#cb22-6"></a><span class="bu">printf</span> <span class="st">&quot;%b%s%b&quot;</span> <span class="st">&quot;</span><span class="va">${bold_green}</span><span class="st">&quot;</span> NATURE <span class="st">&quot;</span><span class="va">${reset}</span><span class="st"> does not hurry, yet everything is accomplished\n&quot;</span></span></code></pre></div>
 <blockquote>
 <ul>
 <li>descriptions are literals, they have no quote</li>
@@ -1472,23 +1481,23 @@ as color commands</li>
 </blockquote>
 <p>Declaring colors can be a tidy task, the following example shows how
 to build a <em>color palette</em>:</p>
-<div class="sourceCode" id="cb22"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1"></a><span class="bu">source</span> bashkit.bash</span>
-<span id="cb22-2"><a href="#cb22-2"></a></span>
-<span id="cb22-3"><a href="#cb22-3"></a><span class="bu">declare</span> <span class="at">-A</span> <span class="va">COLPAL</span><span class="op">=</span><span class="va">(</span>  <span class="co"># color palette</span></span>
-<span id="cb22-4"><a href="#cb22-4"></a>  <span class="op">[</span>panic<span class="op">]</span><span class="va">=</span><span class="st">&#39;underlined blinking bold white text red background&#39;</span></span>
-<span id="cb22-5"><a href="#cb22-5"></a>  <span class="op">[</span>alert<span class="op">]</span><span class="va">=</span><span class="st">&#39;bold white text red background&#39;</span></span>
-<span id="cb22-6"><a href="#cb22-6"></a>  <span class="op">[</span>crit<span class="op">]</span><span class="va">=</span><span class="st">&#39;underlined bold red text&#39;</span></span>
-<span id="cb22-7"><a href="#cb22-7"></a>  <span class="op">[</span>fatal<span class="op">]</span><span class="va">=</span><span class="st">&#39;bold red text&#39;</span></span>
-<span id="cb22-8"><a href="#cb22-8"></a>  <span class="op">[</span>error<span class="op">]</span><span class="va">=</span><span class="st">&#39;red text&#39;</span></span>
-<span id="cb22-9"><a href="#cb22-9"></a>  <span class="op">[</span>warn<span class="op">]</span><span class="va">=</span><span class="st">&#39;yellow text&#39;</span></span>
-<span id="cb22-10"><a href="#cb22-10"></a>  <span class="op">[</span>note<span class="op">]</span><span class="va">=</span><span class="st">&#39;blue text&#39;</span></span>
-<span id="cb22-11"><a href="#cb22-11"></a>  <span class="op">[</span>info<span class="op">]</span><span class="va">=</span><span class="st">&#39;green text&#39;</span></span>
-<span id="cb22-12"><a href="#cb22-12"></a>  <span class="op">[</span>debug<span class="op">]</span><span class="va">=</span><span class="st">&#39;magenta text&#39;</span></span>
-<span id="cb22-13"><a href="#cb22-13"></a>  <span class="op">[</span>reset<span class="op">]</span><span class="va">=</span><span class="st">&#39;reset&#39;</span></span>
-<span id="cb22-14"><a href="#cb22-14"></a><span class="va">)</span></span>
-<span id="cb22-15"><a href="#cb22-15"></a></span>
-<span id="cb22-16"><a href="#cb22-16"></a><span class="ex">color::table</span> COLPAL</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1"></a><span class="bu">source</span> bashkit.bash</span>
+<span id="cb23-2"><a href="#cb23-2"></a></span>
+<span id="cb23-3"><a href="#cb23-3"></a><span class="bu">declare</span> <span class="at">-A</span> <span class="va">COLPAL</span><span class="op">=</span><span class="va">(</span>  <span class="co"># color palette</span></span>
+<span id="cb23-4"><a href="#cb23-4"></a>  <span class="op">[</span>panic<span class="op">]</span><span class="va">=</span><span class="st">&#39;underlined blinking bold white text red background&#39;</span></span>
+<span id="cb23-5"><a href="#cb23-5"></a>  <span class="op">[</span>alert<span class="op">]</span><span class="va">=</span><span class="st">&#39;bold white text red background&#39;</span></span>
+<span id="cb23-6"><a href="#cb23-6"></a>  <span class="op">[</span>crit<span class="op">]</span><span class="va">=</span><span class="st">&#39;underlined bold red text&#39;</span></span>
+<span id="cb23-7"><a href="#cb23-7"></a>  <span class="op">[</span>fatal<span class="op">]</span><span class="va">=</span><span class="st">&#39;bold red text&#39;</span></span>
+<span id="cb23-8"><a href="#cb23-8"></a>  <span class="op">[</span>error<span class="op">]</span><span class="va">=</span><span class="st">&#39;red text&#39;</span></span>
+<span id="cb23-9"><a href="#cb23-9"></a>  <span class="op">[</span>warn<span class="op">]</span><span class="va">=</span><span class="st">&#39;yellow text&#39;</span></span>
+<span id="cb23-10"><a href="#cb23-10"></a>  <span class="op">[</span>note<span class="op">]</span><span class="va">=</span><span class="st">&#39;blue text&#39;</span></span>
+<span id="cb23-11"><a href="#cb23-11"></a>  <span class="op">[</span>info<span class="op">]</span><span class="va">=</span><span class="st">&#39;green text&#39;</span></span>
+<span id="cb23-12"><a href="#cb23-12"></a>  <span class="op">[</span>debug<span class="op">]</span><span class="va">=</span><span class="st">&#39;magenta text&#39;</span></span>
+<span id="cb23-13"><a href="#cb23-13"></a>  <span class="op">[</span>reset<span class="op">]</span><span class="va">=</span><span class="st">&#39;reset&#39;</span></span>
+<span id="cb23-14"><a href="#cb23-14"></a><span class="va">)</span></span>
+<span id="cb23-15"><a href="#cb23-15"></a></span>
+<span id="cb23-16"><a href="#cb23-16"></a><span class="ex">color::table</span> COLPAL</span></code></pre></div>
 <blockquote>
 <p>The demonstrated palette is actually used by bashkit
 <code>logging</code> routines.</p>
@@ -1497,11 +1506,28 @@ class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><
 <code>color::table</code> will substitute, in place, each description by
 a computed ANSI <em>escape sequence</em>. The resulting dictionary is to
 be used later as a <code>lookup table</code>.</p>
+<h1 id="bashkitload">bashkit::load</h1>
+<p>bashkit::load - load a bashkit module</p>
+<h3 id="synopsis">SYNOPSIS</h3>
+<p>note [<em>modname</em> …]</p>
+<h3 id="description">DESCRIPTION</h3>
+<p>With <em>modname</em> a string, <code>bashkit:load</code> takes an
+arbitrary number of <em>modname</em> arguments. <em>modname</em> refers
+to a module named <code>&lt;modname&gt;.bash</code> lying in the
+hierarchy pointed by the environement variable $BASHKIT_MODPATH.</p>
+<p><code>bashkit::load</code> returns success unless the module does not
+exist.</p>
+<h3 id="examples">EXAMPLES</h3>
+<pre><code>$ bashkit load array</code></pre>
+<h3 id="environment">ENVIRONMENT</h3>
+<ul>
+<li>$BASHKIT_MODPATH points to the modules location</li>
+</ul>
 <h1 id="catch">catch</h1>
 <p>catch - store a raising <code>errcode</code> and resume execution</p>
-<h3 id="synopsis">SYNOPSIS</h3>
+<h3 id="synopsis-1">SYNOPSIS</h3>
 <p>catch [<em>refname</em>]</p>
-<h3 id="description">DESCRIPTION</h3>
+<h3 id="description-1">DESCRIPTION</h3>
 <p>Catch captures and stores a raising <code>errcode</code> and then
 resume execution at the first following command.</p>
 <p>If no <em>refname</em> is specified, <code>errcode</code> is stored
@@ -1509,7 +1535,7 @@ in special bashkit variable <code>$____</code>.</p>
 <p>When <code>catch</code> returns, the error context is modified:
 <code>$?</code> is equal to 0.</p>
 <p>Catch always returns with an exit code of zero.</p>
-<h3 id="examples">EXAMPLES</h3>
+<h3 id="examples-1">EXAMPLES</h3>
 <p><strong>Example 1 <code>true(1)</code> equivalence</strong></p>
 <p>The following command will never fail, it is equivalent to using
 <code>true(1)</code>.</p>
@@ -1531,13 +1557,13 @@ otherwise.</p>
 <p><code>raise(1)</code>, <code>resume(1)</code></p>
 <h1 id="not">not</h1>
 <p>not - unary logical not as a function</p>
-<h3 id="synopsis-1">SYNOPSIS</h3>
+<h3 id="synopsis-2">SYNOPSIS</h3>
 <p>not [<em>command</em>]</p>
-<h3 id="description-1">DESCRIPTION</h3>
+<h3 id="description-2">DESCRIPTION</h3>
 <p><code>not</code> is the functional equivalent of <code>!</code>. It
 is intended to be used with <code>resume(1)</code> that can only accept
 a command as argument.</p>
-<h3 id="examples-1">EXAMPLES</h3>
+<h3 id="examples-2">EXAMPLES</h3>
 <p><strong>Example 1 Direct invocation</strong></p>
 <p>The first following command always fails while the second always
 succeeds.</p>
@@ -1551,9 +1577,9 @@ $ not false</code></pre>
 <p><code>resume(1)</code></p>
 <h1 id="raise">raise</h1>
 <p>raise - raise or reraise an <code>errcode</code></p>
-<h3 id="synopsis-2">SYNOPSIS</h3>
+<h3 id="synopsis-3">SYNOPSIS</h3>
 <p>raise [<em>errcode</em>] [<em>errmsg</em>]</p>
-<h3 id="description-2">DESCRIPTION</h3>
+<h3 id="description-3">DESCRIPTION</h3>
 <p>Raise set an <em>errcode</em> and an <em>errmsg</em> and then fails
 immediately.</p>
 <p>Raise returns the given <em>errcode</em>. If the specified
@@ -1562,7 +1588,7 @@ immediately.</p>
 last positionned <code>errcode</code> or defaults to one if none.</p>
 <p>If <em>errmsg</em> is not given, <code>raise</code> uses the last
 positionned one or defaults to none.</p>
-<h3 id="examples-2">EXAMPLES</h3>
+<h3 id="examples-3">EXAMPLES</h3>
 <p><strong>Example 1 Direct invocation</strong></p>
 <p>The following command always fails, here <code>raise</code> is
 equivalent to <code>false(1)</code>.</p>
@@ -1626,14 +1652,14 @@ $ bash isint.bash
 <h1 id="resume">resume</h1>
 <p>resume - abort a raising <code>errcode</code> and resume
 execution</p>
-<h3 id="synopsis-3">SYNOPSIS</h3>
+<h3 id="synopsis-4">SYNOPSIS</h3>
 <p>resume [<em>command</em>]</p>
-<h3 id="description-3">DESCRIPTION</h3>
+<h3 id="description-4">DESCRIPTION</h3>
 <p>Unlike <code>catch(1)</code>, <code>resume</code> executes in the
 <em>same context</em> as the error. It allows the flow of control to
 abort the raising <code>errcode</code> and to recover execution by
 running the command that follows it.</p>
-<h3 id="examples-3">EXAMPLES</h3>
+<h3 id="examples-4">EXAMPLES</h3>
 <p><strong>Example 1 Direct invocation</strong></p>
 <p>The following command always succeed, here <code>resume</code> is
 equivalent to builtin <code>:</code>.</p>
@@ -1661,9 +1687,9 @@ use <code>not(1)</code> in the following construct:</p>
 <h1 id="colorencode">color::encode</h1>
 <p>color::encode - compute an 8 colors ANSI code from a color
 description</p>
-<h3 id="synopsis-4">SYNOPSIS</h3>
+<h3 id="synopsis-5">SYNOPSIS</h3>
 <p>color::encode [<em>description</em>]</p>
-<h3 id="description-4">DESCRIPTION</h3>
+<h3 id="description-5">DESCRIPTION</h3>
 <p><code>color::encode</code> encodes a color description into an ANSI
 color escape code. The code is always stored in special bashkit variable
 <code>$__</code>.</p>
@@ -1695,7 +1721,7 @@ reset code while the former is the current system-defined default.</p>
 <p><code>color::encode</code> returns with an exit code of zero upon
 successful encoding. It returns <code>E_PARAM_ERR/9</code>
 otherwise.</p>
-<h3 id="examples-4">EXAMPLES</h3>
+<h3 id="examples-5">EXAMPLES</h3>
 <p>The description must always be written without quote when invoking
 directly:</p>
 <pre><code>  $ color::encode underlined blinking bold white text red background
@@ -1706,9 +1732,9 @@ directly:</p>
 <p><code>color::table(1)</code></p>
 <h1 id="coloris_enabled">color::is_enabled</h1>
 <p>color::is_enabled - test if color is supported</p>
-<h3 id="synopsis-5">SYNOPSIS</h3>
+<h3 id="synopsis-6">SYNOPSIS</h3>
 <p>color::is_enabled</p>
-<h3 id="description-5">DESCRIPTION</h3>
+<h3 id="description-6">DESCRIPTION</h3>
 <p><code>color::is_enabled</code> test if color is not <em>disabled</em>
 and terminal is compatible. One can <em>disable</em> color by setting
 <code>$NO_COLOR</code> before running scripts.</p>
@@ -1721,9 +1747,9 @@ and terminal is compatible. One can <em>disable</em> color by setting
 <h1 id="colortable">color::table</h1>
 <p>color::table - compute 8 colors ANSI code from a description
 dictionary</p>
-<h3 id="synopsis-6">SYNOPSIS</h3>
+<h3 id="synopsis-7">SYNOPSIS</h3>
 <p>color::table [<em>dict</em>]</p>
-<h3 id="description-6">DESCRIPTION</h3>
+<h3 id="description-7">DESCRIPTION</h3>
 <p><code>color::table</code> replaces descriptions found in an
 associative array by corresponding ASCII 8-color codes. The
 <em>dict</em> can subsequently be used as a
@@ -1758,9 +1784,9 @@ $ echo &quot;${COLPAL[panic]}&quot;
 <h1 id="breakpoint">breakpoint</h1>
 <p>breakpoint - set an intentional pausing place for debugging
 purpose</p>
-<h3 id="synopsis-7">SYNOPSIS</h3>
+<h3 id="synopsis-8">SYNOPSIS</h3>
 <p>breakpoint</p>
-<h3 id="description-7">DESCRIPTION</h3>
+<h3 id="description-8">DESCRIPTION</h3>
 <p>When used in conjunction of <code>errcode::trap breakpoint</code>
 mode or if <code>$DEBUG</code> is set beforehand,
 <code>breakpoint</code> pauses the script and throws a minimal console
@@ -1775,9 +1801,9 @@ debug&gt;</code></pre>
 <p><code>errcode::trap(1)</code></p>
 <h1 id="errcodetrap">errcode::trap</h1>
 <p>errcode::trap - get or set <code>errcode</code> mode</p>
-<h3 id="synopsis-8">SYNOPSIS</h3>
+<h3 id="synopsis-9">SYNOPSIS</h3>
 <p>errcode::trap [<em>command</em>]</p>
-<h3 id="description-8">DESCRIPTION</h3>
+<h3 id="description-9">DESCRIPTION</h3>
 <p><em>command</em> is one of <code>default</code> | <code>enable</code>
 | <code>disable</code> | <code>breakpoint</code> | <code>status</code>.
 If no <em>command</em> is given, it defaults to <code>status</code>.
@@ -1797,9 +1823,9 @@ errcode is enabled</code></pre>
 <p><code>breakpoint(1)</code></p>
 <h1 id="errorclass">error::class</h1>
 <p>error::class - error classifying tool</p>
-<h3 id="synopsis-9">SYNOPSIS</h3>
+<h3 id="synopsis-10">SYNOPSIS</h3>
 <p>error::class <em>error</em></p>
-<h3 id="description-9">DESCRIPTION</h3>
+<h3 id="description-10">DESCRIPTION</h3>
 <p>With <em>error</em> either a positive integer in range [0-255] or a
 valid name:</p>
 <pre><code>^E_([A-Z1-9]+)((_([A-Z1-9])+)*)$</code></pre>
@@ -1872,7 +1898,7 @@ valid name:</p>
 <p>The queried error class is printed on <code>stdout</code>
 <em>and</em> stored in special variable <code>$__</code>.</p>
 <p><code>error::class</code> returns 0 on success &gt;0 otherwise.</p>
-<h3 id="examples-5">EXAMPLES</h3>
+<h3 id="examples-6">EXAMPLES</h3>
 <pre><code>$ error::class 129
 signal
 $ error::class E_SIGHUP
@@ -1882,9 +1908,9 @@ signal</code></pre>
 <code>error::whatis(1)</code></p>
 <h1 id="errorcustom">error::custom</h1>
 <p>error::custom - register a custom error</p>
-<h3 id="synopsis-10">SYNOPSIS</h3>
+<h3 id="synopsis-11">SYNOPSIS</h3>
 <p>error::custom <em>rawname</em> <em>rawcode</em></p>
-<h3 id="description-10">DESCRIPTION</h3>
+<h3 id="description-11">DESCRIPTION</h3>
 <p>With <em>rawname</em> a string and <em>rawcode</em> a positive
 integer in range [1-90], <code>error::custom</code> registers
 <code>$E_&lt;RAWerror::custom&gt;</code> wich equals
@@ -1905,9 +1931,9 @@ $ echo ${E_EMPTY_BUFFER}
 <code>error::whatis(1)</code></p>
 <h1 id="errorlist">error::list</h1>
 <p>error::list - error class listing tool</p>
-<h3 id="synopsis-11">SYNOPSIS</h3>
+<h3 id="synopsis-12">SYNOPSIS</h3>
 <p>error::list <em>errclass</em></p>
-<h3 id="description-11">DESCRIPTION</h3>
+<h3 id="description-12">DESCRIPTION</h3>
 <p>With <em>errclass</em> is one of <code>all</code> | <code>bash</code>
 | <code>bashkit</code> | <code>custom</code> | <code>signal</code>. When
 <em>errclass</em> is not given it defaults to <code>all</code>.
@@ -1994,9 +2020,9 @@ E_SIGRTMAX           192</code></pre>
 <h1 id="errorwhatis">error::whatis</h1>
 <p>error::whatis - bidirectional mapper between error codes and
 names</p>
-<h3 id="synopsis-12">SYNOPSIS</h3>
+<h3 id="synopsis-13">SYNOPSIS</h3>
 <p>error::whaits <em>error</em></p>
-<h3 id="description-12">DESCRIPTION</h3>
+<h3 id="description-13">DESCRIPTION</h3>
 <p>With <em>error</em> either a positive integer in range [0-255] or a
 valid name:</p>
 <pre><code>^E_([A-Z1-9]+)((_([A-Z1-9])+)*)$</code></pre>
@@ -2069,7 +2095,7 @@ valid name:</p>
 <p>The queried error code/name is printed on <code>stdout</code>
 <em>and</em> stored in special variable <code>$__</code>.</p>
 <p><code>error::whatis</code> returns 0 on success &gt;0 otherwise.</p>
-<h3 id="examples-6">EXAMPLES</h3>
+<h3 id="examples-7">EXAMPLES</h3>
 <pre><code>$ error::whatis 129
 E_SIGHUP
 $ error::class E_SIGHUP
@@ -2079,9 +2105,9 @@ $ error::class E_SIGHUP
 <code>error::list(1)</code></p>
 <h1 id="alert">alert</h1>
 <p>alert - display an alert message</p>
-<h3 id="synopsis-13">SYNOPSIS</h3>
+<h3 id="synopsis-14">SYNOPSIS</h3>
 <p>alert [<em>message</em> …]</p>
-<h3 id="description-13">DESCRIPTION</h3>
+<h3 id="description-14">DESCRIPTION</h3>
 <p>With <em>message</em> a string, <code>alert</code> takes an arbitrary
 number of <em>message</em> arguments. <em>message</em> can be set in
 special variable <code>$__</code> or by calling
@@ -2090,7 +2116,7 @@ special variable <code>$__</code> or by calling
 each message argument is displayed on its own.</p>
 <p><code>alert</code> is an <code>errcode</code> handler, it returns
 previous <code>$?</code> unless a write or assignment error occurs.</p>
-<h3 id="examples-7">EXAMPLES</h3>
+<h3 id="examples-8">EXAMPLES</h3>
 <pre><code>$ alert
 2022-11-07 16:50:12+0100 [alert] bash:1|
 
@@ -2108,7 +2134,7 @@ $ false \
   || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
   || alert
 2022-11-07 16:59:33+0100 [alert] bash:1| not good</code></pre>
-<h3 id="environment">ENVIRONMENT</h3>
+<h3 id="environment-1">ENVIRONMENT</h3>
 <ul>
 <li>$JSON controls the output format</li>
 <li>$LOGLEVEL controls the logging level</li>
@@ -2119,9 +2145,9 @@ $ false \
 <code>errcode::trap(1)</code>, <code>raise(1)</code></p>
 <h1 id="crit">crit</h1>
 <p>crit - display a critical message</p>
-<h3 id="synopsis-14">SYNOPSIS</h3>
+<h3 id="synopsis-15">SYNOPSIS</h3>
 <p>crit [<em>message</em> …]</p>
-<h3 id="description-14">DESCRIPTION</h3>
+<h3 id="description-15">DESCRIPTION</h3>
 <p>With <em>message</em> a string, <code>crit</code> takes an arbitrary
 number of <em>message</em> arguments. <em>message</em> can be set in
 special variable <code>$__</code> or by calling
@@ -2130,7 +2156,7 @@ special variable <code>$__</code> or by calling
 each message argument is displayed on its own.</p>
 <p><code>crit</code> is an <code>errcode</code> handler, it returns
 previous <code>$?</code> unless a write or assignment error occurs.</p>
-<h3 id="examples-8">EXAMPLES</h3>
+<h3 id="examples-9">EXAMPLES</h3>
 <pre><code>$ crit
 2022-11-07 16:50:12+0100 [crit] bash:1|
 
@@ -2148,7 +2174,7 @@ $ false \
   || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
   || crit
 2022-11-07 16:59:33+0100 [crit] bash:1| not good</code></pre>
-<h3 id="environment-1">ENVIRONMENT</h3>
+<h3 id="environment-2">ENVIRONMENT</h3>
 <ul>
 <li>$JSON controls the output format</li>
 <li>$LOGLEVEL controls the logging level</li>
@@ -2159,9 +2185,9 @@ $ false \
 <code>errcode::trap(1)</code>, <code>raise(1)</code></p>
 <h1 id="debug">debug</h1>
 <p>debug - display a debugging message</p>
-<h3 id="synopsis-15">SYNOPSIS</h3>
+<h3 id="synopsis-16">SYNOPSIS</h3>
 <p>debug [<em>message</em> …]</p>
-<h3 id="description-15">DESCRIPTION</h3>
+<h3 id="description-16">DESCRIPTION</h3>
 <p>With <em>message</em> a string, <code>debug</code> takes an arbitrary
 number of <em>message</em> arguments. <em>message</em> can be set in
 special variable <code>$__</code>.</p>
@@ -2171,7 +2197,7 @@ message is displayed on its own.</p>
 <code>$LOGLEVEL</code> defaults to 7</p>
 <p><code>debug</code> returns success unless a write or assignment error
 occurs.</p>
-<h3 id="examples-9">EXAMPLES</h3>
+<h3 id="examples-10">EXAMPLES</h3>
 <pre><code>$ debug
 2022-11-08 00:59:32+0100 [debug] bash:1|
 
@@ -2180,7 +2206,7 @@ $ debug &quot;debug message&quot;
 
 $ __=&#39;preset message&#39; &amp;&amp; debug
 2022-11-08 01:00:57+0100 [debug] bash:1| preset message</code></pre>
-<h3 id="environment-2">ENVIRONMENT</h3>
+<h3 id="environment-3">ENVIRONMENT</h3>
 <ul>
 <li>$JSON controls the output format</li>
 <li>$LOGLEVEL controls the logging level</li>
@@ -2190,9 +2216,9 @@ $ __=&#39;preset message&#39; &amp;&amp; debug
 <p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code></p>
 <h1 id="error">error</h1>
 <p>error - display an error message</p>
-<h3 id="synopsis-16">SYNOPSIS</h3>
+<h3 id="synopsis-17">SYNOPSIS</h3>
 <p>error [<em>message</em> …]</p>
-<h3 id="description-16">DESCRIPTION</h3>
+<h3 id="description-17">DESCRIPTION</h3>
 <p>With <em>message</em> a string, <code>error</code> takes an arbitrary
 number of <em>message</em> arguments. <em>message</em> can be set in
 special variable <code>$__</code> or by calling
@@ -2201,7 +2227,7 @@ special variable <code>$__</code> or by calling
 each message is displayed on its own.</p>
 <p><code>error</code> is an <code>errcode</code> handler, it returns
 previous <code>$?</code> unless a write or assignment error occurs.</p>
-<h3 id="examples-10">EXAMPLES</h3>
+<h3 id="examples-11">EXAMPLES</h3>
 <pre><code>$ error
 2022-11-07 16:50:12+0100 [error] bash:1|
 
@@ -2219,7 +2245,7 @@ $ false \
   || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
   || error
 2022-11-07 16:59:33+0100 [error] bash:1| not good</code></pre>
-<h3 id="environment-3">ENVIRONMENT</h3>
+<h3 id="environment-4">ENVIRONMENT</h3>
 <ul>
 <li>$JSON controls the output format</li>
 <li>$LOGLEVEL controls the logging level</li>
@@ -2230,9 +2256,9 @@ $ false \
 <code>errcode::trap(1)</code>, <code>raise(1)</code></p>
 <h1 id="fatal">fatal</h1>
 <p>fatal - display a message and panic with an error code</p>
-<h3 id="synopsis-17">SYNOPSIS</h3>
+<h3 id="synopsis-18">SYNOPSIS</h3>
 <p>fatal [<em>message</em> …]</p>
-<h3 id="description-17">DESCRIPTION</h3>
+<h3 id="description-18">DESCRIPTION</h3>
 <p>With <em>message</em> a string, <code>fatal</code> takes an arbitrary
 number of <em>message</em> arguments. <em>message</em> can be set in
 special variable <code>$__</code> or by calling
@@ -2241,7 +2267,7 @@ special variable <code>$__</code> or by calling
 <p><code>fatal</code> is an <code>errcode</code> handler, it returns
 previous <code>$?</code> unless a write or assignment error occurs. If
 previous <code>$?</code> is 0, <code>fatal</code> defaults to 1.</p>
-<h3 id="examples-11">EXAMPLES</h3>
+<h3 id="examples-12">EXAMPLES</h3>
 <pre><code>$ fatal
 2022-11-07 16:50:12+0100 [fatal] bash:1|
 
@@ -2259,7 +2285,7 @@ $ false \
   || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
   || fatal
 2022-11-07 16:59:33+0100 [fatal] bash:1| not good</code></pre>
-<h3 id="environment-4">ENVIRONMENT</h3>
+<h3 id="environment-5">ENVIRONMENT</h3>
 <ul>
 <li>$JSON controls the output format</li>
 <li>$LOGLEVEL controls the logging level</li>
@@ -2270,9 +2296,9 @@ $ false \
 <code>errcode::trap(1)</code>, <code>raise(1)</code></p>
 <h1 id="info">info</h1>
 <p>info - display an informational message</p>
-<h3 id="synopsis-18">SYNOPSIS</h3>
+<h3 id="synopsis-19">SYNOPSIS</h3>
 <p>info [<em>message</em> …]</p>
-<h3 id="description-18">DESCRIPTION</h3>
+<h3 id="description-19">DESCRIPTION</h3>
 <p>With <em>message</em> a string, <code>info</code> takes an arbitrary
 number of <em>message</em> arguments. <em>message</em> can be set in
 special variable <code>$__</code>.</p>
@@ -2283,7 +2309,7 @@ occurs.</p>
 <p><code>info</code> shadows <code>info(1)</code> the bash info document
 reader. If you need to use this reader, invoke it with
 <code>command</code> <code>info</code>.</p>
-<h3 id="examples-12">EXAMPLES</h3>
+<h3 id="examples-13">EXAMPLES</h3>
 <pre><code>$ info
 2022-11-08 00:59:32+0100 [info] bash:1|
 
@@ -2292,7 +2318,7 @@ $ info &quot;info message&quot;
 
 $ __=&#39;preset message&#39; &amp;&amp; info
 2022-11-08 01:00:57+0100 [info] bash:1| preset message</code></pre>
-<h3 id="environment-5">ENVIRONMENT</h3>
+<h3 id="environment-6">ENVIRONMENT</h3>
 <ul>
 <li>$JSON controls the output format</li>
 <li>$LOGLEVEL controls the logging level</li>
@@ -2305,16 +2331,16 @@ $ __=&#39;preset message&#39; &amp;&amp; info
 <pre><code>$ command [-pVv] info [arg ...]</code></pre>
 <h1 id="logginglevel">logging::level</h1>
 <p>logging::level - display the current logging level</p>
-<h3 id="synopsis-19">SYNOPSIS</h3>
+<h3 id="synopsis-20">SYNOPSIS</h3>
 <p>logging::level</p>
-<h3 id="description-19">DESCRIPTION</h3>
+<h3 id="description-20">DESCRIPTION</h3>
 <p><code>logging::level</code> displays the current script logging level
 on <code>stdout</code>.</p>
 <p>It returns success unless a write or assignment error occurs.</p>
-<h3 id="examples-13">EXAMPLES</h3>
+<h3 id="examples-14">EXAMPLES</h3>
 <pre><code>$ logging::level
 6</code></pre>
-<h3 id="environment-6">ENVIRONMENT</h3>
+<h3 id="environment-7">ENVIRONMENT</h3>
 <ul>
 <li>$LOGLEVEL controls the logging level</li>
 </ul>
@@ -2322,9 +2348,9 @@ on <code>stdout</code>.</p>
 <p><code>logging::setlevel(1)</code></p>
 <h1 id="note">note</h1>
 <p>note - display a note message</p>
-<h3 id="synopsis-20">SYNOPSIS</h3>
+<h3 id="synopsis-21">SYNOPSIS</h3>
 <p>note [<em>message</em> …]</p>
-<h3 id="description-20">DESCRIPTION</h3>
+<h3 id="description-21">DESCRIPTION</h3>
 <p>With <em>message</em> a string, <code>note</code> takes an arbitrary
 number of <em>message</em> arguments. <em>message</em> can be set in
 special variable <code>$__</code>.</p>
@@ -2332,7 +2358,7 @@ special variable <code>$__</code>.</p>
 each message is displayed on its own.</p>
 <p><code>note</code> returns success unless a write or assignment error
 occurs.</p>
-<h3 id="examples-14">EXAMPLES</h3>
+<h3 id="examples-15">EXAMPLES</h3>
 <pre><code>$ note
 2022-11-08 00:59:32+0100 [note] bash:1|
 
@@ -2341,7 +2367,7 @@ $ note &quot;note message&quot;
 
 $ __=&#39;preset message&#39; &amp;&amp; note
 2022-11-08 01:00:57+0100 [note] bash:1| preset message</code></pre>
-<h3 id="environment-7">ENVIRONMENT</h3>
+<h3 id="environment-8">ENVIRONMENT</h3>
 <ul>
 <li>$JSON controls the output format</li>
 <li>$LOGLEVEL controls the logging level</li>
@@ -2351,9 +2377,9 @@ $ __=&#39;preset message&#39; &amp;&amp; note
 <p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code></p>
 <h1 id="panic">panic</h1>
 <p>panic - display a message and panic with error code 1</p>
-<h3 id="synopsis-21">SYNOPSIS</h3>
+<h3 id="synopsis-22">SYNOPSIS</h3>
 <p>panic [<em>message</em> …]</p>
-<h3 id="description-21">DESCRIPTION</h3>
+<h3 id="description-22">DESCRIPTION</h3>
 <p>With <em>message</em> a string, <code>panic</code> takes an arbitrary
 number of <em>message</em> arguments. <em>message</em> can be set in
 special variable <code>$__</code> or by calling
@@ -2361,7 +2387,7 @@ special variable <code>$__</code> or by calling
 <p>Each message is always displayed on its own.</p>
 <p><code>panic</code> is an <code>errcode</code> handler, it returns
 1.</p>
-<h3 id="examples-15">EXAMPLES</h3>
+<h3 id="examples-16">EXAMPLES</h3>
 <pre><code>$ panic
 2022-11-07 16:50:12+0100 [panic] bash:1|
 
@@ -2379,7 +2405,7 @@ $ false \
   || raise &quot;${E_PARAM_ERR}&quot; &#39;not good&#39; \
   || panic
 2022-11-07 16:59:33+0100 [panic] bash:1| not good</code></pre>
-<h3 id="environment-8">ENVIRONMENT</h3>
+<h3 id="environment-9">ENVIRONMENT</h3>
 <ul>
 <li>$JSON controls the output format</li>
 <li>$LOGLEVEL controls the logging level</li>
@@ -2390,9 +2416,9 @@ $ false \
 <code>errcode::trap(1)</code>, <code>raise(1)</code></p>
 <h1 id="loggingsetlevel">logging::setlevel</h1>
 <p>logging::setlevel - modify the current logging level</p>
-<h3 id="synopsis-22">SYNOPSIS</h3>
+<h3 id="synopsis-23">SYNOPSIS</h3>
 <p>logging::setlevel [<em>level</em>]</p>
-<h3 id="description-22">DESCRIPTION</h3>
+<h3 id="description-23">DESCRIPTION</h3>
 <p>With <em>level</em> either an integer in [0-7] or a string in: panic
 | emerg | alert | crit | error | warn | note | info | debug,
 <code>logging::setlevel</code> sets the current script logging
@@ -2400,10 +2426,10 @@ level.</p>
 <p>If <em>level</em> is invalid, the logging level defaults to
 INFO/6.</p>
 <p><code>logging::setlevel</code> returns success.</p>
-<h3 id="examples-16">EXAMPLES</h3>
+<h3 id="examples-17">EXAMPLES</h3>
 <pre><code>$ logging::setlevel 7
 $ logging::setlevel debug</code></pre>
-<h3 id="environment-9">ENVIRONMENT</h3>
+<h3 id="environment-10">ENVIRONMENT</h3>
 <ul>
 <li>$LOGLEVEL controls the logging level</li>
 </ul>
@@ -2411,9 +2437,9 @@ $ logging::setlevel debug</code></pre>
 <p><code>logging::level(1)</code></p>
 <h1 id="warn">warn</h1>
 <p>warn - display a warn message</p>
-<h3 id="synopsis-23">SYNOPSIS</h3>
+<h3 id="synopsis-24">SYNOPSIS</h3>
 <p>warn [<em>message</em> …]</p>
-<h3 id="description-23">DESCRIPTION</h3>
+<h3 id="description-24">DESCRIPTION</h3>
 <p>With <em>message</em> a string, <code>warn</code> takes an arbitrary
 number of <em>message</em> arguments. <em>message</em> can be set in
 special variable <code>$__</code>.</p>
@@ -2421,7 +2447,7 @@ special variable <code>$__</code>.</p>
 each message is displayed on its own.</p>
 <p><code>warn</code> returns success unless a write or assignment error
 occurs.</p>
-<h3 id="examples-17">EXAMPLES</h3>
+<h3 id="examples-18">EXAMPLES</h3>
 <pre><code>$ warn
 2022-11-08 00:59:32+0100 [warn] bash:1|
 
@@ -2430,7 +2456,7 @@ $ warn &quot;warn message&quot;
 
 $ __=&#39;preset message&#39; &amp;&amp; warn
 2022-11-08 01:00:57+0100 [warn] bash:1| preset message</code></pre>
-<h3 id="environment-10">ENVIRONMENT</h3>
+<h3 id="environment-11">ENVIRONMENT</h3>
 <ul>
 <li>$JSON controls the output format</li>
 <li>$LOGLEVEL controls the logging level</li>
@@ -2440,9 +2466,9 @@ $ __=&#39;preset message&#39; &amp;&amp; warn
 <p><code>logging::level(1)</code>, <code>logging::setlevel(1)</code></p>
 <h1 id="trapcallback">trap::callback</h1>
 <p>trap::callback - hook a command to a signal</p>
-<h3 id="synopsis-24">SYNOPSIS</h3>
+<h3 id="synopsis-25">SYNOPSIS</h3>
 <p>trap::callback [[<em>arg</em>] <em>signal_spec</em> …]</p>
-<h3 id="description-24">DESCRIPTION</h3>
+<h3 id="description-25">DESCRIPTION</h3>
 <p><code>trap::callback</code> is a wrapper to bash builtin trap that
 goes the extra mile of stacking up <em>arg</em> to already hooked up
 commands.</p>
@@ -2457,14 +2483,14 @@ goodbye world!</code></pre>
 <p>builtin <code>trap</code>, <code>cleanup(1)</code></p>
 <h1 id="cleanup">cleanup</h1>
 <p>cleanup - hook a command to the EXIT signal</p>
-<h3 id="synopsis-25">SYNOPSIS</h3>
+<h3 id="synopsis-26">SYNOPSIS</h3>
 <p>cleanup [<em>arg</em>]</p>
-<h3 id="description-25">DESCRIPTION</h3>
+<h3 id="description-26">DESCRIPTION</h3>
 <p><code>cleanup</code> is a wrapper to bashkit
 <code>trap::callback</code> on the EXIT signal.</p>
 <p><em>arg</em> is defined in bash builtin trap help.</p>
 <p>Upon reception of EXIT, the commands are executed in LIFO order.</p>
-<h3 id="examples-18">EXAMPLES</h3>
+<h3 id="examples-19">EXAMPLES</h3>
 <pre><code>$ cleanup &quot;echo goodbye world!&quot;
 goodbye world!
 $ touch /tmp/tmpfile &amp;&amp; cleanup &#39;rm -f /tmp/tmpfile&#39;</code></pre>
@@ -2472,9 +2498,9 @@ $ touch /tmp/tmpfile &amp;&amp; cleanup &#39;rm -f /tmp/tmpfile&#39;</code></pre
 <p>builtin <code>trap</code>, <code>trap::callback(1)</code></p>
 <h1 id="arraycontains">array::contains</h1>
 <p>array::contains - test if an array contains a given value</p>
-<h3 id="synopsis-26">SYNOPSIS</h3>
+<h3 id="synopsis-27">SYNOPSIS</h3>
 <p>array::contains <em>A</em> <em>x</em> [<em>idx</em>]</p>
-<h3 id="description-26">DESCRIPTION</h3>
+<h3 id="description-27">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <em>x</em> a value and
 <em>idx</em> a variable, <code>array::contains</code> test if <em>x</em>
 exists in <em>A</em> and set <em>idx</em> to <em>x</em> index. If
@@ -2491,9 +2517,9 @@ $ echo &quot;${ARRAY[idx]}&quot;
 2</code></pre>
 <h1 id="arrayinter">array::inter</h1>
 <p>array::inter - intersect two arrays</p>
-<h3 id="synopsis-27">SYNOPSIS</h3>
+<h3 id="synopsis-28">SYNOPSIS</h3>
 <p>array::inter <em>A</em> <em>B</em></p>
-<h3 id="description-27">DESCRIPTION</h3>
+<h3 id="description-28">DESCRIPTION</h3>
 <p>With <em>A</em> et <em>B</em> array variables,
 <code>array::inter</code> intersects <em>A</em> and <em>B</em> and set
 the resulting array in <em>A</em>.</p>
@@ -2507,15 +2533,15 @@ $ echo &quot;${A[@]}&quot;
 3 4 world</code></pre>
 <h1 id="arraymap">array::map</h1>
 <p>array::map - apply a function to an array elements</p>
-<h3 id="synopsis-28">SYNOPSIS</h3>
+<h3 id="synopsis-29">SYNOPSIS</h3>
 <p>array::map <em>A</em> <em>fun</em></p>
-<h3 id="description-28">DESCRIPTION</h3>
+<h3 id="description-29">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>fun</em> a bash function
 that transforms <code>$1</code> and prints the result to
 <code>stdout</code>, <code>array::map</code> applies <em>fun</em> in
 place to each elements of <em>A</em>.</p>
 <p><code>array::map</code> returns 0 upon success &gt;0 otherwise.</p>
-<h3 id="examples-19">EXAMPLES</h3>
+<h3 id="examples-20">EXAMPLES</h3>
 <pre><code>$ declare -a A=( {a..e} )
 $ up(){ echo ${1^^}; }
 $ array::map A up
@@ -2525,9 +2551,9 @@ A B C D E</code></pre>
 <p><code>array::reduce(1)</code></p>
 <h1 id="arraypick">array::pick</h1>
 <p>array::pick - pick a random array element</p>
-<h3 id="synopsis-29">SYNOPSIS</h3>
+<h3 id="synopsis-30">SYNOPSIS</h3>
 <p>array::pick <em>A</em> [<em>x</em>]</p>
-<h3 id="description-29">DESCRIPTION</h3>
+<h3 id="description-30">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>x</em> a variable,
 <code>array::pick</code> sets <em>x</em> to a random element of
 <em>A</em>. If <em>x</em> is not specified, it defaults to the special
@@ -2540,9 +2566,9 @@ $ echo &quot;${x}&quot;
 3</code></pre>
 <h1 id="arraypop">array::pop</h1>
 <p>array::pop - remove the last element from an array</p>
-<h3 id="synopsis-30">SYNOPSIS</h3>
+<h3 id="synopsis-31">SYNOPSIS</h3>
 <p>array::pop <em>A</em> [<em>x</em>]</p>
-<h3 id="description-30">DESCRIPTION</h3>
+<h3 id="description-31">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>x</em> a variable,
 <code>array::pop</code> sets <em>x</em> to the last element from
 <em>A</em> before removing it. If <em>x</em> is not specified, it
@@ -2559,9 +2585,9 @@ $ echo &quot;${x}&quot;
 <p><code>array::popi(1)</code></p>
 <h1 id="arraypopi">array::popi</h1>
 <p>array::popi - remove the ith element from an array</p>
-<h3 id="synopsis-31">SYNOPSIS</h3>
+<h3 id="synopsis-32">SYNOPSIS</h3>
 <p>array::popi <em>A</em> <em>i</em> [<em>x</em>]</p>
-<h3 id="description-31">DESCRIPTION</h3>
+<h3 id="description-32">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable <em>i</em> an index and <em>x</em>
 a variable, <code>array::popi</code> sets <em>x</em> to the ith element
 from <em>A</em> before removing it. If <em>i</em> is negative, the
@@ -2579,9 +2605,9 @@ $ echo &quot;${x}&quot;
 <p><code>array::pop(1)</code>, <code>array::shift(1)</code></p>
 <h1 id="arraypush">array::push</h1>
 <p>array::push - add one or more elements to the end of an array</p>
-<h3 id="synopsis-32">SYNOPSIS</h3>
+<h3 id="synopsis-33">SYNOPSIS</h3>
 <p>array::push <em>A</em> [<em>x</em> …]</p>
-<h3 id="description-32">DESCRIPTION</h3>
+<h3 id="description-33">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable <em>x</em> a value,
 <code>array::push</code> adds <em>x</em> at the end of <em>A</em>.</p>
 <p><code>array::push</code> returns 0 upon success, &gt;0 otherwise.</p>
@@ -2592,9 +2618,9 @@ $ echo &quot;${A[-1]}&quot;
 12</code></pre>
 <h1 id="arrayreduce">array::reduce</h1>
 <p>array::reduce - perform a summary operation of an array</p>
-<h3 id="synopsis-33">SYNOPSIS</h3>
+<h3 id="synopsis-34">SYNOPSIS</h3>
 <p>array::reduce <em>A</em> <em>fun</em> <em>acc</em></p>
-<h3 id="description-33">DESCRIPTION</h3>
+<h3 id="description-34">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <em>fun</em> a bash function that
 aggregates <code>$1</code> and <code>$2</code> and prints the result to
 <code>stdout</code> and <em>acc</em> a variable,
@@ -2614,9 +2640,9 @@ $ echo &quot;${acc}&quot;
 <p><code>array::map(1)</code></p>
 <h1 id="arrayreverse">array::reverse</h1>
 <p>array::reverse - reverse an array in place</p>
-<h3 id="synopsis-34">SYNOPSIS</h3>
+<h3 id="synopsis-35">SYNOPSIS</h3>
 <p>array::reverse <em>A</em></p>
-<h3 id="description-34">DESCRIPTION</h3>
+<h3 id="description-35">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <code>array::reverse</code>
 reverses <em>A</em> in place.</p>
 <p><code>array::reverse</code> returns 0 upon success, &gt;0
@@ -2629,9 +2655,9 @@ $ echo &quot;${A[@]}&quot;
 <h1 id="arrayrotate">array::rotate</h1>
 <p>array::rotate - shift elements of an array to the specified
 positions</p>
-<h3 id="synopsis-35">SYNOPSIS</h3>
+<h3 id="synopsis-36">SYNOPSIS</h3>
 <p>array::rotate <em>A</em> <em>i</em></p>
-<h3 id="description-35">DESCRIPTION</h3>
+<h3 id="description-36">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>i</em> an integer,
 <code>array::rotate</code> shifts elements of <em>A</em> to the
 specified positions. If <em>i</em> is positive, cycling is done from
@@ -2639,16 +2665,16 @@ right to left, if <em>i</em> is negative, cycling occurs from left to
 right.</p>
 <p><code>array::rotate</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="examples-20">EXAMPLES</h3>
+<h3 id="examples-21">EXAMPLES</h3>
 <pre><code>$ declare -a A=( {1..8} )
 $ array::rotate A -10
 $ echo &quot;${A[@]}&quot;
 3 4 5 6 7 8 1 2</code></pre>
 <h1 id="arrayshift">array::shift</h1>
 <p>array::shift - remove the first element of an array</p>
-<h3 id="synopsis-36">SYNOPSIS</h3>
+<h3 id="synopsis-37">SYNOPSIS</h3>
 <p>array::shift <em>A</em> [<em>x</em>]</p>
-<h3 id="description-36">DESCRIPTION</h3>
+<h3 id="description-37">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>x</em> a variable,
 <code>array::shift</code> removes the first element of <em>A</em> and
 sets <em>x</em> to it. If <em>x</em> is not given, it defaults to
@@ -2664,9 +2690,9 @@ $ (( x == 1 )) &amp;&amp; echo &quot;${A[@]}&quot;
 <p><code>array::popi(1)</code></p>
 <h1 id="arrayshuffle">array::shuffle</h1>
 <p>array::shuffle - randomly reorder elements of an array</p>
-<h3 id="synopsis-37">SYNOPSIS</h3>
+<h3 id="synopsis-38">SYNOPSIS</h3>
 <p>array::shuffle <em>A</em></p>
-<h3 id="description-37">DESCRIPTION</h3>
+<h3 id="description-38">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <code>array::shuffle</code>
 performs in place a modern fisher-yates shuffling.</p>
 <p><code>array::shuffle</code> returns 0 upon success, &gt;0
@@ -2680,22 +2706,22 @@ $ echo &quot;${A[@]}&quot;
 <p>https://en.wikipedia.org/wiki/Fisher–Yates_shuffle#Modern_method</p>
 <h1 id="arraysort">array::sort</h1>
 <p>array::sort - sort elements of an array in place</p>
-<h3 id="synopsis-38">SYNOPSIS</h3>
+<h3 id="synopsis-39">SYNOPSIS</h3>
 <p>array::sort <em>A</em></p>
-<h3 id="description-38">DESCRIPTION</h3>
+<h3 id="description-39">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <code>array::sort</code> in place
 sorts the array.</p>
 <p><code>array::sort</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="examples-21">EXAMPLES</h3>
+<h3 id="examples-22">EXAMPLES</h3>
 <pre><code>$ declare -a A=( 8 7 5 6 3 4 1 2 )
 $ array::sort A
 $ echo &quot;${A[@]}&quot;
 1 2 3 4 5 6 7 8</code></pre>
 <h1 id="arraysplit">array::split</h1>
 <p>array::split - build an array from a split string</p>
-<h3 id="synopsis-39">SYNOPSIS</h3>
+<h3 id="synopsis-40">SYNOPSIS</h3>
 <p>array::split <em>A</em> <em>str</em> <em>sep</em></p>
-<h3 id="description-39">DESCRIPTION</h3>
+<h3 id="description-40">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <em>str</em> and <em>sep</em> two
 strings, <code>array::split</code> divides <em>str</em> into an ordered
 list of substrings by searching for <em>sep</em>, puts these substrings
@@ -2709,13 +2735,13 @@ $ echo &quot;${A[@]}&quot;
 apples oranges pears grapes</code></pre>
 <h1 id="arrayuniq">array::uniq</h1>
 <p>array::uniq - deduplicate elements of an array</p>
-<h3 id="synopsis-40">SYNOPSIS</h3>
+<h3 id="synopsis-41">SYNOPSIS</h3>
 <p>array::uniq <em>A</em></p>
-<h3 id="description-40">DESCRIPTION</h3>
+<h3 id="description-41">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <code>array:uniq</code>
 deduplicates elements in place.</p>
 <p><code>array::uniq</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="examples-22">EXAMPLES</h3>
+<h3 id="examples-23">EXAMPLES</h3>
 <pre><code>$ declare -a A=( {1..8} )
 $ A+=( &quot;${A[@]}&quot; )  # duplicate array items
 $ echo &quot;${A[@]}&quot;
@@ -2726,9 +2752,9 @@ $ echo &quot;${A[@]}&quot;
 <h1 id="arrayunshift">array::unshift</h1>
 <p>array::unshift - add one or more elements to the beginning of an
 array</p>
-<h3 id="synopsis-41">SYNOPSIS</h3>
+<h3 id="synopsis-42">SYNOPSIS</h3>
 <p>array::unshift <em>A</em> [<em>x</em> …]</p>
-<h3 id="description-41">DESCRIPTION</h3>
+<h3 id="description-42">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and a list of values <em>x</em>,
 <code>array::unshift</code> adds them to the beginning of <em>A</em></p>
 <p><code>array::unshift</code> returns 0 upon success, &gt;0
@@ -2740,9 +2766,9 @@ $ echo &quot;${A[@]}&quot;
 1 2 3 4 5 6 7 8</code></pre>
 <h1 id="arrayzip">array::zip</h1>
 <p>array::zip - merge two arrays in a dictionary</p>
-<h3 id="synopsis-42">SYNOPSIS</h3>
+<h3 id="synopsis-43">SYNOPSIS</h3>
 <p>array::zip <em>D</em> <em>K</em> <em>V</em></p>
-<h3 id="description-42">DESCRIPTION</h3>
+<h3 id="description-43">DESCRIPTION</h3>
 <p>With <em>D</em> an dictionary (ie. associative array), <em>K</em> and
 <em>V</em> two arrays, <code>array::zip</code> merges the arrays into a
 dict where keys are taken from <em>K</em> ans associated to values taken
@@ -2757,9 +2783,9 @@ $ declare -p D
 D=([e]=&quot;5&quot; [d]=&quot;4&quot; [c]=&quot;3&quot; [b]=&quot;2&quot; [a]=&quot;1&quot; )</code></pre>
 <h1 id="checkcmd">check::cmd</h1>
 <p>check::cmd - check if a command is available</p>
-<h3 id="synopsis-43">SYNOPSIS</h3>
+<h3 id="synopsis-44">SYNOPSIS</h3>
 <p>check::cmd [<em>cmd</em> …]</p>
-<h3 id="description-43">DESCRIPTION</h3>
+<h3 id="description-44">DESCRIPTION</h3>
 <p>With a list of <em>cmd</em>, <code>check::cmd</code> verify that
 <em>cmd</em> is executable.</p>
 <p><code>check::cmd</code> returns 0 if <em>cmd</em> is executable,
@@ -2769,9 +2795,9 @@ D=([e]=&quot;5&quot; [d]=&quot;4&quot; [c]=&quot;3&quot; [b]=&quot;2&quot; [a]=&
 ls and cat are available</code></pre>
 <h1 id="checkdir">check::dir</h1>
 <p>check::dir - ensure a directory exists</p>
-<h3 id="synopsis-44">SYNOPSIS</h3>
+<h3 id="synopsis-45">SYNOPSIS</h3>
 <p>check::dir [<em>dir</em> …]</p>
-<h3 id="description-44">DESCRIPTION</h3>
+<h3 id="description-45">DESCRIPTION</h3>
 <p>With <em>dir</em> a directory, <code>check::dir</code> ensures that
 it exists, if not it creates it.</p>
 <p><code>check::dir</code> returns 0 if <em>dir</em> exists or has been
@@ -2780,9 +2806,9 @@ created, &gt;0 otherwise.</p>
 <pre><code>$ check::dir /usr /tmp/mydir</code></pre>
 <h1 id="checkvartype">check::vartype</h1>
 <p>check::vartype - check variable attributes</p>
-<h3 id="synopsis-45">SYNOPSIS</h3>
+<h3 id="synopsis-46">SYNOPSIS</h3>
 <p>check::vartype <em>attrs</em> <em>var</em></p>
-<h3 id="description-45">DESCRIPTION</h3>
+<h3 id="description-46">DESCRIPTION</h3>
 <p>With <em>attrs</em> an attribute string and <em>var</em> a variable,
 <code>check::vartype</code> checks if <em>var</em> has set
 <em>attrs</em>. It does NOT check the content of <em>var</em>.</p>
@@ -2858,7 +2884,7 @@ nameref and more, <em>var</em> is dereferenced before checking for more
 <em>attrs</em> than <em>n</em>.</p>
 <p><code>check::vartype</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="examples-23">EXAMPLES</h3>
+<h3 id="examples-24">EXAMPLES</h3>
 <pre><code>$ declare -a ARR=()
 $ declare -n _A=ARR
 $ check::vartype nas _A &amp;&amp; echo OK
@@ -2870,9 +2896,9 @@ NOK</code></pre>
 <p>builtin <code>declare</code></p>
 <h1 id="curldownload">curl::download</h1>
 <p>curl::download - download a file from an URL and print stats</p>
-<h3 id="synopsis-46">SYNOPSIS</h3>
+<h3 id="synopsis-47">SYNOPSIS</h3>
 <p>curl::download <em>url</em> <em>dest</em></p>
-<h3 id="description-46">DESCRIPTION</h3>
+<h3 id="description-47">DESCRIPTION</h3>
 <p>With <em>dest</em> being a filename, <code>curl::download</code>
 prints a downloading digest that contains the size and md5 hash of the
 downloaded file.</p>
@@ -2888,9 +2914,9 @@ otherwise.</p>
 <p><code>curl(1)</code></p>
 <h1 id="funlist">funlist</h1>
 <p>funlist - list all declared functions</p>
-<h3 id="synopsis-47">SYNOPSIS</h3>
+<h3 id="synopsis-48">SYNOPSIS</h3>
 <p>funlist</p>
-<h3 id="description-47">DESCRIPTION</h3>
+<h3 id="description-48">DESCRIPTION</h3>
 <p><code>funlist</code> is part of bashkit module extras, it lists all
 declared functions by the time of calling.</p>
 <h3 id="example-28">EXAMPLE</h3>
@@ -2904,9 +2930,9 @@ declared functions by the time of calling.</p>
   ...</code></pre>
 <h1 id="isint">isint</h1>
 <p>isint - test for integers</p>
-<h3 id="synopsis-48">SYNOPSIS</h3>
+<h3 id="synopsis-49">SYNOPSIS</h3>
 <p>isint [<em>x</em> …]</p>
-<h3 id="description-48">DESCRIPTION</h3>
+<h3 id="description-49">DESCRIPTION</h3>
 <p><code>isint</code> is part of bashkit module <code>extras</code>,
 given <em>x</em> a value, it tests if <em>x</em> is an integer.</p>
 <p><code>isint</code> returns 0 if all <em>x</em> are integers, &gt;0
@@ -2917,23 +2943,23 @@ otherwise.</p>
   $ yes</code></pre>
 <h1 id="join">join</h1>
 <p>join - build a string of arguments separated by a given character</p>
-<h3 id="synopsis-49">SYNOPSIS</h3>
+<h3 id="synopsis-50">SYNOPSIS</h3>
 <p>join <em>sep</em> <em>arg</em> [<em>arg</em> …]</p>
-<h3 id="description-49">DESCRIPTION</h3>
+<h3 id="description-50">DESCRIPTION</h3>
 <p><code>join</code> is part of bashkit module <code>extras</code>,
 given <em>sep</em> a single character and <em>arg</em> a list of
 arbitrary strings, it builds a string with all <em>args</em> separated
 by <em>sep</em>.</p>
-<h3 id="examples-24">EXAMPLES</h3>
+<h3 id="examples-25">EXAMPLES</h3>
 <pre><code>  $ join &quot;,&quot; a b c d
   a,b,c,d
   $ join &quot;:&quot; a
   a</code></pre>
 <h1 id="now">now</h1>
 <p>now - get the number of milliseconds elapsed since EPOCH</p>
-<h3 id="synopsis-50">SYNOPSIS</h3>
+<h3 id="synopsis-51">SYNOPSIS</h3>
 <p>now [<em>dest</em>]</p>
-<h3 id="description-50">DESCRIPTION</h3>
+<h3 id="description-51">DESCRIPTION</h3>
 <p><code>now</code> is part of bashkit module <code>extras</code>, it
 sets <em>dest</em> var to the number of milliseconds elapsed since
 EPOCH. If <em>dest</em> is omitted, <code>now</code> sets the special
@@ -2946,9 +2972,9 @@ variable <code>$__</code>.</p>
   1008</code></pre>
 <h1 id="progress">progress</h1>
 <p>progress - display a progress bar</p>
-<h3 id="synopsis-51">SYNOPSIS</h3>
+<h3 id="synopsis-52">SYNOPSIS</h3>
 <p>progress <em>percent</em> <em>total</em></p>
-<h3 id="description-51">DESCRIPTION</h3>
+<h3 id="description-52">DESCRIPTION</h3>
 <p><code>progress</code> is part of bashkit module <code>extras</code>,
 given two integers <em>percent</em> and <em>total</em>, it displays a
 progress bar. This bar has a len of <em>total</em> dashes.</p>
@@ -2961,9 +2987,9 @@ progress bar. This bar has a len of <em>total</em> dashes.</p>
   [--------------------]</code></pre>
 <h1 id="urldecode">urldecode</h1>
 <p>urldecode - percent decode a string</p>
-<h3 id="synopsis-52">SYNOPSIS</h3>
+<h3 id="synopsis-53">SYNOPSIS</h3>
 <p>urldecode <em>url</em></p>
-<h3 id="description-52">DESCRIPTION</h3>
+<h3 id="description-53">DESCRIPTION</h3>
 <p><code>urldecode</code> is part of bashkit module <code>extras</code>,
 given a percent-encoded <em>url</em>, it restores it to its original
 form.</p>
@@ -2975,9 +3001,9 @@ https://github.com/dylanaraps/pure-bash-bible</code></pre>
 <p><code>urlencode(1)</code></p>
 <h1 id="urlencode">urlencode</h1>
 <p>urlencode - percent encode a string</p>
-<h3 id="synopsis-53">SYNOPSIS</h3>
+<h3 id="synopsis-54">SYNOPSIS</h3>
 <p>urlencode <em>url</em></p>
-<h3 id="description-53">DESCRIPTION</h3>
+<h3 id="description-54">DESCRIPTION</h3>
 <p><code>urlencode</code> is part of bashkit module <code>extras</code>,
 given an <em>url</em> string, it displays a percent encoded version of
 it.</p>
@@ -2989,9 +3015,9 @@ https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible</code></pre>
 <p><code>urldecode(1)</code></p>
 <h1 id="usleep">usleep</h1>
 <p>usleep - micro sleep</p>
-<h3 id="synopsis-54">SYNOPSIS</h3>
+<h3 id="synopsis-55">SYNOPSIS</h3>
 <p>usleep [<em>n</em>]</p>
-<h3 id="description-54">DESCRIPTION</h3>
+<h3 id="description-55">DESCRIPTION</h3>
 <p><code>usleep</code> is part of bashkit module <code>extras</code>, it
 waits for a delay proportional to <em>n</em>. When <em>n</em> is
 omitted, it defaults to 1.</p>
@@ -2999,9 +3025,9 @@ omitted, it defaults to 1.</p>
 <pre><code>$ usleep 10</code></pre>
 <h1 id="interactiveyesno">interactive::yesno</h1>
 <p>interactive::yesno - ask a yes/no question to the user</p>
-<h3 id="synopsis-55">SYNOPSIS</h3>
+<h3 id="synopsis-56">SYNOPSIS</h3>
 <p>interactive::yesno <em>question</em> [<em>default</em>]</p>
-<h3 id="description-55">DESCRIPTION</h3>
+<h3 id="description-56">DESCRIPTION</h3>
 <p><code>interactive::yesno</code> displays <em>question</em> and wait
 for the user to answer, if <em>default</em> is given, it is used if the
 user simply presses <code>ENTER</code>.</p>
@@ -3012,9 +3038,9 @@ user simply presses <code>ENTER</code>.</p>
 are you happy? [YES/no]:</code></pre>
 <h1 id="jsonfrom_toml">json::from_toml</h1>
 <p>json::from_toml - convert toml to json</p>
-<h3 id="synopsis-56">SYNOPSIS</h3>
+<h3 id="synopsis-57">SYNOPSIS</h3>
 <p>json::from_toml <em>toml</em></p>
-<h3 id="description-56">DESCRIPTION</h3>
+<h3 id="description-57">DESCRIPTION</h3>
 <p>Given a <em>toml</em> string, <code>json::from_toml</code> converts
 it to JSON.</p>
 <p><code>json::from_toml</code> returns 0 upon success, &gt;0
@@ -3023,9 +3049,9 @@ otherwise.</p>
 <p><code>json::to_toml(1)</code></p>
 <h1 id="jsonfrom_yaml">json::from_yaml</h1>
 <p>json::from_yaml - convert yaml to json</p>
-<h3 id="synopsis-57">SYNOPSIS</h3>
+<h3 id="synopsis-58">SYNOPSIS</h3>
 <p>json::from_yaml <em>yaml</em></p>
-<h3 id="description-57">DESCRIPTION</h3>
+<h3 id="description-58">DESCRIPTION</h3>
 <p>Given a <em>yaml</em> string, <code>json::from_yaml</code> converts
 it to json.</p>
 <p><code>json::from_yaml</code> returns 0 upon success, &gt;0
@@ -3034,9 +3060,9 @@ otherwise.</p>
 <p><code>json::to_yaml(1)</code></p>
 <h1 id="jsoninto_array">json::into_array</h1>
 <p>json::into_array - load a json array into a bash array</p>
-<h3 id="synopsis-58">SYNOPSIS</h3>
+<h3 id="synopsis-59">SYNOPSIS</h3>
 <p>json::into_array <em>A</em> <em>jarr</em></p>
-<h3 id="description-58">DESCRIPTION</h3>
+<h3 id="description-59">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>jarr</em> a string
 representing a json array, <code>json::into_array</code> loads
 <em>jarr</em> content into <em>A</em>.</p>
@@ -3052,9 +3078,9 @@ a b 3 7</code></pre>
 <p><code>json::into_dict(1)</code></p>
 <h1 id="jsoninto_dict">json::into_dict</h1>
 <p>json::into_dict - load a json dictionary into a bash one</p>
-<h3 id="synopsis-59">SYNOPSIS</h3>
+<h3 id="synopsis-60">SYNOPSIS</h3>
 <p>json::into_dict <em>D</em> <em>jdict</em></p>
-<h3 id="description-59">DESCRIPTION</h3>
+<h3 id="description-60">DESCRIPTION</h3>
 <p>With <em>D</em> an associative array variable and <em>jdict</em> a
 json dictionary, <code>json::into_dict</code> loads <em>jdict</em>
 content into <em>D</em>. It does NOT recurse because bash does not
@@ -3073,9 +3099,9 @@ $ echo &quot;${D[7]}&quot;
 <p><code>json::into_array(1)</code></p>
 <h1 id="jsonto_toml">json::to_toml</h1>
 <p>json::to_toml - convert json to toml</p>
-<h3 id="synopsis-60">SYNOPSIS</h3>
+<h3 id="synopsis-61">SYNOPSIS</h3>
 <p>json::to_toml <em>fd</em></p>
-<h3 id="description-60">DESCRIPTION</h3>
+<h3 id="description-61">DESCRIPTION</h3>
 <p>With <em>fd</em> a file descriptor, <code>json::to_toml</code> reads
 json from <em>fd</em> and prints the resulting toml to
 <code>stdout</code>.</p>
@@ -3087,9 +3113,9 @@ otherwise.</p>
 <p><code>json::from_toml(1)</code></p>
 <h1 id="jsonto_yaml">json::to_yaml</h1>
 <p>json::to_yaml - convert json to toml</p>
-<h3 id="synopsis-61">SYNOPSIS</h3>
+<h3 id="synopsis-62">SYNOPSIS</h3>
 <p>json::to_yaml <em>fd</em></p>
-<h3 id="description-61">DESCRIPTION</h3>
+<h3 id="description-62">DESCRIPTION</h3>
 <p>With <em>fd</em> a file descriptor, <code>json::to_yaml</code> reads
 json from <em>fd</em> and prints the resulting yaml to
 <code>stdout</code>.</p>
@@ -3101,9 +3127,9 @@ otherwise.</p>
 <p><code>json::from_yaml(1)</code></p>
 <h1 id="patchapply">patch::apply</h1>
 <p>patch::apply - apply a patch</p>
-<h3 id="synopsis-62">SYNOPSIS</h3>
+<h3 id="synopsis-63">SYNOPSIS</h3>
 <p>patch::apply <em>dir</em> <em>patch</em></p>
-<h3 id="description-62">DESCRIPTION</h3>
+<h3 id="description-63">DESCRIPTION</h3>
 <p>Witn <em>dir</em> a destination directory and <em>patch</em> a patch
 file, <code>patch::apply</code> applies modification from <em>patch</em>
 to <em>dir</em> files.</p>
@@ -3117,9 +3143,9 @@ otherwise.</p>
 <h1 id="patchbatch">patch::batch</h1>
 <p>patch::batch - apply all patches from a patch directory onto files in
 a target directory</p>
-<h3 id="synopsis-63">SYNOPSIS</h3>
+<h3 id="synopsis-64">SYNOPSIS</h3>
 <p>patch::batch <em>target</em> <em>patches</em></p>
-<h3 id="description-63">DESCRIPTION</h3>
+<h3 id="description-64">DESCRIPTION</h3>
 <p>Witn <em>target</em> a destination directory and <em>patches</em> a
 patch directory, <code>patch::batch</code> applies modification from
 <em>patches</em> to <em>target</em> files.</p>
@@ -3132,9 +3158,9 @@ otherwise.</p>
 <code>patch::apply(1)</code></p>
 <h1 id="permsgid">perms::gid</h1>
 <p>perms::gid - convert group name to gid</p>
-<h3 id="synopsis-64">SYNOPSIS</h3>
+<h3 id="synopsis-65">SYNOPSIS</h3>
 <p>perms::gid <em>group</em></p>
-<h3 id="description-64">DESCRIPTION</h3>
+<h3 id="description-65">DESCRIPTION</h3>
 <p>With <em>group</em> a group name as given by <code>id -g</code>,
 <code>perms::gid</code> converts it to a gid integer as given by
 <code>id -gn</code>.</p>
@@ -3147,9 +3173,9 @@ error otherwise.</p>
 <p><code>id(1)</code>, <code>perms::uid(1)</code></p>
 <h1 id="permsmode">perms::mode</h1>
 <p>perms::mode - convert symbolic file mode to absolute notation</p>
-<h3 id="synopsis-65">SYNOPSIS</h3>
+<h3 id="synopsis-66">SYNOPSIS</h3>
 <p>perms::mode <em>mode</em></p>
-<h3 id="description-65">DESCRIPTION</h3>
+<h3 id="description-66">DESCRIPTION</h3>
 <p>With <em>mode</em> an absolute mode as defined in
 <code>chmod(1)</code>, <code>perms::mode</code> convert it to its
 absolute representation.</p>
@@ -3161,9 +3187,9 @@ absolute representation.</p>
 <p><code>chmod(1)</code></p>
 <h1 id="permsuid">perms::uid</h1>
 <p>perms::uid - convert user name to uid</p>
-<h3 id="synopsis-66">SYNOPSIS</h3>
+<h3 id="synopsis-67">SYNOPSIS</h3>
 <p>perms::uid <em>user</em></p>
-<h3 id="description-66">DESCRIPTION</h3>
+<h3 id="description-67">DESCRIPTION</h3>
 <p>With <em>user</em> a user name as given by <code>id -u</code>,
 <code>perms::uid</code> converts it to an uid integer as given by
 <code>id -un</code>.</p>
@@ -3176,9 +3202,9 @@ error otherwise.</p>
 <p><code>id(1)</code>, <code>perms::gid(1)</code></p>
 <h1 id="readlinkf">readlinkf</h1>
 <p>readlinkf - display symbolic link target status</p>
-<h3 id="synopsis-67">SYNOPSIS</h3>
+<h3 id="synopsis-68">SYNOPSIS</h3>
 <p>readlinkf <em>filelink</em></p>
-<h3 id="description-67">DESCRIPTION</h3>
+<h3 id="description-68">DESCRIPTION</h3>
 <p>With <em>filelink</em> a symbolic link, <code>readlinkf</code>
 resolves paths and displays the corresponding absolute pathname.</p>
 <p><code>readlinkf</code> returns 0 upon success, &gt;0 otherwise.</p>
@@ -3186,9 +3212,9 @@ resolves paths and displays the corresponding absolute pathname.</p>
 <p><code>readlink(1)</code>, https://github.com/ko1nksm/readlinkf</p>
 <h1 id="shoptpop">shopt::pop</h1>
 <p>shopt::pop - restores previous shopt context</p>
-<h3 id="synopsis-68">SYNOPSIS</h3>
+<h3 id="synopsis-69">SYNOPSIS</h3>
 <p>shopt::pop</p>
-<h3 id="description-68">DESCRIPTION</h3>
+<h3 id="description-69">DESCRIPTION</h3>
 <p><code>shopt::pop</code> restores a builtin <code>shopt</code> context
 previously created by calling <code>shopt::push(1)</code>.</p>
 <p><code>shopt::pop</code> always succeeds and returns 0.</p>
@@ -3201,9 +3227,9 @@ $ shopt::pop</code></pre>
 <p>builtin <code>shopt</code>, <code>shopt::push(1)</code></p>
 <h1 id="shoptpush">shopt::push</h1>
 <p>shopt::push - create a new shopt context</p>
-<h3 id="synopsis-69">SYNOPSIS</h3>
+<h3 id="synopsis-70">SYNOPSIS</h3>
 <p>shopt::push</p>
-<h3 id="description-69">DESCRIPTION</h3>
+<h3 id="description-70">DESCRIPTION</h3>
 <p><code>shopt::push</code> creates a new <code>shopt</code> context
 that can be modified and discarded later by a call to
 <code>shopt::pop(1)</code>.</p>
@@ -3217,13 +3243,13 @@ $ shopt::pop</code></pre>
 <p>builtin <code>shopt</code>, <code>shopt::push(1)</code></p>
 <h1 id="stringlstrip">string::lstrip</h1>
 <p>string::lstrip - remove pattern from start of string</p>
-<h3 id="synopsis-70">SYNOPSIS</h3>
+<h3 id="synopsis-71">SYNOPSIS</h3>
 <p>string::lstrip <em>str</em> <em>pat</em></p>
-<h3 id="description-70">DESCRIPTION</h3>
+<h3 id="description-71">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>pat</em> two strings,
 <code>string::lstrip</code> removes <em>pat</em> occuring at
 <em>str</em> start (or left side).</p>
-<h3 id="examples-25">EXAMPLES</h3>
+<h3 id="examples-26">EXAMPLES</h3>
 <pre><code>$ string::lstrip &#39;The Quick Brown Fox&#39; &#39;The &#39;
 Quick Brown Fox</code></pre>
 <h3 id="see-also-50">SEE ALSO</h3>
@@ -3231,9 +3257,9 @@ Quick Brown Fox</code></pre>
 <code>string::stripall(1)</code></p>
 <h1 id="stringregex">string::regex</h1>
 <p>string::regex - match string against regular expression</p>
-<h3 id="synopsis-71">SYNOPSIS</h3>
+<h3 id="synopsis-72">SYNOPSIS</h3>
 <p>string::regex <em>str</em> <em>rex</em></p>
-<h3 id="description-71">DESCRIPTION</h3>
+<h3 id="description-72">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>rex</em> two strings,
 <code>string::regex</code> matches <em>str</em> again regular expression
 <em>rex</em> and displays the matching part of <em>str</em>.</p>
@@ -3243,9 +3269,9 @@ Quick Brown Fox</code></pre>
 hello</code></pre>
 <h1 id="stringrstrip">string::rstrip</h1>
 <p>string::rstrip - remove pattern from end of string</p>
-<h3 id="synopsis-72">SYNOPSIS</h3>
+<h3 id="synopsis-73">SYNOPSIS</h3>
 <p>string::rstrip <em>str</em> <em>pat</em></p>
-<h3 id="description-72">DESCRIPTION</h3>
+<h3 id="description-73">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>pat</em> two strings,
 <code>string::rstrip</code> removes <em>pat</em> occuring at
 <em>str</em> end (or right side).</p>
@@ -3258,9 +3284,9 @@ The Quick Brown</code></pre>
 <h1 id="stringsplit">string::split</h1>
 <p>string::split - extract substrings delimited by a separator from
 string</p>
-<h3 id="synopsis-73">SYNOPSIS</h3>
+<h3 id="synopsis-74">SYNOPSIS</h3>
 <p>string::split <em>str</em> <em>sep</em></p>
-<h3 id="description-73">DESCRIPTION</h3>
+<h3 id="description-74">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>sep</em>, two strings,
 <code>string::split</code> splits <em>str</em> on <em>sep</em>
 occurences.</p>
@@ -3269,9 +3295,9 @@ occurences.</p>
 apples oranges pears grapes</code></pre>
 <h1 id="stringstrip">string::strip</h1>
 <p>string::strip - remove first occuring pattern from string</p>
-<h3 id="synopsis-74">SYNOPSIS</h3>
+<h3 id="synopsis-75">SYNOPSIS</h3>
 <p>string::strip <em>str</em> <em>pat</em></p>
-<h3 id="description-74">DESCRIPTION</h3>
+<h3 id="description-75">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>pat</em> two strings,
 <code>string::strip</code> removes the first occurence of <em>pat</em>
 in <em>str</em>.</p>
@@ -3283,9 +3309,9 @@ Th Quick Brown Fox</code></pre>
 <code>string::rstrip(1)</code></p>
 <h1 id="stringstripall">string::stripall</h1>
 <p>string::stripall - remove pattern from string</p>
-<h3 id="synopsis-75">SYNOPSIS</h3>
+<h3 id="synopsis-76">SYNOPSIS</h3>
 <p>string::stripall <em>str</em> <em>pat</em></p>
-<h3 id="description-75">DESCRIPTION</h3>
+<h3 id="description-76">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>pat</em> two strings,
 <code>string::stripall</code> removes all occurences of <em>pat</em> in
 <em>str</em>.</p>
@@ -3297,9 +3323,9 @@ Th Quck Brwn Fx</code></pre>
 <code>string::rstrip(1)</code></p>
 <h1 id="stringtrim">string::trim</h1>
 <p>string::trim - remove leadind and trailing spaces from string</p>
-<h3 id="synopsis-76">SYNOPSIS</h3>
+<h3 id="synopsis-77">SYNOPSIS</h3>
 <p>string::trim <em>str</em></p>
-<h3 id="description-76">DESCRIPTION</h3>
+<h3 id="description-77">DESCRIPTION</h3>
 <p><code>string::trim</code> removes all leading and trailing spaces
 from string <em>str</em>.</p>
 <h3 id="example-52">EXAMPLE</h3>
