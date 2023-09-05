@@ -9,9 +9,6 @@
   <title>Bashkit</title>
   <style>
     html {
-      line-height: 1.5;
-      font-family: Georgia, serif;
-      font-size: 20px;
       color: #1a1a1a;
       background-color: #fdfdfd;
     }
@@ -30,13 +27,16 @@
     @media (max-width: 600px) {
       body {
         font-size: 0.9em;
-        padding: 1em;
+        padding: 12px;
       }
       h1 {
         font-size: 1.8em;
       }
     }
     @media print {
+      html {
+        background-color: white;
+      }
       body {
         background-color: transparent;
         color: black;
@@ -60,6 +60,10 @@
       color: #1a1a1a;
     }
     img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
       max-width: 100%;
     }
     h1, h2, h3, h4, h5, h6 {
@@ -97,9 +101,10 @@
       margin-bottom: 0.5em;
     }
     code {
-      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
       font-size: 85%;
       margin: 0;
+      hyphens: manual;
     }
     pre {
       margin: 1em 0;
@@ -164,12 +169,17 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
     ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
     pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -233,7 +243,6 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
     /*
      * Custom CSS file. Override it as you like.
      *
@@ -648,6 +657,9 @@ id="toc-loggingsetlevel">logging::setlevel</a></li>
 <li><a href="#trapcallback"
 id="toc-trapcallback">trap::callback</a></li>
 <li><a href="#cleanup" id="toc-cleanup">cleanup</a></li>
+<li><a href="#section" id="toc-section"></a></li>
+<li><a href="#section-1" id="toc-section-1"></a></li>
+<li><a href="#section-2" id="toc-section-2"></a></li>
 <li><a href="#arraycontains"
 id="toc-arraycontains">array::contains</a></li>
 <li><a href="#arrayinter" id="toc-arrayinter">array::inter</a></li>
@@ -713,6 +725,9 @@ id="toc-stringrstrip">string::rstrip</a></li>
 <li><a href="#stringstripall"
 id="toc-stringstripall">string::stripall</a></li>
 <li><a href="#stringtrim" id="toc-stringtrim">string::trim</a></li>
+<li><a href="#semvercompare"
+id="toc-semvercompare">semver::compare</a></li>
+<li><a href="#semverparse" id="toc-semverparse">semver::parse</a></li>
 </ul>
 </nav>
 <h1 id="what-is-bashkit">What is bashkit</h1>
@@ -1206,7 +1221,7 @@ class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><
 <span id="cb10-5"><a href="#cb10-5"></a><span class="kw">}</span></span>
 <span id="cb10-6"><a href="#cb10-6"></a></span>
 <span id="cb10-7"><a href="#cb10-7"></a><span class="ex">bash-5.2$</span> bash <span class="at">-c</span> <span class="st">&#39;source bashkit.bash; check_cmd(){... ; check_cmd inexistent&#39;</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a><span class="ex">2022-10-17</span> 16:18:02+0200 [error] bash:1<span class="kw">|</span> <span class="ex">inexistent</span> not found</span></code></pre></div>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="ex">2022-10-17</span> 16:18:02+0200 <span class="pp">[</span><span class="ss">error</span><span class="pp">]</span> bash:1<span class="kw">|</span> <span class="ex">inexistent</span> not found</span></code></pre></div>
 <p>It is slightly better but still lacks some genericity: what if we
 just want to know if a command exists and proceed with a workaround if
 not? Enter <code>raise</code> that ultimately enables more efficient
@@ -2496,11 +2511,88 @@ goodbye world!
 $ touch /tmp/tmpfile &amp;&amp; cleanup &#39;rm -f /tmp/tmpfile&#39;</code></pre>
 <h3 id="see-also-25">SEE ALSO</h3>
 <p>builtin <code>trap</code>, <code>trap::callback(1)</code></p>
+<p>% VERSION::BASHKIT(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="section"></h1>
+<p>version::bashkit - get current bashkit version</p>
+<h3 id="synopsis-27">SYNOPSIS</h3>
+<p>version::bashkit [VAR]</p>
+<h3 id="description-27">DESCRIPTION</h3>
+<p>The version is stored in special bashkit variable <code>$__</code> or
+in <code>$VAR</code> if present.</p>
+<p><code>version::bashkit</code> creates a semver compatible version
+string in the form <code>compat.date.commit[.branch][.hash]</code>.</p>
+<ul>
+<li><code>compat</code> compatibility, is changed in case of breaking
+changes</li>
+<li><code>date</code> month and year release date, inform on available
+features</li>
+<li><code>commit</code> unique version number</li>
+<li><code>branch</code> only if not default, which branch was used to
+release bashkit</li>
+<li><code>hash</code> only if local files changed, see
+<code>state(1)</code></li>
+</ul>
+<h3 id="example-12">EXAMPLE</h3>
+<pre><code>$ version::bashkit &amp;&amp; echo &quot;${__}&quot;
+1.2210.230</code></pre>
+<h3 id="see-also-26">SEE ALSO</h3>
+<p><code>version::state(1)</code></p>
+<h3 id="colophon">COLOPHON</h3>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% VERSION::STATE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="section-1"></h1>
+<p>version::state - get local bashkit version state</p>
+<h3 id="synopsis-28">SYNOPSIS</h3>
+<p>version::state [VAR]</p>
+<h3 id="description-28">DESCRIPTION</h3>
+<p>The state is stored in special bashkit variable <code>$__</code> or
+in <code>$VAR</code> if present.</p>
+<p><code>version::state</code> outputs a string containing local files
+version information, and is the input of <code>hash</code> version field
+see <code>version::bashkit(1)</code>.</p>
+<p><code>version::state</code> outputs nothing if local files are not
+modified.</p>
+<h3 id="example-13">EXAMPLE</h3>
+<pre><code>$ version::state &amp;&amp; echo &quot;${__}&quot;
+changed_version.bash ...</code></pre>
+<h3 id="see-also-27">SEE ALSO</h3>
+<p><code>version::bashkit(1)</code></p>
+<h3 id="colophon-1">COLOPHON</h3>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
+<p>% VERSION::UPDATE(1) Bashkit User Manuals % Wuage % October 2022</p>
+<h1 id="section-2"></h1>
+<p>version::update - set current bashkit version</p>
+<h3 id="synopsis-29">SYNOPSIS</h3>
+<p>version::update</p>
+<h3 id="description-29">DESCRIPTION</h3>
+<p><code>version::update</code> is intended to be used by bashkit
+developers, it allows updating <code>version.bash</code> with current
+version informations.</p>
+<p><code>version::update</code> generates values for both
+<code>version::bashkit(1)</code> and <code>version::state(1)</code>.</p>
+<h3 id="example-14">EXAMPLE</h3>
+<pre><code>$ version::update</code></pre>
+<h3 id="see-also-28">SEE ALSO</h3>
+<p><code>version::bashkit(1)</code> <code>version::state(1)</code></p>
+<h3 id="colophon-2">COLOPHON</h3>
+<p>This page is part of the wuage bashkit framework. Source code and all
+documentation maybe downloaded from <a href="http://bashkit.wuage.org"
+class="uri">http://bashkit.wuage.org</a></p>
+<p>The <code>doc</code> directory distributed with <code>bashkit</code>
+contains full documentation.</p>
 <h1 id="arraycontains">array::contains</h1>
 <p>array::contains - test if an array contains a given value</p>
-<h3 id="synopsis-27">SYNOPSIS</h3>
+<h3 id="synopsis-30">SYNOPSIS</h3>
 <p>array::contains <em>A</em> <em>x</em> [<em>idx</em>]</p>
-<h3 id="description-27">DESCRIPTION</h3>
+<h3 id="description-30">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <em>x</em> a value and
 <em>idx</em> a variable, <code>array::contains</code> test if <em>x</em>
 exists in <em>A</em> and set <em>idx</em> to <em>x</em> index. If
@@ -2508,7 +2600,7 @@ exists in <em>A</em> and set <em>idx</em> to <em>x</em> index. If
 <code>$__</code>.</p>
 <p><code>array::contains</code> returns 0 if <em>x</em> in <em>A</em>,
 &gt;0 otherwise or if an error occurs.</p>
-<h3 id="example-12">EXAMPLE</h3>
+<h3 id="example-15">EXAMPLE</h3>
 <pre><code>$ declare -a ARRAY=( 1 2 3 4 )
 $ array::contains ARRAY 2 idx
 $ echo $?
@@ -2517,15 +2609,15 @@ $ echo &quot;${ARRAY[idx]}&quot;
 2</code></pre>
 <h1 id="arrayinter">array::inter</h1>
 <p>array::inter - intersect two arrays</p>
-<h3 id="synopsis-28">SYNOPSIS</h3>
+<h3 id="synopsis-31">SYNOPSIS</h3>
 <p>array::inter <em>A</em> <em>B</em></p>
-<h3 id="description-28">DESCRIPTION</h3>
+<h3 id="description-31">DESCRIPTION</h3>
 <p>With <em>A</em> et <em>B</em> array variables,
 <code>array::inter</code> intersects <em>A</em> and <em>B</em> and set
 the resulting array in <em>A</em>.</p>
 <p><code>array::inter</code> returns 0 unless wrong arguments or error
 &gt;0.</p>
-<h3 id="example-13">EXAMPLE</h3>
+<h3 id="example-16">EXAMPLE</h3>
 <pre><code>$ declare -a A=( hello world 1 2 3 4 )
 $ declare -a B=( 3 4 5 6 goodbye world )
 $ array::inter A B
@@ -2533,9 +2625,9 @@ $ echo &quot;${A[@]}&quot;
 3 4 world</code></pre>
 <h1 id="arraymap">array::map</h1>
 <p>array::map - apply a function to an array elements</p>
-<h3 id="synopsis-29">SYNOPSIS</h3>
+<h3 id="synopsis-32">SYNOPSIS</h3>
 <p>array::map <em>A</em> <em>fun</em></p>
-<h3 id="description-29">DESCRIPTION</h3>
+<h3 id="description-32">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>fun</em> a bash function
 that transforms <code>$1</code> and prints the result to
 <code>stdout</code>, <code>array::map</code> applies <em>fun</em> in
@@ -2547,80 +2639,80 @@ $ up(){ echo ${1^^}; }
 $ array::map A up
 $ echo &quot;${A[@]}&quot;
 A B C D E</code></pre>
-<h3 id="see-also-26">SEE ALSO</h3>
+<h3 id="see-also-29">SEE ALSO</h3>
 <p><code>array::reduce(1)</code></p>
 <h1 id="arraypick">array::pick</h1>
 <p>array::pick - pick a random array element</p>
-<h3 id="synopsis-30">SYNOPSIS</h3>
+<h3 id="synopsis-33">SYNOPSIS</h3>
 <p>array::pick <em>A</em> [<em>x</em>]</p>
-<h3 id="description-30">DESCRIPTION</h3>
+<h3 id="description-33">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>x</em> a variable,
 <code>array::pick</code> sets <em>x</em> to a random element of
 <em>A</em>. If <em>x</em> is not specified, it defaults to the special
 variable <code>$__</code>.</p>
 <p><code>array::pick</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="example-14">EXAMPLE</h3>
+<h3 id="example-17">EXAMPLE</h3>
 <pre><code>$ declare -a A=( 1 2 3 4 )
 $ array::pick A x
 $ echo &quot;${x}&quot;
 3</code></pre>
 <h1 id="arraypop">array::pop</h1>
 <p>array::pop - remove the last element from an array</p>
-<h3 id="synopsis-31">SYNOPSIS</h3>
+<h3 id="synopsis-34">SYNOPSIS</h3>
 <p>array::pop <em>A</em> [<em>x</em>]</p>
-<h3 id="description-31">DESCRIPTION</h3>
+<h3 id="description-34">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>x</em> a variable,
 <code>array::pop</code> sets <em>x</em> to the last element from
 <em>A</em> before removing it. If <em>x</em> is not specified, it
 defaults to the special variable <code>$__</code>.</p>
 <p><code>array::pop</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="example-15">EXAMPLE</h3>
+<h3 id="example-18">EXAMPLE</h3>
 <pre><code>$ declare -a A=( 1 2 3 4 )
 $ array::pop A x
 $ echo &quot;${A[@]}&quot;
 1 2 3
 $ echo &quot;${x}&quot;
 4</code></pre>
-<h3 id="see-also-27">SEE ALSO</h3>
+<h3 id="see-also-30">SEE ALSO</h3>
 <p><code>array::popi(1)</code></p>
 <h1 id="arraypopi">array::popi</h1>
 <p>array::popi - remove the ith element from an array</p>
-<h3 id="synopsis-32">SYNOPSIS</h3>
+<h3 id="synopsis-35">SYNOPSIS</h3>
 <p>array::popi <em>A</em> <em>i</em> [<em>x</em>]</p>
-<h3 id="description-32">DESCRIPTION</h3>
+<h3 id="description-35">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable <em>i</em> an index and <em>x</em>
 a variable, <code>array::popi</code> sets <em>x</em> to the ith element
 from <em>A</em> before removing it. If <em>i</em> is negative, the
 element is removed starting from the end of <em>A</em>. If <em>x</em> is
 not specified, it defaults to the special variable <code>$__</code>.</p>
 <p><code>array::popi</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="example-16">EXAMPLE</h3>
+<h3 id="example-19">EXAMPLE</h3>
 <pre><code>$ declare -a A=( 1 2 3 4 )
 $ array::popi A 2 x
 $ echo &quot;${A[@]}&quot;
 1 2 4
 $ echo &quot;${x}&quot;
 3</code></pre>
-<h3 id="see-also-28">SEE ALSO</h3>
+<h3 id="see-also-31">SEE ALSO</h3>
 <p><code>array::pop(1)</code>, <code>array::shift(1)</code></p>
 <h1 id="arraypush">array::push</h1>
 <p>array::push - add one or more elements to the end of an array</p>
-<h3 id="synopsis-33">SYNOPSIS</h3>
+<h3 id="synopsis-36">SYNOPSIS</h3>
 <p>array::push <em>A</em> [<em>x</em> …]</p>
-<h3 id="description-33">DESCRIPTION</h3>
+<h3 id="description-36">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable <em>x</em> a value,
 <code>array::push</code> adds <em>x</em> at the end of <em>A</em>.</p>
 <p><code>array::push</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="example-17">EXAMPLE</h3>
+<h3 id="example-20">EXAMPLE</h3>
 <pre><code>$ declare -a A=( {1..11} )
 $ array::push A 12
 $ echo &quot;${A[-1]}&quot;
 12</code></pre>
 <h1 id="arrayreduce">array::reduce</h1>
 <p>array::reduce - perform a summary operation of an array</p>
-<h3 id="synopsis-34">SYNOPSIS</h3>
+<h3 id="synopsis-37">SYNOPSIS</h3>
 <p>array::reduce <em>A</em> <em>fun</em> <em>acc</em></p>
-<h3 id="description-34">DESCRIPTION</h3>
+<h3 id="description-37">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <em>fun</em> a bash function that
 aggregates <code>$1</code> and <code>$2</code> and prints the result to
 <code>stdout</code> and <em>acc</em> a variable,
@@ -2629,25 +2721,25 @@ repetitively aplying <code>fun acc x</code> for <em>x</em> in
 <em>A</em>.</p>
 <p><code>array::reduce</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-18">EXAMPLE</h3>
+<h3 id="example-21">EXAMPLE</h3>
 <pre><code>$ declare -a A=( {1..8} )
 $ add() { echo $(( $1 + $2 )); }
 $ acc=0
 $ array::reduce A add acc
 $ echo &quot;${acc}&quot;
 36</code></pre>
-<h3 id="see-also-29">SEE ALSO</h3>
+<h3 id="see-also-32">SEE ALSO</h3>
 <p><code>array::map(1)</code></p>
 <h1 id="arrayreverse">array::reverse</h1>
 <p>array::reverse - reverse an array in place</p>
-<h3 id="synopsis-35">SYNOPSIS</h3>
+<h3 id="synopsis-38">SYNOPSIS</h3>
 <p>array::reverse <em>A</em></p>
-<h3 id="description-35">DESCRIPTION</h3>
+<h3 id="description-38">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <code>array::reverse</code>
 reverses <em>A</em> in place.</p>
 <p><code>array::reverse</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-19">EXAMPLE</h3>
+<h3 id="example-22">EXAMPLE</h3>
 <pre><code>$ declare -a A=( {1..11} )
 $ array::reverse A
 $ echo &quot;${A[@]}&quot;
@@ -2655,9 +2747,9 @@ $ echo &quot;${A[@]}&quot;
 <h1 id="arrayrotate">array::rotate</h1>
 <p>array::rotate - shift elements of an array to the specified
 positions</p>
-<h3 id="synopsis-36">SYNOPSIS</h3>
+<h3 id="synopsis-39">SYNOPSIS</h3>
 <p>array::rotate <em>A</em> <em>i</em></p>
-<h3 id="description-36">DESCRIPTION</h3>
+<h3 id="description-39">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>i</em> an integer,
 <code>array::rotate</code> shifts elements of <em>A</em> to the
 specified positions. If <em>i</em> is positive, cycling is done from
@@ -2672,43 +2764,43 @@ $ echo &quot;${A[@]}&quot;
 3 4 5 6 7 8 1 2</code></pre>
 <h1 id="arrayshift">array::shift</h1>
 <p>array::shift - remove the first element of an array</p>
-<h3 id="synopsis-37">SYNOPSIS</h3>
+<h3 id="synopsis-40">SYNOPSIS</h3>
 <p>array::shift <em>A</em> [<em>x</em>]</p>
-<h3 id="description-37">DESCRIPTION</h3>
+<h3 id="description-40">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>x</em> a variable,
 <code>array::shift</code> removes the first element of <em>A</em> and
 sets <em>x</em> to it. If <em>x</em> is not given, it defaults to
 special variable <code>$__</code>.</p>
 <p><code>array::shift</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-20">EXAMPLE</h3>
+<h3 id="example-23">EXAMPLE</h3>
 <pre><code>$ declare -a A=( {1..8} )
 $ array::shift A x
 $ (( x == 1 )) &amp;&amp; echo &quot;${A[@]}&quot;
 2 3 4 5 6 7 8</code></pre>
-<h3 id="see-also-30">SEE ALSO</h3>
+<h3 id="see-also-33">SEE ALSO</h3>
 <p><code>array::popi(1)</code></p>
 <h1 id="arrayshuffle">array::shuffle</h1>
 <p>array::shuffle - randomly reorder elements of an array</p>
-<h3 id="synopsis-38">SYNOPSIS</h3>
+<h3 id="synopsis-41">SYNOPSIS</h3>
 <p>array::shuffle <em>A</em></p>
-<h3 id="description-38">DESCRIPTION</h3>
+<h3 id="description-41">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <code>array::shuffle</code>
 performs in place a modern fisher-yates shuffling.</p>
 <p><code>array::shuffle</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-21">EXAMPLE</h3>
+<h3 id="example-24">EXAMPLE</h3>
 <pre><code>$ declare -a A=( {1..8} )
 $ array::shuffle A
 $ echo &quot;${A[@]}&quot;
 7 6 2 1 3 4 5 8</code></pre>
-<h3 id="see-also-31">SEE ALSO</h3>
+<h3 id="see-also-34">SEE ALSO</h3>
 <p>https://en.wikipedia.org/wiki/Fisher–Yates_shuffle#Modern_method</p>
 <h1 id="arraysort">array::sort</h1>
 <p>array::sort - sort elements of an array in place</p>
-<h3 id="synopsis-39">SYNOPSIS</h3>
+<h3 id="synopsis-42">SYNOPSIS</h3>
 <p>array::sort <em>A</em></p>
-<h3 id="description-39">DESCRIPTION</h3>
+<h3 id="description-42">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <code>array::sort</code> in place
 sorts the array.</p>
 <p><code>array::sort</code> returns 0 upon success, &gt;0 otherwise.</p>
@@ -2719,25 +2811,25 @@ $ echo &quot;${A[@]}&quot;
 1 2 3 4 5 6 7 8</code></pre>
 <h1 id="arraysplit">array::split</h1>
 <p>array::split - build an array from a split string</p>
-<h3 id="synopsis-40">SYNOPSIS</h3>
+<h3 id="synopsis-43">SYNOPSIS</h3>
 <p>array::split <em>A</em> <em>str</em> <em>sep</em></p>
-<h3 id="description-40">DESCRIPTION</h3>
+<h3 id="description-43">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <em>str</em> and <em>sep</em> two
 strings, <code>array::split</code> divides <em>str</em> into an ordered
 list of substrings by searching for <em>sep</em>, puts these substrings
 in <em>A</em>.</p>
 <p><code>array::split</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-22">EXAMPLE</h3>
+<h3 id="example-25">EXAMPLE</h3>
 <pre><code>$ declare -a A
 $ array::split A &#39;apples,oranges,pears,grapes&#39; &#39;,&#39;
 $ echo &quot;${A[@]}&quot;
 apples oranges pears grapes</code></pre>
 <h1 id="arrayuniq">array::uniq</h1>
 <p>array::uniq - deduplicate elements of an array</p>
-<h3 id="synopsis-41">SYNOPSIS</h3>
+<h3 id="synopsis-44">SYNOPSIS</h3>
 <p>array::uniq <em>A</em></p>
-<h3 id="description-41">DESCRIPTION</h3>
+<h3 id="description-44">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable, <code>array:uniq</code>
 deduplicates elements in place.</p>
 <p><code>array::uniq</code> returns 0 upon success, &gt;0 otherwise.</p>
@@ -2752,29 +2844,29 @@ $ echo &quot;${A[@]}&quot;
 <h1 id="arrayunshift">array::unshift</h1>
 <p>array::unshift - add one or more elements to the beginning of an
 array</p>
-<h3 id="synopsis-42">SYNOPSIS</h3>
+<h3 id="synopsis-45">SYNOPSIS</h3>
 <p>array::unshift <em>A</em> [<em>x</em> …]</p>
-<h3 id="description-42">DESCRIPTION</h3>
+<h3 id="description-45">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and a list of values <em>x</em>,
 <code>array::unshift</code> adds them to the beginning of <em>A</em></p>
 <p><code>array::unshift</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-23">EXAMPLE</h3>
+<h3 id="example-26">EXAMPLE</h3>
 <pre><code>$ declare -a A=( {4..8} )
 $ array::unshift A 1 2 3
 $ echo &quot;${A[@]}&quot;
 1 2 3 4 5 6 7 8</code></pre>
 <h1 id="arrayzip">array::zip</h1>
 <p>array::zip - merge two arrays in a dictionary</p>
-<h3 id="synopsis-43">SYNOPSIS</h3>
+<h3 id="synopsis-46">SYNOPSIS</h3>
 <p>array::zip <em>D</em> <em>K</em> <em>V</em></p>
-<h3 id="description-43">DESCRIPTION</h3>
+<h3 id="description-46">DESCRIPTION</h3>
 <p>With <em>D</em> an dictionary (ie. associative array), <em>K</em> and
 <em>V</em> two arrays, <code>array::zip</code> merges the arrays into a
 dict where keys are taken from <em>K</em> ans associated to values taken
 in turn from <em>V</em>.</p>
 <p><code>array::zip</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="example-24">EXAMPLE</h3>
+<h3 id="example-27">EXAMPLE</h3>
 <pre><code>$ declare -A D
 $ declare -a K=( {a..e} )
 $ declare -a V=( {1..8} )
@@ -2783,32 +2875,32 @@ $ declare -p D
 D=([e]=&quot;5&quot; [d]=&quot;4&quot; [c]=&quot;3&quot; [b]=&quot;2&quot; [a]=&quot;1&quot; )</code></pre>
 <h1 id="checkcmd">check::cmd</h1>
 <p>check::cmd - check if a command is available</p>
-<h3 id="synopsis-44">SYNOPSIS</h3>
+<h3 id="synopsis-47">SYNOPSIS</h3>
 <p>check::cmd [<em>cmd</em> …]</p>
-<h3 id="description-44">DESCRIPTION</h3>
+<h3 id="description-47">DESCRIPTION</h3>
 <p>With a list of <em>cmd</em>, <code>check::cmd</code> verify that
 <em>cmd</em> is executable.</p>
 <p><code>check::cmd</code> returns 0 if <em>cmd</em> is executable,
 &gt;0 otherwise.</p>
-<h3 id="example-25">EXAMPLE</h3>
+<h3 id="example-28">EXAMPLE</h3>
 <pre><code>$ check::cmd ls cat &amp;&amp; echo &quot;ls and cat are available&quot;
 ls and cat are available</code></pre>
 <h1 id="checkdir">check::dir</h1>
 <p>check::dir - ensure a directory exists</p>
-<h3 id="synopsis-45">SYNOPSIS</h3>
+<h3 id="synopsis-48">SYNOPSIS</h3>
 <p>check::dir [<em>dir</em> …]</p>
-<h3 id="description-45">DESCRIPTION</h3>
+<h3 id="description-48">DESCRIPTION</h3>
 <p>With <em>dir</em> a directory, <code>check::dir</code> ensures that
 it exists, if not it creates it.</p>
 <p><code>check::dir</code> returns 0 if <em>dir</em> exists or has been
 created, &gt;0 otherwise.</p>
-<h3 id="example-26">EXAMPLE</h3>
+<h3 id="example-29">EXAMPLE</h3>
 <pre><code>$ check::dir /usr /tmp/mydir</code></pre>
 <h1 id="checkvartype">check::vartype</h1>
 <p>check::vartype - check variable attributes</p>
-<h3 id="synopsis-46">SYNOPSIS</h3>
+<h3 id="synopsis-49">SYNOPSIS</h3>
 <p>check::vartype <em>attrs</em> <em>var</em></p>
-<h3 id="description-46">DESCRIPTION</h3>
+<h3 id="description-49">DESCRIPTION</h3>
 <p>With <em>attrs</em> an attribute string and <em>var</em> a variable,
 <code>check::vartype</code> checks if <em>var</em> has set
 <em>attrs</em>. It does NOT check the content of <em>var</em>.</p>
@@ -2892,13 +2984,13 @@ OK
 $ n=0  # no integer attribute
 $ check::vartype i n || echo NOK
 NOK</code></pre>
-<h3 id="see-also-32">SEE ALSO</h3>
+<h3 id="see-also-35">SEE ALSO</h3>
 <p>builtin <code>declare</code></p>
 <h1 id="curldownload">curl::download</h1>
 <p>curl::download - download a file from an URL and print stats</p>
-<h3 id="synopsis-47">SYNOPSIS</h3>
+<h3 id="synopsis-50">SYNOPSIS</h3>
 <p>curl::download <em>url</em> <em>dest</em></p>
-<h3 id="description-47">DESCRIPTION</h3>
+<h3 id="description-50">DESCRIPTION</h3>
 <p>With <em>dest</em> being a filename, <code>curl::download</code>
 prints a downloading digest that contains the size and md5 hash of the
 downloaded file.</p>
@@ -2908,18 +3000,18 @@ continue-at | - | | fail | | | location | | | retry | 5 | | retry-delay
 | 0 | | retry-max-time | 40 | | show-error | | | silent | |</p>
 <p><code>curl::download</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-27">EXAMPLE</h3>
+<h3 id="example-30">EXAMPLE</h3>
 <pre><code>$ curl::download http://example.com &quot;${tmpfile}&quot;</code></pre>
-<h3 id="see-also-33">SEE ALSO</h3>
+<h3 id="see-also-36">SEE ALSO</h3>
 <p><code>curl(1)</code></p>
 <h1 id="funlist">funlist</h1>
 <p>funlist - list all declared functions</p>
-<h3 id="synopsis-48">SYNOPSIS</h3>
+<h3 id="synopsis-51">SYNOPSIS</h3>
 <p>funlist</p>
-<h3 id="description-48">DESCRIPTION</h3>
+<h3 id="description-51">DESCRIPTION</h3>
 <p><code>funlist</code> is part of bashkit module extras, it lists all
 declared functions by the time of calling.</p>
-<h3 id="example-28">EXAMPLE</h3>
+<h3 id="example-31">EXAMPLE</h3>
 <pre><code>  $ funlist
   __unhandled
   alert
@@ -2930,22 +3022,22 @@ declared functions by the time of calling.</p>
   ...</code></pre>
 <h1 id="isint">isint</h1>
 <p>isint - test for integers</p>
-<h3 id="synopsis-49">SYNOPSIS</h3>
+<h3 id="synopsis-52">SYNOPSIS</h3>
 <p>isint [<em>x</em> …]</p>
-<h3 id="description-49">DESCRIPTION</h3>
+<h3 id="description-52">DESCRIPTION</h3>
 <p><code>isint</code> is part of bashkit module <code>extras</code>,
 given <em>x</em> a value, it tests if <em>x</em> is an integer.</p>
 <p><code>isint</code> returns 0 if all <em>x</em> are integers, &gt;0
 otherwise.</p>
-<h3 id="example-29">EXAMPLE</h3>
+<h3 id="example-32">EXAMPLE</h3>
 <pre><code>  $ n=10
   $ isint &quot;${n}&quot; 1 2 3 4 || echo yes
   $ yes</code></pre>
 <h1 id="join">join</h1>
 <p>join - build a string of arguments separated by a given character</p>
-<h3 id="synopsis-50">SYNOPSIS</h3>
+<h3 id="synopsis-53">SYNOPSIS</h3>
 <p>join <em>sep</em> <em>arg</em> [<em>arg</em> …]</p>
-<h3 id="description-50">DESCRIPTION</h3>
+<h3 id="description-53">DESCRIPTION</h3>
 <p><code>join</code> is part of bashkit module <code>extras</code>,
 given <em>sep</em> a single character and <em>arg</em> a list of
 arbitrary strings, it builds a string with all <em>args</em> separated
@@ -2957,14 +3049,14 @@ by <em>sep</em>.</p>
   a</code></pre>
 <h1 id="now">now</h1>
 <p>now - get the number of milliseconds elapsed since EPOCH</p>
-<h3 id="synopsis-51">SYNOPSIS</h3>
+<h3 id="synopsis-54">SYNOPSIS</h3>
 <p>now [<em>dest</em>]</p>
-<h3 id="description-51">DESCRIPTION</h3>
+<h3 id="description-54">DESCRIPTION</h3>
 <p><code>now</code> is part of bashkit module <code>extras</code>, it
 sets <em>dest</em> var to the number of milliseconds elapsed since
 EPOCH. If <em>dest</em> is omitted, <code>now</code> sets the special
 variable <code>$__</code>.</p>
-<h3 id="example-30">EXAMPLE</h3>
+<h3 id="example-33">EXAMPLE</h3>
 <pre><code>  $ now start
   $ sleep 1
   $ now end
@@ -2972,13 +3064,13 @@ variable <code>$__</code>.</p>
   1008</code></pre>
 <h1 id="progress">progress</h1>
 <p>progress - display a progress bar</p>
-<h3 id="synopsis-52">SYNOPSIS</h3>
+<h3 id="synopsis-55">SYNOPSIS</h3>
 <p>progress <em>percent</em> <em>total</em></p>
-<h3 id="description-52">DESCRIPTION</h3>
+<h3 id="description-55">DESCRIPTION</h3>
 <p><code>progress</code> is part of bashkit module <code>extras</code>,
 given two integers <em>percent</em> and <em>total</em>, it displays a
 progress bar. This bar has a len of <em>total</em> dashes.</p>
-<h3 id="example-31">EXAMPLE</h3>
+<h3 id="example-34">EXAMPLE</h3>
 <pre><code>  $ for (( i=0; i&lt;=100; i++ )); do
   &gt;   usleep 5
   &gt;   progress &quot;${i}&quot; 20
@@ -2987,107 +3079,107 @@ progress bar. This bar has a len of <em>total</em> dashes.</p>
   [--------------------]</code></pre>
 <h1 id="urldecode">urldecode</h1>
 <p>urldecode - percent decode a string</p>
-<h3 id="synopsis-53">SYNOPSIS</h3>
+<h3 id="synopsis-56">SYNOPSIS</h3>
 <p>urldecode <em>url</em></p>
-<h3 id="description-53">DESCRIPTION</h3>
+<h3 id="description-56">DESCRIPTION</h3>
 <p><code>urldecode</code> is part of bashkit module <code>extras</code>,
 given a percent-encoded <em>url</em>, it restores it to its original
 form.</p>
 <p><code>urldecode</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="example-32">EXAMPLE</h3>
+<h3 id="example-35">EXAMPLE</h3>
 <pre><code>$ urldecode &quot;https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible&quot;
 https://github.com/dylanaraps/pure-bash-bible</code></pre>
-<h3 id="see-also-34">SEE ALSO</h3>
+<h3 id="see-also-37">SEE ALSO</h3>
 <p><code>urlencode(1)</code></p>
 <h1 id="urlencode">urlencode</h1>
 <p>urlencode - percent encode a string</p>
-<h3 id="synopsis-54">SYNOPSIS</h3>
+<h3 id="synopsis-57">SYNOPSIS</h3>
 <p>urlencode <em>url</em></p>
-<h3 id="description-54">DESCRIPTION</h3>
+<h3 id="description-57">DESCRIPTION</h3>
 <p><code>urlencode</code> is part of bashkit module <code>extras</code>,
 given an <em>url</em> string, it displays a percent encoded version of
 it.</p>
 <p><code>urlencode</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="example-33">EXAMPLE</h3>
+<h3 id="example-36">EXAMPLE</h3>
 <pre><code>$ urlencode &quot;https://github.com/dylanaraps/pure-bash-bible&quot;
 https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible</code></pre>
-<h3 id="see-also-35">SEE ALSO</h3>
+<h3 id="see-also-38">SEE ALSO</h3>
 <p><code>urldecode(1)</code></p>
 <h1 id="usleep">usleep</h1>
 <p>usleep - micro sleep</p>
-<h3 id="synopsis-55">SYNOPSIS</h3>
+<h3 id="synopsis-58">SYNOPSIS</h3>
 <p>usleep [<em>n</em>]</p>
-<h3 id="description-55">DESCRIPTION</h3>
+<h3 id="description-58">DESCRIPTION</h3>
 <p><code>usleep</code> is part of bashkit module <code>extras</code>, it
 waits for a delay proportional to <em>n</em>. When <em>n</em> is
 omitted, it defaults to 1.</p>
-<h3 id="example-34">EXAMPLE</h3>
+<h3 id="example-37">EXAMPLE</h3>
 <pre><code>$ usleep 10</code></pre>
 <h1 id="interactiveyesno">interactive::yesno</h1>
 <p>interactive::yesno - ask a yes/no question to the user</p>
-<h3 id="synopsis-56">SYNOPSIS</h3>
+<h3 id="synopsis-59">SYNOPSIS</h3>
 <p>interactive::yesno <em>question</em> [<em>default</em>]</p>
-<h3 id="description-56">DESCRIPTION</h3>
+<h3 id="description-59">DESCRIPTION</h3>
 <p><code>interactive::yesno</code> displays <em>question</em> and wait
 for the user to answer, if <em>default</em> is given, it is used if the
 user simply presses <code>ENTER</code>.</p>
 <p><code>interactive::yesno</code> returns 0 when user answers
 <code>yes</code>, &gt;0 otherwise</p>
-<h3 id="example-35">EXAMPLE</h3>
+<h3 id="example-38">EXAMPLE</h3>
 <pre><code>$ interactive::yesno &quot;are you happy?&quot; y
 are you happy? [YES/no]:</code></pre>
 <h1 id="jsonfrom_toml">json::from_toml</h1>
 <p>json::from_toml - convert toml to json</p>
-<h3 id="synopsis-57">SYNOPSIS</h3>
+<h3 id="synopsis-60">SYNOPSIS</h3>
 <p>json::from_toml <em>toml</em></p>
-<h3 id="description-57">DESCRIPTION</h3>
+<h3 id="description-60">DESCRIPTION</h3>
 <p>Given a <em>toml</em> string, <code>json::from_toml</code> converts
 it to JSON.</p>
 <p><code>json::from_toml</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="see-also-36">SEE ALSO</h3>
+<h3 id="see-also-39">SEE ALSO</h3>
 <p><code>json::to_toml(1)</code></p>
 <h1 id="jsonfrom_yaml">json::from_yaml</h1>
 <p>json::from_yaml - convert yaml to json</p>
-<h3 id="synopsis-58">SYNOPSIS</h3>
+<h3 id="synopsis-61">SYNOPSIS</h3>
 <p>json::from_yaml <em>yaml</em></p>
-<h3 id="description-58">DESCRIPTION</h3>
+<h3 id="description-61">DESCRIPTION</h3>
 <p>Given a <em>yaml</em> string, <code>json::from_yaml</code> converts
 it to json.</p>
 <p><code>json::from_yaml</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="see-also-37">SEE ALSO</h3>
+<h3 id="see-also-40">SEE ALSO</h3>
 <p><code>json::to_yaml(1)</code></p>
 <h1 id="jsoninto_array">json::into_array</h1>
 <p>json::into_array - load a json array into a bash array</p>
-<h3 id="synopsis-59">SYNOPSIS</h3>
+<h3 id="synopsis-62">SYNOPSIS</h3>
 <p>json::into_array <em>A</em> <em>jarr</em></p>
-<h3 id="description-59">DESCRIPTION</h3>
+<h3 id="description-62">DESCRIPTION</h3>
 <p>With <em>A</em> an array variable and <em>jarr</em> a string
 representing a json array, <code>json::into_array</code> loads
 <em>jarr</em> content into <em>A</em>.</p>
 <p><code>json::into_array</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-36">EXAMPLE</h3>
+<h3 id="example-39">EXAMPLE</h3>
 <pre><code>$ json=&#39;[&quot;a&quot;, &quot;b&quot;, 3, 7]&#39;
 $ declare -a A
 $ json::into_array A &lt;&lt;&lt; &quot;${json}&quot;
 $ echo &quot;${A[@]}&quot;
 a b 3 7</code></pre>
-<h3 id="see-also-38">SEE ALSO</h3>
+<h3 id="see-also-41">SEE ALSO</h3>
 <p><code>json::into_dict(1)</code></p>
 <h1 id="jsoninto_dict">json::into_dict</h1>
 <p>json::into_dict - load a json dictionary into a bash one</p>
-<h3 id="synopsis-60">SYNOPSIS</h3>
+<h3 id="synopsis-63">SYNOPSIS</h3>
 <p>json::into_dict <em>D</em> <em>jdict</em></p>
-<h3 id="description-60">DESCRIPTION</h3>
+<h3 id="description-63">DESCRIPTION</h3>
 <p>With <em>D</em> an associative array variable and <em>jdict</em> a
 json dictionary, <code>json::into_dict</code> loads <em>jdict</em>
 content into <em>D</em>. It does NOT recurse because bash does not
 support nested dictionaries.</p>
 <p><code>json::into_dict</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-37">EXAMPLE</h3>
+<h3 id="example-40">EXAMPLE</h3>
 <pre><code>$ json=&#39;{&quot;a&quot;: 3, &quot;7&quot;: { &quot;sub&quot;: [3, true, &quot;x&quot;] }}&#39;
 $ declare -A D
 $ json::into_dict D &lt;&lt;&lt; &quot;${json}&quot;
@@ -3095,240 +3187,278 @@ $ echo &quot;${!D[@]}
 a 7
 $ echo &quot;${D[7]}&quot;
 { &quot;sub&quot;: [3, true, &quot;x&quot;] }</code></pre>
-<h3 id="see-also-39">SEE ALSO</h3>
+<h3 id="see-also-42">SEE ALSO</h3>
 <p><code>json::into_array(1)</code></p>
 <h1 id="jsonto_toml">json::to_toml</h1>
 <p>json::to_toml - convert json to toml</p>
-<h3 id="synopsis-61">SYNOPSIS</h3>
+<h3 id="synopsis-64">SYNOPSIS</h3>
 <p>json::to_toml <em>fd</em></p>
-<h3 id="description-61">DESCRIPTION</h3>
+<h3 id="description-64">DESCRIPTION</h3>
 <p>With <em>fd</em> a file descriptor, <code>json::to_toml</code> reads
 json from <em>fd</em> and prints the resulting toml to
 <code>stdout</code>.</p>
 <p><code>json::to_toml</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-38">EXAMPLE</h3>
+<h3 id="example-41">EXAMPLE</h3>
 <pre><code>$ printf &#39;%s\n&#39; &quot;${json}&quot; | json::to_toml /dev/stdin</code></pre>
-<h3 id="see-also-40">SEE ALSO</h3>
+<h3 id="see-also-43">SEE ALSO</h3>
 <p><code>json::from_toml(1)</code></p>
 <h1 id="jsonto_yaml">json::to_yaml</h1>
 <p>json::to_yaml - convert json to toml</p>
-<h3 id="synopsis-62">SYNOPSIS</h3>
+<h3 id="synopsis-65">SYNOPSIS</h3>
 <p>json::to_yaml <em>fd</em></p>
-<h3 id="description-62">DESCRIPTION</h3>
+<h3 id="description-65">DESCRIPTION</h3>
 <p>With <em>fd</em> a file descriptor, <code>json::to_yaml</code> reads
 json from <em>fd</em> and prints the resulting yaml to
 <code>stdout</code>.</p>
 <p><code>json::to_yaml</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-39">EXAMPLE</h3>
+<h3 id="example-42">EXAMPLE</h3>
 <pre><code>$ printf &#39;%s\n&#39; &quot;${json}&quot; | json::to_yaml /dev/stdin</code></pre>
-<h3 id="see-also-41">SEE ALSO</h3>
+<h3 id="see-also-44">SEE ALSO</h3>
 <p><code>json::from_yaml(1)</code></p>
 <h1 id="patchapply">patch::apply</h1>
 <p>patch::apply - apply a patch</p>
-<h3 id="synopsis-63">SYNOPSIS</h3>
+<h3 id="synopsis-66">SYNOPSIS</h3>
 <p>patch::apply <em>dir</em> <em>patch</em></p>
-<h3 id="description-63">DESCRIPTION</h3>
+<h3 id="description-66">DESCRIPTION</h3>
 <p>Witn <em>dir</em> a destination directory and <em>patch</em> a patch
 file, <code>patch::apply</code> applies modification from <em>patch</em>
 to <em>dir</em> files.</p>
 <p><code>patch::apply</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-40">EXAMPLE</h3>
+<h3 id="example-43">EXAMPLE</h3>
 <pre><code>$ patch::apply &quot;${DIR}&quot; &quot;a.patch&quot;</code></pre>
-<h3 id="see-also-42">SEE ALSO</h3>
+<h3 id="see-also-45">SEE ALSO</h3>
 <p><code>diff(1)</code>, <code>patch(1)</code>,
 <code>patch::batch(1)</code></p>
 <h1 id="patchbatch">patch::batch</h1>
 <p>patch::batch - apply all patches from a patch directory onto files in
 a target directory</p>
-<h3 id="synopsis-64">SYNOPSIS</h3>
+<h3 id="synopsis-67">SYNOPSIS</h3>
 <p>patch::batch <em>target</em> <em>patches</em></p>
-<h3 id="description-64">DESCRIPTION</h3>
+<h3 id="description-67">DESCRIPTION</h3>
 <p>Witn <em>target</em> a destination directory and <em>patches</em> a
 patch directory, <code>patch::batch</code> applies modification from
 <em>patches</em> to <em>target</em> files.</p>
 <p><code>patch::batch</code> returns 0 upon success, &gt;0
 otherwise.</p>
-<h3 id="example-41">EXAMPLE</h3>
+<h3 id="example-44">EXAMPLE</h3>
 <pre><code>$ patch::batch &quot;${TARGET_DIR}&quot; &quot;${PATCH_DIR}&quot;</code></pre>
-<h3 id="see-also-43">SEE ALSO</h3>
+<h3 id="see-also-46">SEE ALSO</h3>
 <p><code>diff(1)</code>, <code>patch(1)</code>,
 <code>patch::apply(1)</code></p>
 <h1 id="permsgid">perms::gid</h1>
 <p>perms::gid - convert group name to gid</p>
-<h3 id="synopsis-65">SYNOPSIS</h3>
+<h3 id="synopsis-68">SYNOPSIS</h3>
 <p>perms::gid <em>group</em></p>
-<h3 id="description-65">DESCRIPTION</h3>
+<h3 id="description-68">DESCRIPTION</h3>
 <p>With <em>group</em> a group name as given by <code>id -g</code>,
 <code>perms::gid</code> converts it to a gid integer as given by
 <code>id -gn</code>.</p>
 <p><code>perms::gid</code> returns 0 upon success, &gt;0 and logs an
 error otherwise.</p>
-<h3 id="example-42">EXAMPLE</h3>
+<h3 id="example-45">EXAMPLE</h3>
 <pre><code>$ perms::gid wheel
 0</code></pre>
-<h3 id="see-also-44">SEE ALSO</h3>
+<h3 id="see-also-47">SEE ALSO</h3>
 <p><code>id(1)</code>, <code>perms::uid(1)</code></p>
 <h1 id="permsmode">perms::mode</h1>
 <p>perms::mode - convert symbolic file mode to absolute notation</p>
-<h3 id="synopsis-66">SYNOPSIS</h3>
+<h3 id="synopsis-69">SYNOPSIS</h3>
 <p>perms::mode <em>mode</em></p>
-<h3 id="description-66">DESCRIPTION</h3>
+<h3 id="description-69">DESCRIPTION</h3>
 <p>With <em>mode</em> an absolute mode as defined in
 <code>chmod(1)</code>, <code>perms::mode</code> convert it to its
 absolute representation.</p>
 <p><code>perms::mode</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="example-43">EXAMPLE</h3>
+<h3 id="example-46">EXAMPLE</h3>
 <pre><code>$ perms::mode &quot;-rw-r--r--&quot;
 0644</code></pre>
-<h3 id="see-also-45">SEE ALSO</h3>
+<h3 id="see-also-48">SEE ALSO</h3>
 <p><code>chmod(1)</code></p>
 <h1 id="permsuid">perms::uid</h1>
 <p>perms::uid - convert user name to uid</p>
-<h3 id="synopsis-67">SYNOPSIS</h3>
+<h3 id="synopsis-70">SYNOPSIS</h3>
 <p>perms::uid <em>user</em></p>
-<h3 id="description-67">DESCRIPTION</h3>
+<h3 id="description-70">DESCRIPTION</h3>
 <p>With <em>user</em> a user name as given by <code>id -u</code>,
 <code>perms::uid</code> converts it to an uid integer as given by
 <code>id -un</code>.</p>
 <p><code>perms::uid</code> returns 0 upon success, &gt;0 and logs an
 error otherwise.</p>
-<h3 id="example-44">EXAMPLE</h3>
+<h3 id="example-47">EXAMPLE</h3>
 <pre><code>$ perms::uid root
 0</code></pre>
-<h3 id="see-also-46">SEE ALSO</h3>
+<h3 id="see-also-49">SEE ALSO</h3>
 <p><code>id(1)</code>, <code>perms::gid(1)</code></p>
 <h1 id="readlinkf">readlinkf</h1>
 <p>readlinkf - display symbolic link target status</p>
-<h3 id="synopsis-68">SYNOPSIS</h3>
+<h3 id="synopsis-71">SYNOPSIS</h3>
 <p>readlinkf <em>filelink</em></p>
-<h3 id="description-68">DESCRIPTION</h3>
+<h3 id="description-71">DESCRIPTION</h3>
 <p>With <em>filelink</em> a symbolic link, <code>readlinkf</code>
 resolves paths and displays the corresponding absolute pathname.</p>
 <p><code>readlinkf</code> returns 0 upon success, &gt;0 otherwise.</p>
-<h3 id="see-also-47">SEE ALSO</h3>
+<h3 id="see-also-50">SEE ALSO</h3>
 <p><code>readlink(1)</code>, https://github.com/ko1nksm/readlinkf</p>
 <h1 id="shoptpop">shopt::pop</h1>
 <p>shopt::pop - restores previous shopt context</p>
-<h3 id="synopsis-69">SYNOPSIS</h3>
+<h3 id="synopsis-72">SYNOPSIS</h3>
 <p>shopt::pop</p>
-<h3 id="description-69">DESCRIPTION</h3>
+<h3 id="description-72">DESCRIPTION</h3>
 <p><code>shopt::pop</code> restores a builtin <code>shopt</code> context
 previously created by calling <code>shopt::push(1)</code>.</p>
 <p><code>shopt::pop</code> always succeeds and returns 0.</p>
-<h3 id="example-45">EXAMPLE</h3>
+<h3 id="example-48">EXAMPLE</h3>
 <pre><code>$ shopt::push
 $ shopt -s extdebug
 $ do_something_with_extdebug_on
 $ shopt::pop</code></pre>
-<h3 id="see-also-48">SEE ALSO</h3>
+<h3 id="see-also-51">SEE ALSO</h3>
 <p>builtin <code>shopt</code>, <code>shopt::push(1)</code></p>
 <h1 id="shoptpush">shopt::push</h1>
 <p>shopt::push - create a new shopt context</p>
-<h3 id="synopsis-70">SYNOPSIS</h3>
+<h3 id="synopsis-73">SYNOPSIS</h3>
 <p>shopt::push</p>
-<h3 id="description-70">DESCRIPTION</h3>
+<h3 id="description-73">DESCRIPTION</h3>
 <p><code>shopt::push</code> creates a new <code>shopt</code> context
 that can be modified and discarded later by a call to
 <code>shopt::pop(1)</code>.</p>
 <p><code>shopt::push</code> always succeeds and returns 0.</p>
-<h3 id="example-46">EXAMPLE</h3>
+<h3 id="example-49">EXAMPLE</h3>
 <pre><code>$ shopt::push
 $ shopt -s extdebug
 $ do_something_with_extdebug_on
 $ shopt::pop</code></pre>
-<h3 id="see-also-49">SEE ALSO</h3>
+<h3 id="see-also-52">SEE ALSO</h3>
 <p>builtin <code>shopt</code>, <code>shopt::push(1)</code></p>
 <h1 id="stringlstrip">string::lstrip</h1>
 <p>string::lstrip - remove pattern from start of string</p>
-<h3 id="synopsis-71">SYNOPSIS</h3>
+<h3 id="synopsis-74">SYNOPSIS</h3>
 <p>string::lstrip <em>str</em> <em>pat</em></p>
-<h3 id="description-71">DESCRIPTION</h3>
+<h3 id="description-74">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>pat</em> two strings,
 <code>string::lstrip</code> removes <em>pat</em> occuring at
 <em>str</em> start (or left side).</p>
 <h3 id="examples-26">EXAMPLES</h3>
 <pre><code>$ string::lstrip &#39;The Quick Brown Fox&#39; &#39;The &#39;
 Quick Brown Fox</code></pre>
-<h3 id="see-also-50">SEE ALSO</h3>
+<h3 id="see-also-53">SEE ALSO</h3>
 <p><code>string::rstrip(1)</code>, <code>string::strip(1)</code>,
 <code>string::stripall(1)</code></p>
 <h1 id="stringregex">string::regex</h1>
 <p>string::regex - match string against regular expression</p>
-<h3 id="synopsis-72">SYNOPSIS</h3>
+<h3 id="synopsis-75">SYNOPSIS</h3>
 <p>string::regex <em>str</em> <em>rex</em></p>
-<h3 id="description-72">DESCRIPTION</h3>
+<h3 id="description-75">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>rex</em> two strings,
 <code>string::regex</code> matches <em>str</em> again regular expression
 <em>rex</em> and displays the matching part of <em>str</em>.</p>
 <p><code>string::regex</code> returns 0 upon match, &gt;0 otherwise.</p>
-<h3 id="example-47">EXAMPLE</h3>
+<h3 id="example-50">EXAMPLE</h3>
 <pre><code>$ string::regex &#39;    hello&#39; &#39;^[[:space:]]*(.*)&#39;
 hello</code></pre>
 <h1 id="stringrstrip">string::rstrip</h1>
 <p>string::rstrip - remove pattern from end of string</p>
-<h3 id="synopsis-73">SYNOPSIS</h3>
+<h3 id="synopsis-76">SYNOPSIS</h3>
 <p>string::rstrip <em>str</em> <em>pat</em></p>
-<h3 id="description-73">DESCRIPTION</h3>
+<h3 id="description-76">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>pat</em> two strings,
 <code>string::rstrip</code> removes <em>pat</em> occuring at
 <em>str</em> end (or right side).</p>
-<h3 id="example-48">EXAMPLE</h3>
+<h3 id="example-51">EXAMPLE</h3>
 <pre><code>$ string::rstrip &#39;The Quick Brown Fox&#39; &#39; Fox&#39;
 The Quick Brown</code></pre>
-<h3 id="see-also-51">SEE ALSO</h3>
+<h3 id="see-also-54">SEE ALSO</h3>
 <p><code>string::lstrip(1)</code>, <code>string::strip(1)</code>,
 <code>string::stripall(1)</code></p>
 <h1 id="stringsplit">string::split</h1>
 <p>string::split - extract substrings delimited by a separator from
 string</p>
-<h3 id="synopsis-74">SYNOPSIS</h3>
+<h3 id="synopsis-77">SYNOPSIS</h3>
 <p>string::split <em>str</em> <em>sep</em></p>
-<h3 id="description-74">DESCRIPTION</h3>
+<h3 id="description-77">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>sep</em>, two strings,
 <code>string::split</code> splits <em>str</em> on <em>sep</em>
 occurences.</p>
-<h3 id="example-49">EXAMPLE</h3>
+<h3 id="example-52">EXAMPLE</h3>
 <pre><code>$ string::split &#39;apples,oranges,pears,grapes&#39; &#39;,&#39;
 apples oranges pears grapes</code></pre>
 <h1 id="stringstrip">string::strip</h1>
 <p>string::strip - remove first occuring pattern from string</p>
-<h3 id="synopsis-75">SYNOPSIS</h3>
+<h3 id="synopsis-78">SYNOPSIS</h3>
 <p>string::strip <em>str</em> <em>pat</em></p>
-<h3 id="description-75">DESCRIPTION</h3>
+<h3 id="description-78">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>pat</em> two strings,
 <code>string::strip</code> removes the first occurence of <em>pat</em>
 in <em>str</em>.</p>
-<h3 id="example-50">EXAMPLE</h3>
+<h3 id="example-53">EXAMPLE</h3>
 <pre><code>$ string::strip &#39;The Quick Brown Fox&#39; &#39;[aeiou]&#39;
 Th Quick Brown Fox</code></pre>
-<h3 id="see-also-52">SEE ALSO</h3>
+<h3 id="see-also-55">SEE ALSO</h3>
 <p><code>string::stripall(1)</code>, <code>string::lstrip(1)</code>,
 <code>string::rstrip(1)</code></p>
 <h1 id="stringstripall">string::stripall</h1>
 <p>string::stripall - remove pattern from string</p>
-<h3 id="synopsis-76">SYNOPSIS</h3>
+<h3 id="synopsis-79">SYNOPSIS</h3>
 <p>string::stripall <em>str</em> <em>pat</em></p>
-<h3 id="description-76">DESCRIPTION</h3>
+<h3 id="description-79">DESCRIPTION</h3>
 <p>With <em>str</em> and <em>pat</em> two strings,
 <code>string::stripall</code> removes all occurences of <em>pat</em> in
 <em>str</em>.</p>
-<h3 id="example-51">EXAMPLE</h3>
+<h3 id="example-54">EXAMPLE</h3>
 <pre><code>$ string::strip &#39;The Quick Brown Fox&#39; &#39;[aeiou]&#39;
 Th Quck Brwn Fx</code></pre>
-<h3 id="see-also-53">SEE ALSO</h3>
+<h3 id="see-also-56">SEE ALSO</h3>
 <p><code>string::strip(1)</code>, <code>string::lstrip(1)</code>,
 <code>string::rstrip(1)</code></p>
 <h1 id="stringtrim">string::trim</h1>
 <p>string::trim - remove leadind and trailing spaces from string</p>
-<h3 id="synopsis-77">SYNOPSIS</h3>
+<h3 id="synopsis-80">SYNOPSIS</h3>
 <p>string::trim <em>str</em></p>
-<h3 id="description-77">DESCRIPTION</h3>
+<h3 id="description-80">DESCRIPTION</h3>
 <p><code>string::trim</code> removes all leading and trailing spaces
 from string <em>str</em>.</p>
-<h3 id="example-52">EXAMPLE</h3>
+<h3 id="example-55">EXAMPLE</h3>
 <p>$ string::trim ’ Hello, world ’ Hello, world</p>
+<h1 id="semvercompare">semver::compare</h1>
+<p>semver::compare - compare two semantic version strings and return the
+result</p>
+<h3 id="synopsis-81">SYNOPSIS</h3>
+<p>semver::compare [V1] [V2]</p>
+<h3 id="description-81">DESCRIPTION</h3>
+<p><code>semver::compare</code> compares two semantic version strings,
+V1 and V2, and returns the result in the form of an integer.</p>
+<p>The comparison result is stored in the variable <code>__</code>. A
+value of 0 indicates that the input strings are equal, a value of 1
+indicates that the first input string is greater than the second input
+string, and a value of -1 indicates that the first input string is less
+than the second input string.</p>
+<h3 id="example-56">EXAMPLE</h3>
+<pre><code>$ semver::compare &quot;1.2.3-alpha.1+build.42&quot; &quot;1.2.3-beta.1+build.42&quot;
+$ echo &quot;${__}&quot;  # output: -1</code></pre>
+<h1 id="semverparse">semver::parse</h1>
+<p>semver::parse - parse a semantic version string and return major,
+minor, patch, pre-release, and build information</p>
+<h3 id="synopsis-82">SYNOPSIS</h3>
+<p>semver::parse [string]</p>
+<h3 id="description-82">DESCRIPTION</h3>
+<p><code>semver::parse</code> parses a semantic version string and
+returns major, minor, patch, pre-release, and build information. The
+input string must be in the format of “X.Y.Z(-PRERELEASE)(+BUILD)”. The
+function checks the input string against a regular expression to ensure
+the proper format. If the input string does not match the format, the
+function raises an error. The returned information is stored in
+<code>__</code>, with the following elements:</p>
+<pre><code>${__[0]} - major version
+${__[1]} - minor version
+${__[2]} - patch version
+${__[3]} - pre-release version
+${__[4]} - build version</code></pre>
+<h3 id="example-57">EXAMPLE</h3>
+<pre><code>$ semver::parse &quot;v1.2.3-alpha.1+build.42&quot;
+$ echo &quot;${__[0]}&quot;  # output: 1
+$ echo &quot;${__[3]}&quot;  # output: alpha.1</code></pre>
 </body>
 </html>
