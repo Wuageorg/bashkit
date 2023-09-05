@@ -1,7 +1,10 @@
-% VERSION::UPDATE(1) Bashkit User Manuals
-% Wuage
-% October 2022
-
+---
+title: VERSION::UPDATE
+section: 1
+header: Bashkit User Manual
+footer: RC
+date: September 2023
+---
 # NAME
 
 version::update - set current bashkit version

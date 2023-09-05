@@ -1,7 +1,10 @@
-% VERSION::STATE(1) Bashkit User Manuals
-% Wuage
-% October 2022
-
+---
+title: VERSION::STATE
+section: 1
+header: Bashkit User Manual
+footer: RC
+date: September 2023
+---
 # NAME
 
 version::state - get local bashkit version state
