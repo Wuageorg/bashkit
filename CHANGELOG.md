@@ -1,8 +1,8 @@
 # Changelog
----
+
 ## 1.2301.32
----
-*Released 01/27/2023*
+
+*Released Fri Jan 27 16:24:00 2023 +0100*
 
 **Summary:**
 
