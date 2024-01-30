@@ -42,7 +42,7 @@ Bashkit as a pure bash functions collection will fit right into your environment
 </p>
 
 [wuage-img]:     ./doc/images/wuage_badge.svg
-[wuage]:         https://bashkit.wuage.io
+[wuage]:         https://bashkit.wuage.org
 
 ## Who Uses Bashkit
 

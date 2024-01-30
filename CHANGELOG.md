@@ -6,7 +6,7 @@
 
 **Summary:**
 
-The first public release of BashkitV1 is now [available](https://bashkit.wuage.io)
+The first public release of BashkitV1 is now [available](https://bashkit.wuage.org)
 and from the main branch of the Bashkit [git repository](https://github.com/Wuageorg/bashkit).
 
 Bashkit is the Wuage’s shell scripting modular framework.

@@ -31,6 +31,6 @@ omitted, `now` sets the special variable `$__`.
 Written by \\Nuage
 # COLOPHON
 This page is part of the wuage bashkit framework. Source code and all
-documentation maybe downloaded from <https://bashkit.wuage.io>
+documentation maybe downloaded from <https://bashkit.wuage.org>
 
 The `doc` directory distributed with `bashkit` contains full documentation.
