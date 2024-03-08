@@ -190,12 +190,14 @@ Trace mode is controlled by `$TRACE`. When activated:
 
 ## Error handling
 
-Bashkit proposes a unique yet classical error handling coding patterns. They extend bash error semantic by exploiting conditional statements. They assemble into error handling pipelines. Bashkit uses a trap to catch errors as they arise. If they are handled locally, the flow of control proceeds. Otherwise, the error is bubbled up the calling stack until handled. When an unhandled error reaches its calling-stack root, the calling script usually crashes. In Bashkit, almost *all errors are fatal*.
+Bashkit proposes a unique yet classical set of error handling coding patterns. They extend bash error semantic by exploiting conditional statements. They assemble into error handling pipelines.\
+Bashkit uses a trap to catch errors as they arise. If they are handled locally, the flow of control proceeds. Otherwise, the error is bubbled up the calling stack until handled. When an unhandled error reaches its calling-stack root, the calling script usually crashes.\
+In Bashkit, almost *all errors are fatal*.
 
 ### Discussion
 Handling error in bash is difficult: The query "error handling in bash", on the biggest search engine, returns +88M links as of October 2022. On [SO](https://stackoverflow.com/questions/64786/error-handling-in-bash), a closely related question, asked in 2008, was viewed +410k times and received answers as late as early 2022. Eventually, it was deemed "opinion-based" by moderators and closed to more answers.
 
-Bash basic exit status handling is flawed by decisions made early during bash design along with heavy POSIX constraints on the subject. The resulting `set -e` mode is unsatisfactory and error-prone: whenever scripts are thought to fail fast, they could just behave in unintuitive ways, fallen into one of the many bash pitfalls.
+Bash basic exit status handling is flawed by decisions made early during bash design along with heavy POSIX constraints on the subject. The resulting `set -e` mode is [unsatisfactory](https://mywiki.wooledge.org/BashFAQ/105) and [error-prone](https://fvue.nl/wiki/Bash:_Error_handling#Caveat_1:_.60Exit_on_error.27_ignoring_subshell_exit_status): whenever scripts are thought to fail fast, they could just behave in unintuitive ways, fallen into one of the [many bash pitfalls](https://mywiki.wooledge.org/BashPitfalls).
 
 Bashkit helps scripts to efficiently handle errors or fail fast in most of the cases. One should be aware that some bash quirks are simply unreachable to address within bash itself. Don't do this:
 
@@ -256,7 +258,7 @@ echo "all went well!"
 
 ```sh
 check_cmd() {
-    command -v "${cmd}" &> /dev/null
+    command -v "$1" &> /dev/null
 }
 ```
 `command` is a bash `builtin`. When used with `-v` option, it prints a description similar to the `type` builtin.
@@ -265,9 +267,8 @@ To be more on point, `check_cmd` should be more flexible than silently failing (
 
 ```sh
 check_cmd() {
-    local cmd=$1
-    command -v "${cmd}" &> /dev/null \
-    || error "${cmd} not found"
+    command -v "$1" &> /dev/null \
+    || error "$1 not found"
 }
 
 bash-5.2$ bash -c 'source bashkit.bash; check_cmd(){... ; check_cmd inexistent'
@@ -279,9 +280,8 @@ It is slightly better but still lacks some genericity: what if we just want to k
 source bashkit.bash
 
 check_cmd() {
-    local cmd=$1
-    command -v "${cmd}" &> /dev/null \
-    || raise "${cmd} not found"
+    command -v "$1" &> /dev/null \
+    || raise "$1 not found"
 }
 
 check_cmd inexistent \
@@ -379,7 +379,7 @@ bash-5.2$ ./noint.bash
 
 Usually `assertions` are different from exceptions in the way that assertions can be turned off because they were believed useful during design and tuning development stages. Experience has proven them usefull even in production where *real* problems happen.
 
-Bash has no support built-in support for *assertions*. Bashkit which is mostly written in pure-bash does not either implement a *per-se* assertion system: instead it *emulates* them using `conditional construcs` and `errcode`: Namely a tests followed by a `|| raise` pattern that exploits `raise` polymorphism *is* an `assertion`.
+Bash has no built-in support for *assertions*. Bashkit which is mostly written in pure-bash does not either implement a *per-se* assertion system: instead it *emulates* them using `conditional construcs` and `errcode`: Namely a tests followed by a `|| raise` pattern that exploits `raise` polymorphism *is* an `assertion`.
 
 <details><summary><b>Show example</b></summary>
 
