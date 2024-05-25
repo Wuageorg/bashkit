@@ -31,6 +31,7 @@ darwin::init() {
         [date]=gdate
         [ln]=gln
         [sed]=gsed
+        [grep]=ggrep
     )
     # shellcheck disable=SC2016  # template is literal
     local -r tmpl='
