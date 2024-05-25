@@ -1,0 +1,187 @@
+From 5549c1ab034474d7f627e6f02d84ca562b989c22 Mon Sep 17 00:00:00 2001
+From: Hugues Morisset <morisset.hugues@gmail.com>
+Date: Tue, 11 Oct 2022 11:47:35 +0200
+Subject: [PATCH] Shopt cmdand
+
+---
+ builtins/shopt.def | 35 +++++++++++++++++++++++++++++++++++
+ config.h.in        |  4 ++++
+ configure.in       |  6 ++++++
+ doc/bashref.texi   |  6 ++++++
+ parse.y            |  5 ++++-
+ 5 files changed, 55 insertions(+), 1 deletion(-)
+
+diff --git builtins/shopt.def builtins/shopt.def
+index ba97e702..9c9ef48b 100644
+--- builtins/shopt.def
++++ builtins/shopt.def
+@@ -69,6 +69,10 @@ $END
+ #  include "../bashhist.h"
+ #endif
+ 
++#if defined (DEFAULT_COMMAND_CONNECTOR)
++#  include <y.tab.h>
++#endif
++
+ #define UNSETOPT	0
+ #define SETOPT		1
+ 
+@@ -131,6 +135,10 @@ int expand_once_flag;
+ extern int syslog_history;
+ #endif
+ 
++#if defined (DEFAULT_COMMAND_CONNECTOR)
++extern int default_connector;
++#endif
++
+ static void shopt_error PARAMS((char *));
+ 
+ static int set_shellopts_after_change PARAMS((char *, int));
+@@ -157,6 +165,11 @@ static int shopt_set_extglob PARAMS((char *, int));
+ int expaliases_flag = 0;
+ static int shopt_set_expaliases PARAMS((char *, int));
+ 
++#if defined (DEFAULT_COMMAND_CONNECTOR)
++static int set_default_connector PARAMS((char *, int));
++static int connector_and_and;
++#endif
++
+ static int shopt_set_debug_mode PARAMS((char *, int));
+ 
+ static int shopt_login_shell;
+@@ -201,6 +214,9 @@ static struct {
+   { "compat44", &shopt_compat44, set_compatibility_level },
+ #if defined (READLINE)
+   { "complete_fullquote", &complete_fullquote, (shopt_set_func_t *)NULL},
++#if defined (DEFAULT_COMMAND_CONNECTOR)
++  { "default_connector_and_and", &connector_and_and, set_default_connector },
++#endif
+   { "direxpand", &dircomplete_expand, shopt_set_complete_direxpand },
+   { "dirspell", &dircomplete_spelling, (shopt_set_func_t *)NULL },
+ #endif
+@@ -430,6 +446,10 @@ reset_shopt_options ()
+   xpg_echo = 0;
+ #endif /* DEFAULT_ECHO_TO_XPG */
+ 
++#if defined (DEFAULT_COMMAND_CONNECTOR)
++  connector_and_and = 0;
++#endif
++
+   shopt_login_shell = login_shell;
+ }
+ 
+@@ -964,3 +984,18 @@ set_assoc_expand (option_name, mode)
+   return 0;
+ }
+ #endif
++
++#if defined (DEFAULT_COMMAND_CONNECTOR)
++static int
++set_default_connector (option_name, mode)
++     char *option_name;
++     int mode;
++{
++  if (mode) {
++    default_connector = AND_AND; /* set commands connector to AND_AND */
++  } else {
++    default_connector = ';'; /* reset to default ; */
++  }
++  return 0;
++}
++#endif
+diff --git config.h.in config.h.in
+index d6d52930..001a3b25 100644
+--- config.h.in
++++ config.h.in
+@@ -106,6 +106,10 @@
+    the ability to time pipelines, functions, and builtins. */
+ #undef COMMAND_TIMING
+ 
++/* Define DEFAULT_COMMAND_CONNECTOR if you want the ability to choose
++   default command connector for newlines. */
++#undef DEFAULT_COMMAND_CONNECTOR
++
+ /* Define ARRAY_VARS if you want ksh-style one-dimensional array variables. */
+ #undef ARRAY_VARS
+ 
+diff --git configure.in configure.in
+index d7e09983..392cfbd0 100644
+--- configure.in
++++ configure.in
+@@ -186,6 +186,7 @@ opt_single_longdoc_strings=yes
+ opt_casemod_attrs=yes
+ opt_casemod_expansions=yes
+ opt_extglob_default=no
++opt_default_command_connector=yes
+ 
+ dnl options that affect how bash is compiled and linked
+ opt_static_link=no
+@@ -206,6 +207,7 @@ if test $opt_minimal_config = yes; then
+ 	opt_net_redirs=no opt_progcomp=no opt_separate_help=no
+ 	opt_multibyte=yes opt_cond_regexp=no opt_coproc=no
+ 	opt_casemod_attrs=no opt_casemod_expansions=no opt_extglob_default=no
++	opt_default_command_connector=no
+ fi
+ 
+ AC_ARG_ENABLE(alias, AC_HELP_STRING([--enable-alias], [enable shell aliases]), opt_alias=$enableval)
+@@ -216,6 +218,7 @@ AC_ARG_ENABLE(brace-expansion, AC_HELP_STRING([--enable-brace-expansion], [inclu
+ AC_ARG_ENABLE(casemod-attributes, AC_HELP_STRING([--enable-casemod-attributes], [include case-modifying variable attributes]), opt_casemod_attrs=$enableval)
+ AC_ARG_ENABLE(casemod-expansions, AC_HELP_STRING([--enable-casemod-expansions], [include case-modifying word expansions]), opt_casemod_expansions=$enableval)
+ AC_ARG_ENABLE(command-timing, AC_HELP_STRING([--enable-command-timing], [enable the time reserved word and command timing]), opt_command_timing=$enableval)
++AC_ARG_ENABLE(default-command-connector, AC_HELP_STRING([--enable-default-command-connector], [enable default command connector features]), opt_default_command_connector=$enableval)
+ AC_ARG_ENABLE(cond-command, AC_HELP_STRING([--enable-cond-command], [enable the conditional command]), opt_cond_command=$enableval)
+ AC_ARG_ENABLE(cond-regexp, AC_HELP_STRING([--enable-cond-regexp], [enable extended regular expression matching in conditional commands]), opt_cond_regexp=$enableval)
+ AC_ARG_ENABLE(coprocesses, AC_HELP_STRING([--enable-coprocesses], [enable coprocess support and the coproc reserved word]), opt_coproc=$enableval)
+@@ -289,6 +292,9 @@ fi
+ if test $opt_command_timing = yes; then
+ AC_DEFINE(COMMAND_TIMING)
+ fi
++if test $opt_default_command_connector = yes; then
++AC_DEFINE(DEFAULT_COMMAND_CONNECTOR)
++fi
+ if test $opt_xpg_echo = yes ; then
+ AC_DEFINE(DEFAULT_ECHO_TO_XPG)
+ fi
+diff --git doc/bashref.texi doc/bashref.texi
+index b0dc2fad..f376999e 100644
+--- doc/bashref.texi
++++ doc/bashref.texi
+@@ -5623,6 +5623,12 @@ easy re-editing of multi-line commands.
+ This option is enabled by default, but only has an effect if command
+ history is enabled (@pxref{Bash History Facilities}).
+ 
++@item default_connector_and_and
++If set, Bash
++will use '&&' as a command separator instead
++of ';' for command lines with no specified
++separator.
++
+ @item compat31
+ @itemx compat32
+ @itemx compat40
+diff --git parse.y parse.y
+index 1d12e639..30fe8376 100644
+--- parse.y
++++ parse.y
+@@ -248,6 +248,9 @@ char *current_prompt_string;
+ /* Non-zero means we expand aliases in commands. */
+ int expand_aliases = 0;
+ 
++/* Token used to connect commands separated by a newline */
++int default_connector = ';';
++
+ /* If non-zero, the decoded prompt string undergoes parameter and
+    variable substitution, command substitution, arithmetic substitution,
+    string expansion, process substitution, and quote removal in
+@@ -1168,7 +1171,7 @@ list1:		list1 AND_AND newline_list list1
+ 			  if (parser_state & PST_CMDSUBST)
+ 			    $$ = command_connect ($1, $4, '\n');
+ 			  else
+-			    $$ = command_connect ($1, $4, ';');
++			    $$ = command_connect ($1, $4, default_connector);
+ 			}
+ 	|	pipeline_command
+ 			{ $$ = $1; }
+-- 
+2.39.1
+
